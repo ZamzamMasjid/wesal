@@ -1,0 +1,385 @@
+<!-- axiom mockup
+     view: home
+     states: default, empty, error
+     semantics: docs/design/views/home.md
+     contract: framework/design-fidelity.md (self-contained, offline,
+     tokens-only styling, liftable structure) -->
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>وصال — الصفحة الرئيسية — mockup</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  /* Base reset + token wiring. Every value a token covers comes from var(--…). */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--color-bg); color: var(--color-fg);
+    font-family: var(--font-sans); font-size: var(--text-base); line-height: var(--leading-body);
+  }
+  :focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+  a { color: inherit; }
+  .num { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums lining-nums; }
+  .icon { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+  [dir="ltr"] .icon-dir { transform: scaleX(-1); }
+  .container { max-width: var(--size-content); margin-inline: auto; padding-inline: var(--space-6); }
+
+  /* ── State switching ── */
+  body[data-state="default"] [data-shows-in]:not([data-shows-in~="default"]) { display: none !important; }
+  body[data-state="empty"]   [data-shows-in]:not([data-shows-in~="empty"])   { display: none !important; }
+  body[data-state="error"]   [data-shows-in]:not([data-shows-in~="error"])   { display: none !important; }
+
+  /* ── Dev chrome: NOT part of the design ── */
+  .axm-switcher {
+    position: fixed; bottom: var(--space-2); left: var(--space-2); direction: ltr;
+    display: flex; gap: var(--space-1); padding: var(--space-1);
+    background: var(--color-surface); border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);
+    font-size: var(--text-xs); z-index: 9999;
+  }
+  .axm-switcher button { cursor: pointer; }
+  .axm-switcher button[aria-pressed="true"] { font-weight: 700; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+    min-height: var(--size-touch); padding-inline: var(--space-6);
+    border: 0; border-radius: var(--radius-full);
+    font: var(--weight-semibold) var(--text-base) var(--font-sans); text-decoration: none; cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+  .btn-primary { background: var(--color-brand); color: var(--color-brand-fg); }
+  .btn-primary:hover { background: var(--color-brand-hover); }
+  .btn-secondary { background: var(--color-fill); color: var(--color-fg); }
+  .btn-lg { min-height: 56px; padding-inline: var(--space-8); font-size: var(--text-lg); }
+  .btn-on-brand { background: var(--color-brand-fg); color: var(--color-brand); }
+
+  /* ── Header ── */
+  .site-header .container { display: flex; align-items: center; justify-content: space-between; height: var(--space-20); }
+  .wordmark { font-size: var(--text-4xl); font-weight: var(--weight-bold); line-height: 1; color: var(--color-brand); text-decoration: none; }
+  .header-tools { display: flex; align-items: center; gap: var(--space-1); padding: var(--space-1); border-radius: var(--radius-full); background: var(--color-surface); box-shadow: var(--shadow-md); }
+  .tool {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: var(--size-touch-dense); height: var(--size-touch-dense); padding-inline: var(--space-4);
+    border: 0; border-radius: var(--radius-full); background: none; color: var(--color-fg);
+    font: var(--weight-medium) var(--text-sm) var(--font-sans); text-decoration: none; cursor: pointer;
+  }
+  .tool:hover { background: var(--color-fill); }
+  .tool-icon { padding-inline: 0; }
+
+  /* ── Hero: the photograph alone, then the name ── */
+  .hero-photo { display: block; width: 100%; height: 480px; border-radius: var(--radius-xl); }
+  /* Placeholder photograph palette — NOT design tokens. Real venue photographs replace these drawings. */
+  .photo { --ph-sky-1: #E7C9A9; --ph-sky-2: #F4E6D3; --ph-ink: #4A2A2A; --ph-glow: #F9E3B4; --ph-sun: #FFF4E0; }
+  .photo-b { --ph-sky-1: #D9DCC0; --ph-sky-2: #EEF0E0; --ph-ink: #3E4524; --ph-glow: #FFF4E0; }
+  .photo-c { --ph-sky-1: #D8C4B4; --ph-sky-2: #EFE3D8; --ph-ink: #5E3B33; --ph-glow: #F9E3B4; }
+
+  .intro { display: grid; grid-template-columns: 5fr 7fr; gap: var(--space-12); padding-block: var(--space-16) 0; align-items: start; }
+  h1 { font-size: var(--text-6xl); font-weight: var(--weight-bold); line-height: var(--leading-heading); }
+  .intro-text p { font-size: var(--text-lg); color: var(--color-muted); }
+  .intro-text p + p { margin-top: var(--space-4); }
+
+  /* ── Sections ── */
+  .section { padding-block: var(--space-24) 0; }
+  h2 { font-size: var(--text-5xl); font-weight: var(--weight-bold); line-height: var(--leading-heading); }
+  .section-note { color: var(--color-muted); margin-top: var(--space-2); max-width: 34ch; }
+
+  /* ── Gallery ── */
+  .gallery { list-style: none; padding: 0; margin-top: var(--space-8); display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-4); }
+  .gallery-item { position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; padding: 0; border: 0; border-radius: var(--radius-lg); overflow: hidden; background: var(--color-fill); cursor: pointer; }
+  .gallery-item svg.shot { display: block; width: 100%; height: 100%; transition: transform var(--duration-base) var(--ease-out); }
+  .gallery-item:hover svg.shot { transform: scale(1.04); }
+  .gallery-wide { grid-column: span 2; }
+  .gallery-wide .gallery-item { aspect-ratio: auto; height: 100%; }
+  .play { position: absolute; inset-block-end: var(--space-3); inset-inline-start: var(--space-3); display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-3); border-radius: var(--radius-full); background: var(--color-surface); color: var(--color-fg); font-size: var(--text-sm); font-weight: var(--weight-medium); box-shadow: var(--shadow-sm); }
+  .play .icon { width: 16px; height: 16px; fill: currentColor; }
+
+  /* ── Prices ── */
+  .band { display: grid; grid-template-columns: 4fr 7fr; gap: var(--space-12); align-items: start; }
+  .deposit-note { margin-top: var(--space-6); padding: var(--space-4) var(--space-5); border-radius: var(--radius-lg); background: var(--color-brand-soft); }
+  .deposit-note b { color: var(--color-brand); font-weight: var(--weight-bold); }
+  .prices { list-style: none; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); }
+  .prices li { min-width: 0; }
+  .price-card {
+    display: grid; grid-template-columns: 1fr auto; align-items: end; gap: var(--space-4) var(--space-3); height: 100%;
+    padding: var(--space-6); border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-md);
+    text-decoration: none; transition: transform var(--duration-fast) var(--ease-out);
+  }
+  .price-card:hover { transform: translateY(-2px); }
+  .price-name { grid-column: 1 / -1; align-self: start; font-size: var(--text-2xl); font-weight: var(--weight-bold); line-height: var(--leading-heading); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; min-height: calc(var(--text-2xl) * var(--leading-heading) * 2); }
+  .price-amount { font-size: var(--text-3xl); font-weight: var(--weight-semibold); line-height: 1.2; color: var(--color-brand); }
+  .price-amount small { font-size: var(--text-sm); font-weight: var(--weight-regular); color: var(--color-muted); margin-inline-start: var(--space-1); }
+  .price-go { display: inline-flex; align-items: center; justify-content: center; width: var(--size-touch-dense); height: var(--size-touch-dense); border-radius: var(--radius-full); background: var(--color-fill); color: var(--color-fg); }
+  .price-card:hover .price-go { background: var(--color-brand); color: var(--color-brand-fg); }
+  .prices-cta { margin-top: var(--space-8); display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; }
+  .prices-cta span { color: var(--color-muted); font-size: var(--text-sm); }
+
+  /* ── Designed empty / error moments ── */
+  .prompt { display: flex; align-items: center; gap: var(--space-6); padding: var(--space-8); border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-md); }
+  .prompt-icon { display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; flex: none; border-radius: var(--radius-full); background: var(--color-brand-soft); color: var(--color-brand); }
+  .prompt-icon .icon { width: 28px; height: 28px; }
+  .prompt h3 { font-size: var(--text-xl); font-weight: var(--weight-bold); line-height: var(--leading-heading); }
+  .prompt p { color: var(--color-muted); }
+  .prompt-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-4); }
+
+  .notice { max-width: 560px; margin: var(--space-16) auto var(--space-24); padding: var(--space-10); border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-md); text-align: center; }
+  .notice .prompt-icon { margin-inline: auto; background: var(--color-warning-soft); color: var(--color-warning); }
+  .notice h1 { font-size: var(--text-3xl); margin-top: var(--space-5); }
+  .notice p { color: var(--color-muted); margin-top: var(--space-2); }
+  .notice .prompt-actions { justify-content: center; margin-top: var(--space-6); }
+  .notice .phone { display: block; margin-top: var(--space-5); font-size: var(--text-2xl); font-weight: var(--weight-semibold); }
+
+  /* ── Policy ── */
+  .policy { border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-md); }
+  .policy summary { display: flex; align-items: center; justify-content: space-between; gap: var(--space-4); min-height: 72px; padding-inline: var(--space-6); font-size: var(--text-xl); font-weight: var(--weight-bold); cursor: pointer; list-style: none; border-radius: var(--radius-lg); }
+  .policy summary::-webkit-details-marker { display: none; }
+  .policy summary .icon { transition: transform var(--duration-fast) var(--ease-out); }
+  .policy[open] summary .icon { transform: rotate(180deg); }
+  .policy ol { margin: 0; padding: 0 var(--space-6) var(--space-6); list-style: none; counter-reset: rule; display: grid; gap: var(--space-3); }
+  .policy li { counter-increment: rule; display: grid; grid-template-columns: var(--space-8) 1fr; gap: var(--space-3); color: var(--color-muted); }
+  .policy li::before { content: counter(rule); display: inline-flex; align-items: center; justify-content: center; width: var(--space-8); height: var(--space-8); border-radius: var(--radius-full); background: var(--color-fill); color: var(--color-fg); font-size: var(--text-sm); font-weight: var(--weight-semibold); }
+
+  /* ── Contact + footer ── */
+  .contact { margin-top: var(--space-24); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-3); padding: var(--space-6) var(--space-8); border-radius: var(--radius-lg); background: var(--color-brand); color: var(--color-brand-fg); }
+  .contact-text { margin-inline-end: auto; }
+  .contact-text h2 { font-size: var(--text-3xl); }
+  .contact-text p { font-size: var(--text-lg); font-weight: var(--weight-medium); }
+  .site-footer .container { display: flex; flex-wrap: wrap; justify-content: space-between; gap: var(--space-3); padding-block: var(--space-8) var(--space-12); font-size: var(--text-sm); color: var(--color-muted); }
+  .site-footer a { color: var(--color-brand); font-weight: var(--weight-medium); }
+
+  /* Sticky contact bar: phones only */
+  .contact-sticky { display: none; }
+
+  @media (max-width: 1023px) {
+    .gallery { grid-template-columns: repeat(3, 1fr); }
+    .gallery-wide { grid-column: span 1; }
+    .gallery-wide .gallery-item { aspect-ratio: 4 / 3; height: auto; }
+  }
+  @media (max-width: 767px) {
+    .intro, .band { grid-template-columns: 1fr; gap: var(--space-6); }
+    .intro { padding-top: var(--space-8); }
+    .section { padding-top: var(--space-16); }
+    h1 { font-size: var(--text-4xl); } h2 { font-size: var(--text-3xl); }
+    .hero-photo { height: 260px; border-radius: var(--radius-lg); }
+  }
+  @media (max-width: 639px) {
+    .container { padding-inline: var(--space-4); }
+    .site-header .container { height: var(--space-16); }
+    .wordmark { font-size: var(--text-3xl); }
+    .tool { padding-inline: var(--space-3); }
+    .gallery { grid-template-columns: repeat(2, 1fr); gap: var(--space-3); }
+    .gallery-wide { grid-column: span 2; }
+    .gallery-wide .gallery-item { aspect-ratio: 16 / 9; }
+    .prices { grid-template-columns: 1fr; }
+    .price-name { min-height: 0; }
+    .prices-cta .btn { width: 100%; }
+    .prompt { flex-direction: column; align-items: flex-start; padding: var(--space-6); }
+    .contact { margin-top: var(--space-16); padding: var(--space-6); }
+    .contact .btn { display: none; }               /* the sticky bar carries the actions */
+    .contact-sticky { position: sticky; bottom: 0; z-index: 10; display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-2); padding: var(--space-2) var(--space-4); background: var(--color-surface); box-shadow: var(--shadow-lg); }
+    .site-footer .container { padding-bottom: var(--space-8); }
+    html { scroll-padding-bottom: 72px; }          /* the sticky bar never covers a focused element */
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; } }
+</style>
+</head>
+<body data-state="default">
+
+<!-- Icon sprite (Lucide) + placeholder photographs. Implementation: lucide-react + real media. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M19 12H5"/></symbol>
+  <symbol id="i-chevron-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="i-play" viewBox="0 0 24 24"><path d="m6 3 14 9-14 9V3z"/></symbol>
+  <symbol id="i-cloud-off" viewBox="0 0 24 24"><path d="m2 2 20 20M5.782 5.782A7 7 0 0 0 9 19h8.5a4.5 4.5 0 0 0 1.307-.193M21.532 16.5A4.5 4.5 0 0 0 17.5 10h-1.79A7.008 7.008 0 0 0 10 5.07"/></symbol>
+
+  <symbol id="ph-facade" viewBox="0 0 1100 520" preserveAspectRatio="xMidYMax slice">
+    <rect width="1100" height="520" style="fill:var(--ph-sky-1)"/><rect y="300" width="1100" height="220" style="fill:var(--ph-sky-2)" opacity=".6"/>
+    <circle cx="820" cy="140" r="54" style="fill:var(--ph-sun)"/>
+    <g style="fill:var(--ph-ink)" transform="translate(190 0)">
+      <path d="M90 520V210h-9v-13h9v-40l13-46 13 46v40h9v13h-9v310z"/>
+      <path d="M160 520V330h38c0-70 46-108 74-128 28 20 74 58 74 128h38v190z"/>
+      <path d="M270 202v-34h4v34z"/><circle cx="272" cy="164" r="6"/>
+      <rect x="384" y="370" width="300" height="150"/>
+      <path d="M520 520V250h-7v-11h7v-32l10-36 10 36v32h7v11h-7v270z"/>
+    </g>
+    <g style="fill:var(--ph-glow)" transform="translate(190 0)">
+      <path d="M194 520v-88a22 22 0 0 1 44 0v88z"/><path d="M250 520v-88a22 22 0 0 1 44 0v88z"/><path d="M306 520v-88a22 22 0 0 1 44 0v88z"/>
+      <path d="M410 520v-70a15 15 0 0 1 30 0v70z"/><path d="M460 520v-70a15 15 0 0 1 30 0v70z"/><path d="M570 520v-70a15 15 0 0 1 30 0v70z"/><path d="M620 520v-70a15 15 0 0 1 30 0v70z"/>
+    </g>
+  </symbol>
+  <symbol id="ph-arches" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+    <rect width="400" height="300" style="fill:var(--ph-ink)"/>
+    <g style="fill:var(--ph-glow)"><path d="M30 300V150a50 50 0 0 1 100 0v150z"/><path d="M150 300V150a50 50 0 0 1 100 0v150z"/><path d="M270 300V150a50 50 0 0 1 100 0v150z"/></g>
+    <g style="fill:var(--ph-sky-1)"><rect x="0" y="262" width="400" height="38"/></g>
+  </symbol>
+  <symbol id="ph-hall" viewBox="0 0 400 300" preserveAspectRatio="xMidYMid slice">
+    <rect width="400" height="300" style="fill:var(--ph-sky-2)"/>
+    <rect y="210" width="400" height="90" style="fill:var(--ph-sky-1)"/>
+    <g style="stroke:var(--ph-ink);stroke-width:2"><path d="M100 0v70M200 0v100M300 0v70"/></g>
+    <g style="fill:var(--ph-glow);stroke:var(--ph-ink);stroke-width:3"><circle cx="100" cy="88" r="18"/><circle cx="200" cy="124" r="24"/><circle cx="300" cy="88" r="18"/></g>
+    <g style="fill:var(--ph-ink)"><rect x="40" y="226" width="60" height="12" rx="6"/><rect x="130" y="226" width="60" height="12" rx="6"/><rect x="220" y="226" width="60" height="12" rx="6"/><rect x="310" y="226" width="60" height="12" rx="6"/><rect x="20" y="256" width="80" height="14" rx="7"/><rect x="120" y="256" width="80" height="14" rx="7"/><rect x="220" y="256" width="80" height="14" rx="7"/><rect x="320" y="256" width="80" height="14" rx="7"/></g>
+  </symbol>
+  <symbol id="ph-dome" viewBox="0 0 400 300" preserveAspectRatio="xMidYMax slice">
+    <rect width="400" height="300" style="fill:var(--ph-sky-1)"/><rect y="180" width="400" height="120" style="fill:var(--ph-sky-2)" opacity=".6"/>
+    <g style="fill:var(--ph-ink)"><path d="M60 300c0-120 80-180 140-220 60 40 140 100 140 220z"/><path d="M197 80V30h6v50z"/><circle cx="200" cy="26" r="9"/></g>
+  </symbol>
+</svg>
+
+<header class="site-header">
+  <div class="container">
+    <a class="wordmark" href="#" aria-label="وصال — الصفحة الرئيسية">وصال</a>
+    <nav class="header-tools" aria-label="أدوات الموقع">
+      <a class="tool" href="#find">ابحث عن حجزي</a>
+      <a class="tool" href="#" lang="en" hreflang="en">English</a>
+      <button class="tool tool-icon" type="button" aria-label="التبديل إلى الوضع الداكن"><svg class="icon"><use href="#i-moon"/></svg></button>
+    </nav>
+  </div>
+</header>
+
+<!-- ═══ default + empty ═══ -->
+<main class="container" data-shows-in="default empty">
+
+  <svg class="hero-photo photo" role="img" aria-label="واجهة مسجد وقاعة وصال عند الغروب"><use href="#ph-facade"/></svg>
+
+  <section class="intro" aria-labelledby="about-h">
+    <h1 id="about-h">مسجد وقاعة وصال</h1>
+    <div class="intro-text">
+      <p>قاعة واحدة تستقبل العائلة في كل مناسباتها: الزفاف والخطوبة وعقد القران والعزاء. تتّسع لثلاثمئة ضيف، وبجوارها المسجد ومكان لانتظار السيارات.</p>
+      <p>يُحجز المكان كاملًا لمناسبة واحدة في كل موعد، فلا يشارككم فيه أحد.</p>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="gallery-h" data-shows-in="default">
+    <h2 id="gallery-h">صور المكان</h2>
+    <ul class="gallery">
+      <li class="gallery-wide"><button class="gallery-item" type="button" aria-label="القاعة الكبرى مضاءة بالفوانيس"><svg class="shot photo"><use href="#ph-hall"/></svg></button></li>
+      <li><button class="gallery-item" type="button" aria-label="أقواس المدخل الرئيسي"><svg class="shot photo photo-c"><use href="#ph-arches"/></svg></button></li>
+      <li><button class="gallery-item" type="button" aria-label="قبة المسجد"><svg class="shot photo photo-b"><use href="#ph-dome"/></svg></button></li>
+      <li><button class="gallery-item" type="button" aria-label="فيديو: جولة داخل القاعة، دقيقة و12 ثانية"><svg class="shot photo photo-c"><use href="#ph-hall"/></svg><span class="play"><svg class="icon"><use href="#i-play"/></svg><span class="num">1:12</span></span></button></li>
+      <li><button class="gallery-item" type="button" aria-label="المسجد من الخارج"><svg class="shot photo"><use href="#ph-dome"/></svg></button></li>
+      <li><button class="gallery-item" type="button" aria-label="قاعة السيدات"><svg class="shot photo photo-b"><use href="#ph-hall"/></svg></button></li>
+      <li><button class="gallery-item" type="button" aria-label="الممر المؤدي إلى القاعة"><svg class="shot photo"><use href="#ph-arches"/></svg></button></li>
+    </ul>
+  </section>
+
+  <section class="section" aria-labelledby="prices-h">
+    <div class="band">
+      <div>
+        <h2 id="prices-h">الأسعار</h2>
+        <p class="section-note" data-shows-in="default">السعر حسب المناسبة، ولا يتغيّر بتغيّر الموعد.</p>
+        <p class="deposit-note" data-shows-in="default">عربون <b class="num">25%</b> من السعر يؤكّد حجزك، ويُحوَّل عبر فودافون كاش أو إنستاباي.</p>
+      </div>
+
+      <div data-shows-in="default">
+        <ul class="prices">
+          <li><a class="price-card" href="#calendar?occasion=wedding"><span class="price-name">زفاف</span><span class="price-amount"><span class="num">10,000</span><small>ج.م</small></span><span class="price-go" aria-hidden="true"><svg class="icon icon-dir"><use href="#i-arrow"/></svg></span></a></li>
+          <li><a class="price-card" href="#calendar?occasion=engagement"><span class="price-name">خطوبة</span><span class="price-amount"><span class="num">6,000</span><small>ج.م</small></span><span class="price-go" aria-hidden="true"><svg class="icon icon-dir"><use href="#i-arrow"/></svg></span></a></li>
+          <li><a class="price-card" href="#calendar?occasion=nikah"><span class="price-name">عقد قران مع استقبال الضيوف في القاعة الكبرى وقاعة السيدات</span><span class="price-amount"><span class="num">3,000</span><small>ج.م</small></span><span class="price-go" aria-hidden="true"><svg class="icon icon-dir"><use href="#i-arrow"/></svg></span></a></li>
+          <li><a class="price-card" href="#calendar?occasion=funeral"><span class="price-name">عزاء</span><span class="price-amount"><span class="num">2,000</span><small>ج.م</small></span><span class="price-go" aria-hidden="true"><svg class="icon icon-dir"><use href="#i-arrow"/></svg></span></a></li>
+        </ul>
+        <div class="prices-cta">
+          <a class="btn btn-primary btn-lg" href="#calendar"><svg class="icon"><use href="#i-calendar"/></svg>اعرض المواعيد المتاحة</a>
+          <span>اختر مناسبة لتبدأ بها، أو تصفّح كل المواعيد.</span>
+        </div>
+      </div>
+
+      <!-- empty: no occasions configured -->
+      <div class="prompt" data-shows-in="empty">
+        <span class="prompt-icon" aria-hidden="true"><svg class="icon"><use href="#i-phone"/></svg></span>
+        <div>
+          <h3>الأسعار غير منشورة حاليًا</h3>
+          <p>تواصل معنا لمعرفة السعر وحجز موعدك.</p>
+          <div class="prompt-actions">
+            <a class="btn btn-primary" href="tel:+201012345678"><svg class="icon"><use href="#i-phone"/></svg>اتصل بنا</a>
+            <a class="btn btn-secondary" href="#"><svg class="icon"><use href="#i-chat"/></svg>واتساب</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" aria-labelledby="policy-h">
+    <details class="policy" open>
+      <summary><span id="policy-h">سياسة الحجز</span><svg class="icon" aria-hidden="true"><use href="#i-chevron-down"/></svg></summary>
+      <ol>
+        <li><span>يُحجز الموعد لمدة <span class="num">20</span> دقيقة حتى تحوّل العربون وترفع صورة التحويل، وبعدها يعود الموعد متاحًا للجميع.</span></li>
+        <li><span>يتأكّد الحجز بعد أن تراجع إدارة القاعة صورة التحويل.</span></li>
+        <li><span>يُسدَّد باقي المبلغ في القاعة قبل المناسبة.</span></li>
+        <li><span>الإلغاء واسترداد العربون يكونان بالتواصل مع إدارة القاعة هاتفيًا.</span></li>
+      </ol>
+    </details>
+  </section>
+
+  <section class="contact" aria-labelledby="contact-h">
+    <div class="contact-text">
+      <h2 id="contact-h">نسعد بسؤالك</h2>
+      <p class="num">010 1234 5678</p>
+    </div>
+    <a class="btn btn-on-brand" href="tel:+201012345678"><svg class="icon"><use href="#i-phone"/></svg>اتصل بنا</a>
+    <a class="btn btn-on-brand" href="#"><svg class="icon"><use href="#i-chat"/></svg>واتساب</a>
+  </section>
+</main>
+
+<!-- ═══ error: database unavailable — static notice ═══ -->
+<main class="container" data-shows-in="error">
+  <div class="notice" role="alert">
+    <span class="prompt-icon" aria-hidden="true"><svg class="icon"><use href="#i-cloud-off"/></svg></span>
+    <h1>الموقع غير متاح مؤقتًا</h1>
+    <p>نعمل على إعادته. يمكنك الحجز والاستفسار بالهاتف أو واتساب الآن.</p>
+    <span class="phone num">010 1234 5678</span>
+    <div class="prompt-actions">
+      <a class="btn btn-primary" href="tel:+201012345678"><svg class="icon"><use href="#i-phone"/></svg>اتصل بنا</a>
+      <a class="btn btn-secondary" href="#"><svg class="icon"><use href="#i-chat"/></svg>واتساب</a>
+    </div>
+  </div>
+</main>
+
+<footer class="site-footer" data-shows-in="default empty">
+  <div class="container">
+    <a id="find" href="#">ابحث عن حجزي برقم الحجز</a>
+    <span>مسجد وقاعة وصال</span>
+  </div>
+</footer>
+
+<!-- phones only: sticky contact bar -->
+<div class="contact-sticky" data-shows-in="default empty">
+  <a class="btn btn-primary" href="tel:+201012345678"><svg class="icon"><use href="#i-phone"/></svg>اتصل بنا</a>
+  <a class="btn btn-secondary" href="#"><svg class="icon"><use href="#i-chat"/></svg>واتساب</a>
+</div>
+
+<!-- dev chrome (state switcher + theme + direction) — not part of the design -->
+<div class="axm-switcher" aria-label="Mockup state switcher">
+  <button type="button" data-set-state="default">default</button>
+  <button type="button" data-set-state="empty">empty</button>
+  <button type="button" data-set-state="error">error</button>
+  <button type="button" data-toggle-theme>dark</button>
+  <button type="button" data-toggle-dir>ltr</button>
+</div>
+<script>
+  (() => {
+    const body = document.body, doc = document.documentElement, q = new URLSearchParams(location.search);
+    const setState = s => {
+      body.dataset.state = s;
+      document.querySelectorAll('[data-set-state]').forEach(b =>
+        b.setAttribute('aria-pressed', String(b.dataset.setState === s)));
+    };
+    document.querySelectorAll('[data-set-state]').forEach(b =>
+      b.addEventListener('click', () => setState(b.dataset.setState)));
+    const themeBtn = document.querySelector('[data-toggle-theme]');
+    const setTheme = dark => { doc.dataset.theme = dark ? 'dark' : ''; themeBtn.textContent = dark ? 'light' : 'dark'; };
+    themeBtn.addEventListener('click', () => setTheme(doc.dataset.theme !== 'dark'));
+    document.querySelector('[data-toggle-dir]').addEventListener('click', e => {
+      doc.dir = doc.dir === 'rtl' ? 'ltr' : 'rtl'; e.target.textContent = doc.dir === 'rtl' ? 'ltr' : 'rtl';
+    });
+    if (q.get('theme') === 'dark') setTheme(true);
+    if (q.get('chrome') === 'off') document.querySelector('.axm-switcher').hidden = true;
+    setState(q.get('state') || 'default');
+  })();
+</script>
+</body>
+</html>

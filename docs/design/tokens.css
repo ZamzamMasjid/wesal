@@ -1,0 +1,127 @@
+/* axiom design tokens — single source of visual truth.
+   docs/design/system.md narrates these; this file is authoritative for values.
+   Contract: framework/design-fidelity.md. Consumed by every mockup via
+   <link rel="stylesheet" href="../tokens.css"> and by the implementation
+   (directly or via a generated framework theme — see the wiring ADR).
+
+   Direction: "Waraq" (ورق) — warm paper neutrals, oxblood brand, olive
+   secondary; large radii, pill controls, soft shadows instead of borders;
+   one type family (Cairo) with hierarchy from weight and size. */
+
+/* Cairo is bundled so mockups stay offline (SIL OFL 1.1 — fonts/OFL.txt). */
+@font-face {
+  font-family: "Cairo";
+  src: url("fonts/Cairo-Variable.ttf") format("truetype");
+  font-weight: 200 1000;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* ── Color (light) ─────────────────────────────── */
+  --color-bg: #F3EDE4;            /* page: warm sand */
+  --color-surface: #FFFDF9;       /* cards, dialogs, inputs: paper */
+  --color-fill: #EAE2D6;          /* quiet fills: secondary buttons, confirmed/closed slots, skeletons */
+  --color-fg: #2A211C;            /* body text */
+  --color-muted: #6A5E55;         /* secondary text, captions */
+  --color-border: #E2D7C9;        /* input outlines, table rules (cards use shadow, not border) */
+  --color-brand: #6B2737;         /* oxblood: primary buttons, links, active states */
+  --color-brand-hover: #5A1F2D;
+  --color-brand-fg: #FFFFFF;      /* text/icon on brand */
+  --color-brand-soft: #F1E1DF;    /* tinted panels, awaiting-review badge */
+  --color-accent: #56602F;        /* olive: free slots, positive secondary */
+  --color-accent-soft: #E9EBD9;
+  --color-danger: #A3312A;        /* errors, reject, cancel */
+  --color-danger-soft: #F6E0DC;
+  --color-warning: #855A00;       /* awaiting payment, countdown near zero */
+  --color-warning-soft: #F8EBCB;
+  --color-success: #2F6B45;       /* confirmed (toasts, dashboard) */
+  --color-success-soft: #DDEBDD;
+  --color-focus: #6B2737;
+  --color-overlay: rgb(42 33 28 / 0.5);   /* dialog backdrop */
+
+  /* ── Typography ─────────────────────────────────── */
+  --font-sans: "Cairo", "Segoe UI", Tahoma, system-ui, sans-serif;   /* everything, Arabic and English */
+  --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;   /* booking IDs only */
+  --text-xs: 0.75rem;     /* 12 */
+  --text-sm: 0.875rem;    /* 14 */
+  --text-base: 1rem;      /* 16 — body minimum on public pages */
+  --text-lg: 1.125rem;    /* 18 */
+  --text-xl: 1.25rem;     /* 20 */
+  --text-2xl: 1.5rem;     /* 24 */
+  --text-3xl: 1.875rem;   /* 30 */
+  --text-4xl: 2.25rem;    /* 36 */
+  --text-5xl: 3rem;       /* 48 — section headings on public pages */
+  --text-6xl: 4rem;       /* 64 — the venue name */
+  --leading-body: 1.8;
+  --leading-heading: 1.3;
+  --weight-regular: 400;
+  --weight-medium: 500;   /* UI labels, badges */
+  --weight-semibold: 600; /* buttons, prices, slot times */
+  --weight-bold: 700;     /* headings */
+
+  /* ── Spacing (base unit: 4px) ───────────────────── */
+  --space-1: calc(4px * 1);
+  --space-2: calc(4px * 2);
+  --space-3: calc(4px * 3);
+  --space-4: calc(4px * 4);
+  --space-5: calc(4px * 5);
+  --space-6: calc(4px * 6);
+  --space-8: calc(4px * 8);
+  --space-10: calc(4px * 10);
+  --space-12: calc(4px * 12);
+  --space-16: calc(4px * 16);
+  --space-20: calc(4px * 20);
+  --space-24: calc(4px * 24);
+
+  /* ── Sizes ──────────────────────────────────────── */
+  --size-touch: 48px;         /* minimum target, public pages */
+  --size-touch-dense: 40px;   /* minimum target, dashboard */
+  --size-content: 1120px;     /* public content cap */
+  --size-sidenav: 240px;      /* dashboard side navigation */
+
+  /* ── Shape ──────────────────────────────────────── */
+  --radius-sm: 8px;       /* table cells, small chips inside dense UI */
+  --radius-md: 16px;      /* dashboard cards, inline panels */
+  --radius-lg: 24px;      /* public cards, dialogs */
+  --radius-xl: 32px;      /* hero photograph */
+  --radius-full: 999px;   /* buttons, inputs, badges, slot rows */
+  --shadow-sm: 0 1px 2px rgb(60 40 20 / 0.08);
+  --shadow-md: 0 1px 2px rgb(60 40 20 / 0.06), 0 12px 32px rgb(60 40 20 / 0.08);
+  --shadow-lg: 0 2px 4px rgb(60 40 20 / 0.08), 0 24px 64px rgb(60 40 20 / 0.18);
+
+  /* ── Motion (measured; disabled under prefers-reduced-motion) ── */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+:root[data-theme="dark"] {
+  --color-bg: #1A1513;
+  --color-surface: #241D1A;
+  --color-fill: #2E2622;
+  --color-fg: #F0E8DE;
+  --color-muted: #B0A297;
+  --color-border: #3A2F2A;
+  --color-brand: #E3A1AE;
+  --color-brand-hover: #EDB7C1;
+  --color-brand-fg: #2A1016;
+  --color-brand-soft: #3A2226;
+  --color-accent: #B9C48A;
+  --color-accent-soft: #2B2E1F;
+  --color-danger: #E2776F;
+  --color-danger-soft: #3B211E;
+  --color-warning: #E0B04A;
+  --color-warning-soft: #33290F;
+  --color-success: #7FC497;
+  --color-success-soft: #1E2E22;
+  --color-focus: #E3A1AE;
+  --color-overlay: rgb(0 0 0 / 0.6);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
+  --shadow-md: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px rgb(0 0 0 / 0.35);
+  --shadow-lg: 0 2px 4px rgb(0 0 0 / 0.3), 0 24px 64px rgb(0 0 0 / 0.55);
+}
+
+/* ── Breakpoints (reference only — media queries can't read custom
+      properties; keep in sync with system.md and the framework config) ──
+   sm: 640px   md: 768px   lg: 1024px   xl: 1280px */

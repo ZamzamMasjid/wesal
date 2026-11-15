@@ -1,0 +1,428 @@
+<!-- axiom mockup
+     view: calendar
+     states: default, loading, empty, error
+     semantics: docs/design/views/calendar.md
+     contract: framework/design-fidelity.md (self-contained, offline,
+     tokens-only styling, liftable structure) -->
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>وصال — المواعيد المتاحة — mockup</title>
+<link rel="stylesheet" href="../tokens.css">
+<style>
+  /* Base reset + token wiring. Every value a token covers comes from var(--…). */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; }
+  body {
+    background: var(--color-bg); color: var(--color-fg);
+    font-family: var(--font-sans); font-size: var(--text-base); line-height: var(--leading-body);
+  }
+  :focus-visible { outline: 2px solid var(--color-focus); outline-offset: 2px; }
+  a { color: inherit; }
+  .num { direction: ltr; unicode-bidi: isolate; font-variant-numeric: tabular-nums lining-nums; }
+  .icon { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+  .icon-sm { width: 16px; height: 16px; }
+  [dir="ltr"] .icon-dir { transform: scaleX(-1); }      /* points "forward" in the reading direction */
+  [dir="rtl"] .icon-back { transform: scaleX(-1); }     /* points "back" in the reading direction */
+  .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .container { max-width: var(--size-content); margin-inline: auto; padding-inline: var(--space-6); }
+
+  /* ── State switching ── */
+  body[data-state="default"] [data-shows-in]:not([data-shows-in~="default"]) { display: none !important; }
+  body[data-state="loading"] [data-shows-in]:not([data-shows-in~="loading"]) { display: none !important; }
+  body[data-state="empty"]   [data-shows-in]:not([data-shows-in~="empty"])   { display: none !important; }
+  body[data-state="error"]   [data-shows-in]:not([data-shows-in~="error"])   { display: none !important; }
+
+  /* ── Dev chrome: NOT part of the design ── */
+  .axm-switcher {
+    position: fixed; bottom: var(--space-2); left: var(--space-2); direction: ltr;
+    display: flex; gap: var(--space-1); padding: var(--space-1);
+    background: var(--color-surface); border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm); box-shadow: var(--shadow-sm);
+    font-size: var(--text-xs); z-index: 9999;
+  }
+  .axm-switcher button { cursor: pointer; }
+  .axm-switcher button[aria-pressed="true"] { font-weight: 700; }
+
+  /* ── Buttons ── */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: var(--space-2);
+    min-height: var(--size-touch); padding-inline: var(--space-6);
+    border: 0; border-radius: var(--radius-full);
+    font: var(--weight-semibold) var(--text-base) var(--font-sans); text-decoration: none; cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+  .btn-primary { background: var(--color-brand); color: var(--color-brand-fg); }
+  .btn-primary:hover { background: var(--color-brand-hover); }
+  .btn-secondary { background: var(--color-fill); color: var(--color-fg); }
+  .btn-icon { width: var(--size-touch); padding-inline: 0; }
+
+  /* ── Header (shared with home) ── */
+  .site-header .container { display: flex; align-items: center; justify-content: space-between; height: var(--space-20); }
+  .wordmark { font-size: var(--text-4xl); font-weight: var(--weight-bold); line-height: 1; color: var(--color-brand); text-decoration: none; }
+  .header-tools { display: flex; align-items: center; gap: var(--space-1); padding: var(--space-1); border-radius: var(--radius-full); background: var(--color-surface); box-shadow: var(--shadow-md); }
+  .tool {
+    display: inline-flex; align-items: center; justify-content: center;
+    min-width: var(--size-touch-dense); height: var(--size-touch-dense); padding-inline: var(--space-4);
+    border: 0; border-radius: var(--radius-full); background: none; color: var(--color-fg);
+    font: var(--weight-medium) var(--text-sm) var(--font-sans); text-decoration: none; cursor: pointer;
+  }
+  .tool:hover { background: var(--color-fill); }
+  .tool-icon { padding-inline: 0; }
+
+  /* ── Page title ── */
+  .page-head { padding-block: var(--space-6) var(--space-8); }
+  .back { display: inline-flex; align-items: center; gap: var(--space-2); min-height: var(--size-touch); color: var(--color-muted); font-size: var(--text-sm); font-weight: var(--weight-medium); text-decoration: none; }
+  .back:hover { color: var(--color-brand); }
+  h1 { font-size: var(--text-5xl); font-weight: var(--weight-bold); line-height: var(--leading-heading); }
+  .page-head p { color: var(--color-muted); }
+
+  /* ── Two columns: month on the start side, day beside it ── */
+  .layout { display: grid; grid-template-columns: 5fr 7fr; gap: var(--space-6); align-items: start; }
+  .card { padding: var(--space-6); border-radius: var(--radius-lg); background: var(--color-surface); box-shadow: var(--shadow-md); }
+
+  /* ── Month ── */
+  .month-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4); }
+  .month-head h2 { font-size: var(--text-xl); font-weight: var(--weight-bold); }
+  .month-nav { display: inline-flex; align-items: center; justify-content: center; width: var(--size-touch); height: var(--size-touch); border: 0; border-radius: var(--radius-full); background: var(--color-fill); color: var(--color-fg); cursor: pointer; }
+  .month-nav:disabled { background: none; color: var(--color-border); cursor: default; }
+  .month { width: 100%; border-collapse: collapse; table-layout: fixed; }
+  .month th { padding-block: var(--space-2); font-size: var(--text-xs); font-weight: var(--weight-medium); color: var(--color-muted); }
+  .month td { padding: var(--space-1) 0; text-align: center; }
+  .day-btn {
+    position: relative; display: inline-flex; align-items: center; justify-content: center;
+    width: var(--size-touch); height: var(--size-touch); border: 0; border-radius: var(--radius-full);
+    background: none; color: var(--color-fg); font: var(--weight-medium) var(--text-base) var(--font-sans);
+    font-variant-numeric: tabular-nums lining-nums; cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+  .day-btn:hover { background: var(--color-fill); }
+  .day-btn[data-free]::after { content: ""; position: absolute; bottom: var(--space-2); width: 6px; height: 6px; border-radius: var(--radius-full); background: var(--color-accent); }
+  .day-btn[data-today] { box-shadow: inset 0 0 0 2px var(--color-border); }
+  .day-btn[data-closed] { color: var(--color-muted); text-decoration: line-through; }
+  .day-btn:disabled { color: var(--color-muted); opacity: 0.55; cursor: default; background: none; }
+  .day-btn[aria-selected="true"] { background: var(--color-brand); color: var(--color-brand-fg); box-shadow: none; font-weight: var(--weight-bold); }
+  .day-btn[aria-selected="true"]::after { background: var(--color-brand-fg); }
+  .month-key { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-5); margin-top: var(--space-4); padding-top: var(--space-4); border-top: 1px solid var(--color-border); font-size: var(--text-sm); color: var(--color-muted); }
+  .month-key span { display: inline-flex; align-items: center; gap: var(--space-2); }
+  .key-dot { width: 6px; height: 6px; border-radius: var(--radius-full); background: var(--color-accent); }
+  .key-today { width: 16px; height: 16px; border-radius: var(--radius-full); box-shadow: inset 0 0 0 2px var(--color-border); }
+  .key-closed { text-decoration: line-through; }
+
+  /* ── Day panel ── */
+  .day-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--space-4); margin-bottom: var(--space-4); }
+  .day-head h2 { font-size: var(--text-2xl); font-weight: var(--weight-bold); line-height: var(--leading-heading); }
+  .day-head h2 small { display: block; font-size: var(--text-sm); font-weight: var(--weight-regular); color: var(--color-muted); }
+  .refreshed { display: inline-flex; align-items: center; gap: var(--space-1); font-size: var(--text-sm); color: var(--color-muted); white-space: nowrap; }
+  .slots { list-style: none; padding: 0; display: grid; gap: var(--space-2); }
+  .slot {
+    display: grid; grid-template-columns: 1fr 176px 112px; align-items: center; gap: var(--space-4);
+    min-height: 68px; padding: var(--space-2); padding-inline-start: var(--space-6);
+    border-radius: var(--radius-full); background: var(--color-bg);
+  }
+  .slot-time { font-size: var(--text-lg); font-weight: var(--weight-medium); color: var(--color-muted); }
+  .slot-open { background: var(--color-accent-soft); }
+  .slot-open .slot-time { font-weight: var(--weight-semibold); color: var(--color-fg); }
+  .slot-action { display: flex; justify-content: flex-end; gap: var(--space-2); }
+  .slot-action .btn { width: 100%; }
+  .slot-action .btn-icon { width: var(--size-touch); flex: none; background: var(--color-surface); }
+
+  .badge { justify-self: start; display: inline-flex; align-items: center; gap: var(--space-2); padding: var(--space-1) var(--space-3); border-radius: var(--radius-full); font-size: var(--text-sm); font-weight: var(--weight-medium); line-height: 1.6; white-space: nowrap; }
+  .badge-free { background: var(--color-surface); color: var(--color-accent); }
+  .badge-call { background: var(--color-surface); color: var(--color-fg); }
+  .badge-pay { background: var(--color-warning-soft); color: var(--color-warning); }
+  .badge-review { background: var(--color-brand-soft); color: var(--color-brand); }
+  .badge-confirmed { background: var(--color-fill); color: var(--color-muted); }
+  .badge-closed { background: var(--color-fill); color: var(--color-muted); text-decoration: line-through; }
+
+  /* ── Legend + contact fallback ── */
+  .legend { margin-top: var(--space-6); display: flex; flex-wrap: wrap; align-items: center; gap: var(--space-2); }
+  .legend h2 { font-size: var(--text-sm); font-weight: var(--weight-medium); color: var(--color-muted); margin-inline-end: var(--space-2); }
+  .legend ul { list-style: none; padding: 0; display: contents; }
+  .legend .badge-free, .legend .badge-call { background: var(--color-accent-soft); }
+  .fallback { margin-top: var(--space-4); margin-bottom: var(--space-16); font-size: var(--text-sm); color: var(--color-muted); }
+  .fallback a { color: var(--color-brand); font-weight: var(--weight-medium); }
+
+  /* ── Designed empty / error moments ── */
+  .moment { display: flex; flex-direction: column; align-items: center; text-align: center; padding-block: var(--space-10); }
+  .moment-icon { display: inline-flex; align-items: center; justify-content: center; width: 64px; height: 64px; border-radius: var(--radius-full); background: var(--color-fill); color: var(--color-muted); }
+  .moment-icon .icon { width: 28px; height: 28px; }
+  .moment-error .moment-icon { background: var(--color-danger-soft); color: var(--color-danger); }
+  .moment h3 { margin-top: var(--space-4); font-size: var(--text-xl); font-weight: var(--weight-bold); line-height: var(--leading-heading); }
+  .moment p { color: var(--color-muted); max-width: 36ch; }
+  .moment-actions { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--space-3); margin-top: var(--space-5); }
+  .error-card { max-width: 640px; margin-inline: auto; }
+
+  /* ── Skeletons ── */
+  .skel { background: var(--color-fill); border-radius: var(--radius-full); animation: pulse 1.4s ease-in-out infinite; }
+  @keyframes pulse { 50% { opacity: 0.5; } }
+  .skel-line { height: var(--space-5); }
+  .skel-day { width: var(--size-touch-dense); height: var(--size-touch-dense); margin: var(--space-1) auto; }
+  .skel-grid { display: grid; grid-template-columns: repeat(7, 1fr); margin-top: var(--space-4); }
+  .skel-slot { height: 68px; }
+  .loading-note { display: flex; align-items: center; gap: var(--space-2); margin-top: var(--space-4); font-size: var(--text-sm); color: var(--color-muted); }
+  .spinner { width: 16px; height: 16px; border-radius: var(--radius-full); border: 2px solid var(--color-border); border-top-color: var(--color-brand); animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  @media (max-width: 767px) {
+    .layout { grid-template-columns: 1fr; gap: var(--space-4); }
+    h1 { font-size: var(--text-3xl); }
+    .page-head { padding-block: var(--space-2) var(--space-5); }
+  }
+  @media (max-width: 639px) {
+    .container { padding-inline: var(--space-4); }
+    .site-header .container { height: var(--space-16); }
+    .wordmark { font-size: var(--text-3xl); }
+    .tool { padding-inline: var(--space-3); }
+    .card { padding: var(--space-4); }
+    .day-btn { width: var(--size-touch-dense); height: var(--size-touch-dense); }
+    .day-btn[data-free]::after { bottom: var(--space-1); }
+    .slot { grid-template-columns: 1fr auto; row-gap: var(--space-2); padding: var(--space-3) var(--space-4); border-radius: var(--radius-lg); }
+    .slot-action { grid-column: 1 / -1; }
+    .slot-action:empty { display: none; }
+    .slot-action .btn-icon { flex: 1; width: auto; }
+    .badge { justify-self: end; }
+  }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body data-state="default">
+
+<!-- Icon sprite (Lucide). Implementation: lucide-react. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="m12 19-7-7 7-7M19 12H5"/></symbol>
+  <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m15 18-6-6 6-6"/></symbol>
+  <symbol id="i-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/></symbol>
+  <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M5 22h14M5 2h14M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/></symbol>
+  <symbol id="i-refresh" viewBox="0 0 24 24"><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/></symbol>
+  <symbol id="i-calendar-x" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18M14 14l-4 4M10 14l4 4"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><path d="M12 9v4M12 17h.01"/></symbol>
+</svg>
+
+<header class="site-header">
+  <div class="container">
+    <a class="wordmark" href="home.html" aria-label="وصال — الصفحة الرئيسية">وصال</a>
+    <nav class="header-tools" aria-label="أدوات الموقع">
+      <a class="tool" href="#">ابحث عن حجزي</a>
+      <a class="tool" href="#" lang="en" hreflang="en">English</a>
+      <button class="tool tool-icon" type="button" aria-label="التبديل إلى الوضع الداكن"><svg class="icon"><use href="#i-moon"/></svg></button>
+    </nav>
+  </div>
+</header>
+
+<main class="container">
+  <div class="page-head">
+    <a class="back" href="home.html"><svg class="icon icon-sm icon-back"><use href="#i-arrow"/></svg>الصفحة الرئيسية</a>
+    <h1>المواعيد المتاحة</h1>
+    <p>اختر يومًا لترى مواعيده، ثم احجز الموعد المتاح.</p>
+  </div>
+
+  <!-- ═══ default + empty: month and day side by side ═══ -->
+  <div class="layout" data-shows-in="default empty">
+
+    <section class="card" aria-labelledby="month-h">
+      <div class="month-head">
+        <button class="month-nav" type="button" aria-label="الشهر السابق" disabled><svg class="icon icon-back"><use href="#i-chevron"/></svg></button>
+        <h2 id="month-h" aria-live="polite">نوفمبر <span class="num">2026</span></h2>
+        <button class="month-nav" type="button" aria-label="الشهر التالي: ديسمبر 2026"><svg class="icon icon-dir"><use href="#i-chevron"/></svg></button>
+      </div>
+      <table class="month" role="grid" aria-labelledby="month-h">
+        <thead>
+          <tr><th scope="col" abbr="السبت">سبت</th><th scope="col" abbr="الأحد">أحد</th><th scope="col" abbr="الاثنين">اثنين</th><th scope="col" abbr="الثلاثاء">ثلاثاء</th><th scope="col" abbr="الأربعاء">أربعاء</th><th scope="col" abbr="الخميس">خميس</th><th scope="col" abbr="الجمعة">جمعة</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td></td>
+            <td><button class="day-btn" type="button" disabled aria-label="الأحد 1 نوفمبر، يوم مضى">1</button></td>
+            <td><button class="day-btn" type="button" disabled aria-label="الاثنين 2 نوفمبر، يوم مضى">2</button></td>
+            <td><button class="day-btn" type="button" disabled aria-label="الثلاثاء 3 نوفمبر، يوم مضى">3</button></td>
+            <td><button class="day-btn" type="button" disabled aria-label="الأربعاء 4 نوفمبر، يوم مضى">4</button></td>
+            <td><button class="day-btn" type="button" disabled aria-label="الخميس 5 نوفمبر، يوم مضى">5</button></td>
+            <td><button class="day-btn" type="button" disabled aria-label="الجمعة 6 نوفمبر، يوم مضى">6</button></td>
+          </tr>
+          <tr>
+            <td><button class="day-btn" type="button" disabled aria-label="السبت 7 نوفمبر، يوم مضى">7</button></td>
+            <td><button class="day-btn" type="button" disabled aria-label="الأحد 8 نوفمبر، يوم مضى">8</button></td>
+            <td><button class="day-btn" type="button" disabled aria-label="الاثنين 9 نوفمبر، يوم مضى">9</button></td>
+            <td><button class="day-btn" type="button" disabled aria-label="الثلاثاء 10 نوفمبر، يوم مضى">10</button></td>
+            <td><button class="day-btn" type="button" disabled aria-label="الأربعاء 11 نوفمبر، يوم مضى">11</button></td>
+            <td><button class="day-btn" type="button" disabled aria-label="الخميس 12 نوفمبر، يوم مضى">12</button></td>
+            <td><button class="day-btn" type="button" disabled aria-label="الجمعة 13 نوفمبر، يوم مضى">13</button></td>
+          </tr>
+          <tr>
+            <td><button class="day-btn" type="button" disabled aria-label="السبت 14 نوفمبر، يوم مضى">14</button></td>
+            <td><button class="day-btn" type="button" data-day="15" data-today data-free aria-selected="true" aria-label="اليوم، الأحد 15 نوفمبر، فيه مواعيد متاحة">15</button></td>
+            <td><button class="day-btn" type="button" data-free tabindex="-1" aria-label="الاثنين 16 نوفمبر، فيه مواعيد متاحة">16</button></td>
+            <td><button class="day-btn" type="button" tabindex="-1" aria-label="الثلاثاء 17 نوفمبر، لا مواعيد متاحة">17</button></td>
+            <td><button class="day-btn" type="button" data-free tabindex="-1" aria-label="الأربعاء 18 نوفمبر، فيه مواعيد متاحة">18</button></td>
+            <td><button class="day-btn" type="button" data-free tabindex="-1" aria-label="الخميس 19 نوفمبر، فيه مواعيد متاحة">19</button></td>
+            <td><button class="day-btn" type="button" data-day="20" data-closed tabindex="-1" aria-label="الجمعة 20 نوفمبر، مغلق">20</button></td>
+          </tr>
+          <tr>
+            <td><button class="day-btn" type="button" data-free tabindex="-1" aria-label="السبت 21 نوفمبر، فيه مواعيد متاحة">21</button></td>
+            <td><button class="day-btn" type="button" data-free tabindex="-1" aria-label="الأحد 22 نوفمبر، فيه مواعيد متاحة">22</button></td>
+            <td><button class="day-btn" type="button" tabindex="-1" aria-label="الاثنين 23 نوفمبر، لا مواعيد متاحة">23</button></td>
+            <td><button class="day-btn" type="button" data-free tabindex="-1" aria-label="الثلاثاء 24 نوفمبر، فيه مواعيد متاحة">24</button></td>
+            <td><button class="day-btn" type="button" data-free tabindex="-1" aria-label="الأربعاء 25 نوفمبر، فيه مواعيد متاحة">25</button></td>
+            <td><button class="day-btn" type="button" data-free tabindex="-1" aria-label="الخميس 26 نوفمبر، فيه مواعيد متاحة">26</button></td>
+            <td><button class="day-btn" type="button" data-closed tabindex="-1" aria-label="الجمعة 27 نوفمبر، مغلق">27</button></td>
+          </tr>
+          <tr>
+            <td><button class="day-btn" type="button" data-free tabindex="-1" aria-label="السبت 28 نوفمبر، فيه مواعيد متاحة">28</button></td>
+            <td><button class="day-btn" type="button" data-free tabindex="-1" aria-label="الأحد 29 نوفمبر، فيه مواعيد متاحة">29</button></td>
+            <td><button class="day-btn" type="button" data-free tabindex="-1" aria-label="الاثنين 30 نوفمبر، فيه مواعيد متاحة">30</button></td>
+            <td></td><td></td><td></td><td></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="month-key" aria-hidden="true">
+        <span><i class="key-dot"></i>فيه مواعيد متاحة</span>
+        <span><i class="key-today"></i>اليوم</span>
+        <span class="key-closed">مغلق</span>
+      </div>
+    </section>
+
+    <!-- default: the selected day's slots -->
+    <section class="card" aria-labelledby="day-h" data-shows-in="default">
+      <div class="day-head">
+        <h2 id="day-h" tabindex="-1">الأحد <span class="num">15</span> نوفمبر <small>اليوم · موعدان متاحان من خمسة</small></h2>
+        <span class="refreshed"><svg class="icon icon-sm"><use href="#i-refresh"/></svg>حُدِّثت الآن</span>
+      </div>
+      <ul class="slots">
+        <li class="slot">
+          <span class="slot-time"><span class="num">10:00</span> – <span class="num">12:00</span> ص</span>
+          <span class="badge badge-confirmed"><svg class="icon icon-sm"><use href="#i-check"/></svg>مؤكَّد</span>
+        </li>
+        <li class="slot">
+          <span class="slot-time"><span class="num">12:30</span> – <span class="num">3:00</span> م</span>
+          <span class="badge badge-review"><svg class="icon icon-sm"><use href="#i-eye"/></svg>بانتظار المراجعة</span>
+        </li>
+        <li class="slot slot-open">
+          <span class="slot-time"><span class="num">3:30</span> – <span class="num">6:00</span> م</span>
+          <span class="badge badge-call"><svg class="icon icon-sm"><use href="#i-phone"/></svg>اتصل للحجز</span>
+          <span class="slot-action">
+            <a class="btn btn-icon" href="tel:+201012345678" aria-label="اتصل بنا لحجز موعد 3:30 م"><svg class="icon"><use href="#i-phone"/></svg></a>
+            <a class="btn btn-icon" href="#" aria-label="راسلنا على واتساب لحجز موعد 3:30 م"><svg class="icon"><use href="#i-chat"/></svg></a>
+          </span>
+        </li>
+        <li class="slot slot-open">
+          <span class="slot-time"><span class="num">6:30</span> – <span class="num">9:00</span> م</span>
+          <span class="badge badge-free"><svg class="icon icon-sm"><use href="#i-circle"/></svg>متاح</span>
+          <span class="slot-action"><a class="btn btn-primary" href="#booking-form" aria-label="احجز موعد 6:30 إلى 9:00 مساءً">احجز</a></span>
+        </li>
+        <li class="slot">
+          <span class="slot-time"><span class="num">9:30</span> – <span class="num">11:30</span> م</span>
+          <span class="badge badge-pay"><svg class="icon icon-sm"><use href="#i-hourglass"/></svg>بانتظار الدفع</span>
+        </li>
+      </ul>
+      <p class="sr-only" aria-live="polite"></p>
+    </section>
+
+    <!-- empty: the selected day is closed or has no slots -->
+    <section class="card" aria-labelledby="day-empty-h" data-shows-in="empty">
+      <div class="day-head">
+        <h2 id="day-empty-h" tabindex="-1">الجمعة <span class="num">20</span> نوفمبر</h2>
+      </div>
+      <div class="moment">
+        <span class="moment-icon" aria-hidden="true"><svg class="icon"><use href="#i-calendar-x"/></svg></span>
+        <h3>القاعة غير متاحة في هذا اليوم</h3>
+        <p>اختر يومًا آخر من التقويم، أو تواصل معنا إن كان لديك سؤال.</p>
+        <div class="moment-actions">
+          <a class="btn btn-secondary" href="tel:+201012345678"><svg class="icon"><use href="#i-phone"/></svg>اتصل بنا</a>
+          <a class="btn btn-secondary" href="#"><svg class="icon"><use href="#i-chat"/></svg>واتساب</a>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <!-- ═══ loading: first load only; a background refresh keeps the previous states ═══ -->
+  <div class="layout" data-shows-in="loading" aria-busy="true">
+    <div class="card">
+      <div class="skel skel-line" style="width:40%; margin-inline:auto"></div>
+      <div class="skel-grid">
+        <i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i>
+        <i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i>
+        <i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i>
+        <i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i>
+        <i class="skel skel-day"></i><i class="skel skel-day"></i><i class="skel skel-day"></i>
+      </div>
+    </div>
+    <div class="card">
+      <div class="skel skel-line" style="width:45%; margin-bottom: var(--space-5)"></div>
+      <div class="slots">
+        <div class="skel skel-slot"></div><div class="skel skel-slot"></div><div class="skel skel-slot"></div>
+      </div>
+      <p class="loading-note" role="status"><span class="spinner" aria-hidden="true"></span>جارٍ تحميل المواعيد…</p>
+    </div>
+  </div>
+
+  <!-- ═══ error: availability failed to load ═══ -->
+  <div class="card error-card" data-shows-in="error" role="alert">
+    <div class="moment moment-error">
+      <span class="moment-icon" aria-hidden="true"><svg class="icon"><use href="#i-alert"/></svg></span>
+      <h3>تعذّر تحميل المواعيد</h3>
+      <p>تحقّق من اتصالك بالإنترنت ثم أعد المحاولة. يمكنك أيضًا الحجز بالهاتف.</p>
+      <div class="moment-actions">
+        <button class="btn btn-primary" type="button"><svg class="icon"><use href="#i-refresh"/></svg>أعد المحاولة</button>
+        <a class="btn btn-secondary" href="tel:+201012345678"><svg class="icon"><use href="#i-phone"/></svg>اتصل بنا</a>
+        <a class="btn btn-secondary" href="#"><svg class="icon"><use href="#i-chat"/></svg>واتساب</a>
+      </div>
+    </div>
+  </div>
+
+  <section class="legend" aria-labelledby="legend-h" data-shows-in="default empty">
+    <h2 id="legend-h">حالات المواعيد</h2>
+    <ul>
+      <li><span class="badge badge-free"><svg class="icon icon-sm"><use href="#i-circle"/></svg>متاح</span></li>
+      <li><span class="badge badge-pay"><svg class="icon icon-sm"><use href="#i-hourglass"/></svg>بانتظار الدفع</span></li>
+      <li><span class="badge badge-review"><svg class="icon icon-sm"><use href="#i-eye"/></svg>بانتظار المراجعة</span></li>
+      <li><span class="badge badge-confirmed"><svg class="icon icon-sm"><use href="#i-check"/></svg>مؤكَّد</span></li>
+      <li><span class="badge badge-closed"><svg class="icon icon-sm"><use href="#i-lock"/></svg>مغلق</span></li>
+    </ul>
+  </section>
+  <p class="fallback" data-shows-in="default empty loading">تحتاج مساعدة؟ <a href="tel:+201012345678">اتصل بنا</a> أو راسلنا على <a href="#">واتساب</a>.</p>
+</main>
+
+<!-- dev chrome (state switcher + theme + direction) — not part of the design -->
+<div class="axm-switcher" aria-label="Mockup state switcher">
+  <button type="button" data-set-state="default">default</button>
+  <button type="button" data-set-state="loading">loading</button>
+  <button type="button" data-set-state="empty">empty</button>
+  <button type="button" data-set-state="error">error</button>
+  <button type="button" data-toggle-theme>dark</button>
+  <button type="button" data-toggle-dir>ltr</button>
+</div>
+<script>
+  (() => {
+    const body = document.body, doc = document.documentElement, q = new URLSearchParams(location.search);
+    const setState = s => {
+      body.dataset.state = s;
+      document.querySelectorAll('[data-set-state]').forEach(b =>
+        b.setAttribute('aria-pressed', String(b.dataset.setState === s)));
+      // dev only: the empty state shows the closed day (20) selected instead of today (15)
+      const pick = s === 'empty' ? '20' : '15';
+      document.querySelectorAll('.day-btn[data-day]').forEach(b =>
+        b.setAttribute('aria-selected', String(b.dataset.day === pick)));
+    };
+    document.querySelectorAll('[data-set-state]').forEach(b =>
+      b.addEventListener('click', () => setState(b.dataset.setState)));
+    const themeBtn = document.querySelector('[data-toggle-theme]');
+    const setTheme = dark => { doc.dataset.theme = dark ? 'dark' : ''; themeBtn.textContent = dark ? 'light' : 'dark'; };
+    themeBtn.addEventListener('click', () => setTheme(doc.dataset.theme !== 'dark'));
+    document.querySelector('[data-toggle-dir]').addEventListener('click', e => {
+      doc.dir = doc.dir === 'rtl' ? 'ltr' : 'rtl'; e.target.textContent = doc.dir === 'rtl' ? 'ltr' : 'rtl';
+    });
+    if (q.get('theme') === 'dark') setTheme(true);
+    if (q.get('chrome') === 'off') document.querySelector('.axm-switcher').hidden = true;
+    setState(q.get('state') || 'default');
+  })();
+</script>
+</body>
+</html>
