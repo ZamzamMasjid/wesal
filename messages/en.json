@@ -1,0 +1,14 @@
+{
+  "Metadata": {
+    "title": "Wesal"
+  },
+  "Home": {
+    "heading": "Wesal",
+    "tagline": "The mosque's event hall"
+  },
+  "NotFound": {
+    "title": "Page not found",
+    "description": "We could not find the page you were looking for.",
+    "backHome": "Back to the home page"
+  }
+}

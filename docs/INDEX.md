@@ -149,6 +149,7 @@ active:
 | `ADR-023` | Production is the only deployed environment | Accepted | phase-1-infrastructure/deployment |
 | `ADR-024` | Feed design tokens to the app as CSS variables | Accepted | phase-1-infrastructure/project-setup |
 | `ADR-025` | Use next-intl for locale routing and message catalogs | Accepted | phase-1-infrastructure/project-setup |
+| `ADR-026` | Define operations once, with a fixed result envelope and one error-code registry | Accepted | phase-1-infrastructure/project-setup |
 
 ## Recent changes
 

@@ -29,7 +29,7 @@ The Next.js application skeleton that every later section builds on. Builds the 
 - [x] Scaffold Next.js App Router project with strict TypeScript, ESLint and Prettier
 - [x] c
 - [x] Add locale routing: Arabic default (RTL) and English, with message catalogs
-- [ ] Add `/api/v1` conventions: zod validation, typed error envelope, error codes
+- [x] Add `/api/v1` conventions: zod validation, typed error envelope, error codes
 - [ ] Add structured logger and injectable clock used by all services
 - [ ] Add light/dark theme toggle wired to design tokens
 
