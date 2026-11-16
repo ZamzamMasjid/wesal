@@ -2,7 +2,7 @@
 id: index
 type: index
 title: Project Index
-last_modified: 2026-11-15
+last_modified: 2026-11-16
 generated_by: axiom:reindex
 budgets: {}
 activities: []
@@ -148,6 +148,7 @@ active:
 | `ADR-022` | Isolate job runs and restart the process when the job loop stalls | Accepted | phase-2-foundations/message-delivery |
 | `ADR-023` | Production is the only deployed environment | Accepted | phase-1-infrastructure/deployment |
 | `ADR-024` | Feed design tokens to the app as CSS variables | Accepted | phase-1-infrastructure/project-setup |
+| `ADR-025` | Use next-intl for locale routing and message catalogs | Accepted | phase-1-infrastructure/project-setup |
 
 ## Recent changes
 

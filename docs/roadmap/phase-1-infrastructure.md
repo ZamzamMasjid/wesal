@@ -27,8 +27,8 @@ None. A Fly.io account and a GitHub repository are needed for the deployment and
 The Next.js application skeleton that every later section builds on. Builds the `web` component: TypeScript, Tailwind, shadcn/ui, bilingual routing with RTL, and the JSON API conventions.
 
 - [x] Scaffold Next.js App Router project with strict TypeScript, ESLint and Prettier
-- [ ] Add Tailwind CSS and shadcn/ui with logical-property (RTL-safe) defaults
-- [ ] Add locale routing: Arabic default (RTL) and English, with message catalogs
+- [x] c
+- [x] Add locale routing: Arabic default (RTL) and English, with message catalogs
 - [ ] Add `/api/v1` conventions: zod validation, typed error envelope, error codes
 - [ ] Add structured logger and injectable clock used by all services
 - [ ] Add light/dark theme toggle wired to design tokens
