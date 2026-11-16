@@ -1,18 +1,13 @@
 // Twilio is never called from tests. The fake sender records what would have
-// been sent and can be told to fail a channel. The messaging adapter
-// (message-delivery, phase 2) implements this same shape.
+// been sent and can be told to fail a channel. It implements the messaging
+// adapter's MessageSender (src/messaging/sender.ts).
+import type {
+  Channel,
+  MessageSender,
+  OutgoingMessage,
+} from "@/messaging/sender";
 
-export type Channel = "whatsapp" | "sms";
-
-export interface OutgoingMessage {
-  channel: Channel;
-  to: string;
-  body: string;
-}
-
-export interface MessageSender {
-  send(message: OutgoingMessage): Promise<{ providerMessageId: string }>;
-}
+export type { Channel, MessageSender, OutgoingMessage };
 
 export interface FakeSender extends MessageSender {
   readonly sent: OutgoingMessage[];

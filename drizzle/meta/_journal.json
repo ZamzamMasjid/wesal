@@ -43,6 +43,13 @@
       "when": 1794836767915,
       "tag": "0005_living_william_stryker",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794838639262,
+      "tag": "0006_outbox_message",
+      "breakpoints": true
     }
   ]
 }

@@ -44,12 +44,14 @@ The `media` and `proofs` directories under `/data` are created on every start by
 | `BETTER_AUTH_URL`                         | staff-access         | The public site URL, e.g. `https://wesal.fly.dev`                   |
 | `TWILIO_ACCOUNT_SID`                      | message-delivery     | From the Twilio console                                             |
 | `TWILIO_AUTH_TOKEN`                       | message-delivery     | From the Twilio console                                             |
-| `TWILIO_WHATSAPP_FROM`, `TWILIO_SMS_FROM` | message-delivery     | Sender numbers; the final names are set by that section             |
+| `TWILIO_WHATSAPP_FROM`, `TWILIO_SMS_FROM` | message-delivery     | WhatsApp sender (e.g. `+14155238886`, the sandbox) and SMS sender   |
+| `MESSAGING_PROVIDER`                      | message-delivery     | `twilio`; without it messages are only logged and none are sent     |
+| `PUBLIC_BASE_URL`                         | message-delivery     | Optional; the public origin for the status webhook (defaults to `BETTER_AUTH_URL`) |
 
 ```bash
 fly secrets set -a wesal DATABASE_URL="postgres://wesal:...@wesal-db.internal:5432/wesal" --stage
 fly secrets set -a wesal BETTER_AUTH_SECRET="$(openssl rand -hex 32)" --stage
-# Twilio values can wait until message-delivery ships; setting them later is fine.
+# Twilio values and MESSAGING_PROVIDER=twilio can be set when you are ready to send; point Twilio's status callback at <site>/api/v1/webhooks/twilio/status.
 ```
 
 `--stage` queues secrets without restarting; they apply on the next deploy. Never commit secrets; `.env*` is git-ignored.

@@ -56,10 +56,10 @@ The weekly slot pattern, date exceptions and blocked dates. Extends `web`; data 
 
 The messaging adapter, the outbox and the in-process job loop inside `web`; talks to Twilio.
 
-- [ ] Define messaging adapter interface with fake sender and Twilio implementation
-- [ ] Implement outbox table and in-process job loop with retry and backoff
-- [ ] Implement Twilio status webhook with signature check and SMS fallback
-- [ ] Add bilingual message templates: code, booking link, staff alert
+- [x] Define messaging adapter interface with fake sender and Twilio implementation
+- [x] Implement outbox table and in-process job loop with retry and backoff
+- [x] Implement Twilio status webhook with signature check and SMS fallback
+- [x] Add bilingual message templates: code, booking link, staff alert
 
 ### phone-verification
 

@@ -1,4 +1,5 @@
 import { getHealth } from "./health";
+import { twilioStatusOperation } from "./messaging/twilio-status";
 import { staffOperations } from "./staff/staff";
 import { scheduleOperations } from "./schedule/schedule";
 import { occasionOperations } from "./venue/occasions";
@@ -10,6 +11,7 @@ import type { Operation } from "@/api/operation";
 // operation must be added here (and gets the access checks for free).
 export const operations: Operation<unknown>[] = [
   getHealth,
+  twilioStatusOperation,
   ...Object.values(staffOperations),
   ...Object.values(occasionOperations),
   ...Object.values(settingsOperations),

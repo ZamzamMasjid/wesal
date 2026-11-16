@@ -218,3 +218,45 @@ export const auditLog = pgTable(
     index("audit_log_at_idx").on(t.at),
   ],
 );
+
+/**
+ * A message waiting to be sent, or already sent, by the job loop (ADR-011).
+ * Written in the same transaction as the change that causes it. `channel` is
+ * the channel the next attempt uses; WhatsApp falls back to SMS by changing it.
+ * `bookingId` has no foreign key yet: the booking table arrives in phase 3.
+ */
+export const outboxMessage = pgTable(
+  "outbox_message",
+  {
+    id: bigint("id", { mode: "number" })
+      .primaryKey()
+      .generatedAlwaysAsIdentity(),
+    bookingId: integer("booking_id"),
+    recipient: text("recipient").notNull(),
+    channel: text("channel", { enum: ["whatsapp", "sms"] }).notNull(),
+    template: text("template", {
+      enum: ["code", "booking-link", "staff-alert"],
+    }).notNull(),
+    values: jsonb("values").$type<Record<string, string>>().notNull(),
+    locale: text("locale", { enum: ["ar", "en"] }).notNull(),
+    status: text("status", {
+      enum: ["queued", "sent", "delivered", "failed"],
+    })
+      .notNull()
+      .default("queued"),
+    /** Failed send attempts on the current channel. */
+    attempts: integer("attempts").notNull().default(0),
+    nextAttemptAt: timestamp("next_attempt_at", {
+      withTimezone: true,
+    }).notNull(),
+    /** After this instant the message is no longer useful and is dropped. */
+    expiresAt: timestamp("expires_at", { withTimezone: true }),
+    providerMessageId: text("provider_message_id"),
+    lastError: text("last_error"),
+    ...timestamps,
+  },
+  (t) => [
+    index("outbox_message_due_idx").on(t.status, t.nextAttemptAt),
+    index("outbox_message_provider_id_idx").on(t.providerMessageId),
+  ],
+);

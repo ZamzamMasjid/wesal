@@ -2,13 +2,13 @@
 id: message-delivery
 type: feature
 title: Message Delivery
-status: planned
-last_modified: 2026-11-15
+status: shipped
+last_modified: 2026-11-16
 milestone: v1
 pillar: messaging
 depends_on: []
 views: []
-adrs: [ADR-006, ADR-007, ADR-009, ADR-011, ADR-017, ADR-018, ADR-022, ADR-023]
+adrs: [ADR-006, ADR-007, ADR-009, ADR-011, ADR-017, ADR-018, ADR-022, ADR-023, ADR-030]
 roadmap_sections: [phase-2-foundations/message-delivery]
 architecture: [overview, data-model, flows, testing]
 components: [web, postgres]
@@ -31,13 +31,15 @@ Messages are written from templates in Arabic and English and sent in the recipi
 
 ## Data
 
-- **Outbox message** — recipient, channel, template and its values, locale, status (queued, sent, delivered, failed), attempts, next attempt time, provider message ID, related booking.
+- **Outbox message** — recipient, channel, template and its values, locale, status (queued, sent, delivered, failed), attempts, next attempt time, expiry, provider message ID, last error, related booking. `channel` is the channel the next attempt uses; falling back to SMS changes it.
 
 ## Surface
 
-- Internal: `send(template, recipient, values)` for inline sends; `queue(...)` for outbox sends inside a transaction.
-- Internal: the job loop's outbox sender.
-- `POST /api/v1/webhooks/twilio/status` — delivery status callbacks, signature-checked.
+- Internal: `sendInline({ sender, logger }, { template, recipient, values, locale })` for inline sends (WhatsApp, then SMS at once; throws `MessageDeliveryError` when both fail); `queueMessage(tx, clock, { template, recipient, values, locale, bookingId?, expiresAt? })` for outbox sends inside a transaction. Values are validated against the template before anything is written.
+- Internal: `MessageSender` (`src/messaging/sender.ts`), implemented by Twilio, a log-only sender for development, and the recording fake in `src/test/`. `MESSAGING_PROVIDER=twilio` selects Twilio; anything else only logs.
+- Internal: the job loop (`src/jobs/loop.ts`, started from `src/instrumentation.ts`; `JOBS=off` disables it) and its outbox sender `processOutbox`.
+- Templates: `code`, `booking-link`, `staff-alert` (kind `proof` or `urgent`; a link to the review page, never the screenshot), each in Arabic and English, times shown in Africa/Cairo.
+- `POST /api/v1/webhooks/twilio/status` — delivery status callbacks (form-encoded, `X-Twilio-Signature` checked against the auth token and the public URL). Answers `FORBIDDEN` for a bad signature and success for any signed call, including an unknown message, so Twilio does not retry. `delivered`/`read` mark the message delivered; `undelivered`/`failed` send a WhatsApp message again by SMS, or mark an SMS failed.
 
 ## Workflows
 
@@ -56,8 +58,10 @@ Messages are written from templates in Arabic and English and sent in the recipi
 
 - Delivery is at-least-once; a message may occasionally arrive twice, so templates must be harmless to receive twice.
 - The job loop runs inside the single app machine. A restart pauses sending for a few minutes; queued messages are sent when it returns.
-- A message that keeps failing is marked failed after a maximum number of attempts and logged; with logs as the only monitoring, nobody is alerted.
-- Messages older than their usefulness (a booking link for an expired hold) are dropped instead of sent late.
+- Each channel gets five attempts, waiting 30 seconds, 2 minutes, 10 minutes and 30 minutes between them (ADR-030). When WhatsApp attempts run out the message restarts on SMS; when SMS attempts run out it is marked failed and logged. With logs as the only monitoring, nobody is alerted.
+- A claimed message is not claimed again for two minutes, so overlapping job runs never send it twice at once; a run that crashes mid-send is retried after that.
+- A status callback that arrives before the send call has stored the provider message ID is ignored.
+- Messages older than their usefulness (a booking link for an expired hold) are dropped instead of sent late: a message queued with an expiry that has passed is marked failed with the reason `expired`.
 - WhatsApp business messages need pre-approved templates; SMS in Egypt needs a registered sender. Both are setup work outside the code.
 - Every message costs money; nothing is sent that a page could show instead.
 - The Twilio trial only delivers to verified numbers, which is enough for testing and not for launch.
@@ -65,4 +69,3 @@ Messages are written from templates in Arabic and English and sent in the recipi
 ## Open questions
 
 - Which provider is used in production, and what do Egypt's WhatsApp and SMS rates and sender registration require?
-- Maximum attempts and the backoff schedule.

@@ -8,7 +8,7 @@ budgets: {}
 activities: []
 active:
   phase: phase-2-foundations
-  section: message-delivery
+  section: phone-verification
 ---
 
 # Project Index
@@ -18,7 +18,7 @@ active:
 ## Active work
 
 - **Current phase**: phase-2-foundations
-- **Current section**: message-delivery
+- **Current section**: phone-verification
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars
@@ -42,7 +42,7 @@ active:
 | `content-management` | Content Management | planned | v1 | public-site | phase-5-public-site/content-management |
 | `customer-mobile-app` | Customer Mobile App | planned | later | mobile-app | phase-7-mobile-app/customer-mobile-app |
 | `landing-page` | Landing Page | planned | v1 | public-site | phase-5-public-site/landing-page |
-| `message-delivery` | Message Delivery | planned | v1 | messaging | phase-2-foundations/message-delivery |
+| `message-delivery` | Message Delivery | shipped | v1 | messaging | phase-2-foundations/message-delivery |
 | `payment-proof` | Payment Proof | planned | v1 | booking | phase-3-booking/payment-proof |
 | `payment-review` | Payment Review | planned | v1 | back-office | phase-4-operations/payment-review |
 | `phone-verification` | Phone Verification | planned | v1 | booking | phase-2-foundations/phone-verification |
@@ -153,6 +153,7 @@ active:
 | `ADR-027` | Write a small JSON logger and take time from an injected clock | Accepted | phase-1-infrastructure/project-setup |
 | `ADR-028` | Remember the theme in local storage and apply it with a script in the page head | Accepted | phase-1-infrastructure/project-setup |
 | `ADR-029` | Staff log in with a username; Better Auth's email field holds a placeholder | Accepted | phase-2-foundations/staff-access |
+| `ADR-030` | Call Twilio over plain HTTP and give each channel five attempts with growing delays | Accepted | phase-2-foundations/message-delivery |
 
 ## Recent changes
 
