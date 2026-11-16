@@ -2,7 +2,7 @@
 id: ADR-004
 type: adr
 title: Use Better Auth for staff login
-last_modified: 2026-11-15
+last_modified: 2026-11-16
 decision_status: Accepted
 phase_section: phase-2-foundations/staff-access
 mirror_id: ""
@@ -32,4 +32,4 @@ It keeps identity data in the same database as everything else, needs no outside
 
 ## Consequences
 
-Staff accounts are created by the owner; there is no public sign-up. Whether the login identifier is an email, a phone number or a username is still open (see the staff-access spec). Sessions are checked against the database on every staff request.
+Staff accounts are created by the owner; there is no public sign-up. The login identifier is a username (ADR-029). Sessions are checked against the database on every staff request.

@@ -1,3 +1,4 @@
+import { getAuth, type Auth } from "@/auth/auth";
 import type { Clock } from "@/lib/clock";
 import type { Logger } from "@/lib/logger";
 
@@ -51,12 +52,25 @@ export function authorize(
 }
 
 /**
- * Works out the caller for an incoming HTTP request. Until staff login exists
- * (phase 2, staff-access) every request is anonymous, so every staff and owner
- * operation is denied. That feature replaces this function with one that reads
- * the Better Auth session.
+ * Works out the caller for an incoming request from its Better Auth session
+ * cookie. The session is looked up in the database every time and the account
+ * must still be active, so disabling an account takes effect at once. Anything
+ * missing, invalid, expired or unreadable is anonymous: there is no fail-open
+ * path, and an unreachable database denies rather than allows.
  */
-export async function resolveCaller(request: Request): Promise<Caller> {
-  void request;
-  return ANONYMOUS;
+export async function resolveCaller(
+  request: Request,
+  auth?: Auth,
+): Promise<Caller> {
+  try {
+    const session = await (auth ?? getAuth()).api.getSession({
+      headers: request.headers,
+    });
+    if (!session) return ANONYMOUS;
+    const { id, role, active } = session.user;
+    if (!active || (role !== "owner" && role !== "staff")) return ANONYMOUS;
+    return { kind: "staff", userId: id, role };
+  } catch {
+    return ANONYMOUS;
+  }
 }

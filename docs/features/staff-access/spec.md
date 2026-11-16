@@ -2,13 +2,13 @@
 id: staff-access
 type: feature
 title: Staff Access
-status: planned
-last_modified: 2026-11-15
+status: in-progress
+last_modified: 2026-11-16
 milestone: v1
 pillar: back-office
 depends_on: []
 views: []
-adrs: [ADR-004, ADR-012, ADR-018, ADR-020]
+adrs: [ADR-004, ADR-012, ADR-018, ADR-020, ADR-026, ADR-029]
 roadmap_sections: [phase-2-foundations/staff-access]
 architecture: [auth, data-model, testing]
 components: [web, postgres]
@@ -38,7 +38,7 @@ The dashboard only shows a staff member what they are allowed to use; the server
 
 ## Data
 
-- **Staff user** — name, login, role (owner or staff), notification phone, active flag.
+- **Staff user** — name, login (a username), role (owner or staff), notification phone, active flag.
 - **Session** — managed by Better Auth.
 - **Audit log** — actor, action, booking or setting affected, time, detail. Append-only.
 
@@ -72,5 +72,5 @@ The dashboard only shows a staff member what they are allowed to use; the server
 
 ## Open questions
 
-- Is the login an email, a phone number or a plain username? The interview left "email or phone + password" open.
+- ~~Is the login an email, a phone number or a plain username?~~ Settled: a username (ADR-029).
 - Is a forgotten-password flow needed in v1, or is an owner reset enough?

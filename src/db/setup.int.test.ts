@@ -36,7 +36,7 @@ describe("dev seed", () => {
   it("creates an owner, occasions and a weekly pattern", async () => {
     await seed(db);
     expect(await db.select().from(staffUser)).toMatchObject([
-      { login: "owner", role: "owner" },
+      { username: "owner", role: "owner" },
     ]);
     expect((await db.select().from(occasion)).length).toBeGreaterThan(0);
     const slots = await db.select().from(slotPattern);

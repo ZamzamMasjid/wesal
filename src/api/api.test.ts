@@ -42,8 +42,9 @@ describe("authorize", () => {
   it("fails closed on an unknown access level", () => {
     expect(authorize("weird" as never, owner)).toBe("forbidden");
   });
-  it("resolves every request to anonymous until staff login exists", async () => {
-    expect(await resolveCaller(new Request("http://x/"))).toEqual(anon);
+  it("resolves to anonymous when there is no session", async () => {
+    const auth = { api: { getSession: async () => null } } as never;
+    expect(await resolveCaller(new Request("http://x/"), auth)).toEqual(anon);
   });
 });
 

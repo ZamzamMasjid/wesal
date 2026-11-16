@@ -2,7 +2,7 @@
 id: data-model
 type: architecture
 title: Data Model
-last_modified: 2026-11-15
+last_modified: 2026-11-16
 review: draft
 depends_on: [overview]
 components: []
@@ -86,7 +86,7 @@ erDiagram
   }
   STAFF_USER {
     string name
-    string login
+    string username
     string role
     string notify_phone
     bool active

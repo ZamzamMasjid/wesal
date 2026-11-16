@@ -2,6 +2,9 @@
 // Idempotent: safe to run repeatedly. Never run against production.
 import { eq } from "drizzle-orm";
 
+import { createStaffAccount } from "@/auth/accounts";
+import { createAuth } from "@/auth/auth";
+
 import { createDb, requireDatabaseUrl, type Database } from "./client";
 import { occasion, slotPattern, staffUser } from "./schema";
 
@@ -23,18 +26,31 @@ const FRIDAY_SLOTS = [
   { start: "18:00", end: "22:00" },
 ];
 
-export async function seed(db: Database): Promise<void> {
-  await db.transaction(async (tx) => {
-    const owner = await tx
-      .select({ id: staffUser.id })
-      .from(staffUser)
-      .where(eq(staffUser.login, "owner"));
-    if (owner.length === 0) {
-      await tx
-        .insert(staffUser)
-        .values({ name: "Owner", login: "owner", role: "owner" });
-    }
+/** The development owner login. Override the password with SEED_OWNER_PASSWORD. */
+export const SEED_OWNER_USERNAME = "owner";
+export const SEED_OWNER_DEFAULT_PASSWORD = "owner-password";
 
+export async function seed(db: Database): Promise<void> {
+  const owner = await db
+    .select({ id: staffUser.id })
+    .from(staffUser)
+    .where(eq(staffUser.username, SEED_OWNER_USERNAME));
+  if (owner.length === 0) {
+    // Only the password hash is used from this instance, so the secret and URL
+    // here never leave the seed script.
+    const auth = createAuth(db, {
+      secret: "seed-script-only-secret-not-used-for-sessions",
+      baseURL: "http://localhost:3000",
+    });
+    await createStaffAccount(auth, {
+      name: "Owner",
+      username: SEED_OWNER_USERNAME,
+      password: process.env.SEED_OWNER_PASSWORD ?? SEED_OWNER_DEFAULT_PASSWORD,
+      role: "owner",
+    });
+  }
+
+  await db.transaction(async (tx) => {
     if ((await tx.select({ id: occasion.id }).from(occasion)).length === 0) {
       await tx
         .insert(occasion)

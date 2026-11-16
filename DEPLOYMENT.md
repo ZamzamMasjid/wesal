@@ -64,6 +64,16 @@ Order (ADR-021): build image, run `node dist/migrate.mjs` on a temporary machine
 
 Migrations must not break the version they replace: add in one deploy, remove in a later one.
 
+## Creating the first owner (once)
+
+There is no sign-up, so a fresh production database has nobody who can log in. After the first deploy that includes staff login, create the owner from the running machine:
+
+```bash
+fly ssh console -a wesal -t -C "node dist/create-owner.mjs --username owner --name Owner"
+```
+
+It asks for the password at a hidden prompt (minimum 8 characters); the password is never an argument, so it stays out of shell history. It refuses if an active owner already exists, so it cannot create a second one. The owner then adds staff from the dashboard. Locally, `npm run owner:create -- --username owner --name Owner` does the same; `npm run db:seed` creates a dev owner with a known password and must never run against production.
+
 ## Checking a deploy
 
 ```bash

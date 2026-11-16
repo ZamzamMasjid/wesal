@@ -2,7 +2,7 @@
 id: phase-1-infrastructure
 type: roadmap-phase
 title: Phase 1 — Infrastructure
-status: in-progress
+status: shipped
 last_modified: 2026-11-16
 milestone: v1
 phase_number: 1
@@ -27,7 +27,7 @@ None. A Fly.io account and a GitHub repository are needed for the deployment and
 The Next.js application skeleton that every later section builds on. Builds the `web` component: TypeScript, Tailwind, shadcn/ui, bilingual routing with RTL, and the JSON API conventions.
 
 - [x] Scaffold Next.js App Router project with strict TypeScript, ESLint and Prettier
-- [x] c
+- [x] Add Tailwind CSS and shadcn/ui with logical-property (RTL-safe) defaults
 - [x] Add locale routing: Arabic default (RTL) and English, with message catalogs
 - [x] Add `/api/v1` conventions: zod validation, typed error envelope, error codes
 - [x] Add structured logger and injectable clock used by all services
@@ -61,5 +61,5 @@ Production on Fly.io. Builds the production `postgres` machine and the `upload-v
 - [x] Write Dockerfile and fly.toml for the app (ams region, always on, no auto-stop)
 - [x] Provision self-run Postgres machine with a volume and daily snapshots
 - [x] Create and mount the upload volume at /data with media and proofs directories
-- [ ] Set Fly secrets (database URL, auth secret, Twilio) and document the deploy steps
+- [x] Set Fly secrets (database URL, auth secret, Twilio) and document the deploy steps _(Twilio secrets are set when message-delivery ships; see DEPLOYMENT.md)_
 - [x] Add health endpoint and static fallback notice with venue phone and WhatsApp

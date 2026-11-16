@@ -2,8 +2,8 @@
 id: phase-2-foundations
 type: roadmap-phase
 title: Phase 2 — Foundations
-status: planned
-last_modified: 2026-11-15
+status: in-progress
+last_modified: 2026-11-16
 milestone: v1
 phase_number: 2
 sections: [staff-access, venue-settings, slot-schedule, message-delivery, phone-verification]
@@ -26,7 +26,8 @@ Phase 1. Message delivery needs Twilio trial credentials for real sends; the fak
 
 Dashboard login, roles and the audit log. Extends `web`; data in `postgres`.
 
-- [ ] Integrate Better Auth with password login and Drizzle-backed sessions
+- [x] Integrate Better Auth with password login and Drizzle-backed sessions
+- [x] Add `owner:create` script that creates the first owner on a fresh production database
 - [ ] Add owner and staff roles with an API authorization guard
 - [ ] Implement dashboard shell and login screen in Arabic and English
 - [ ] Implement staff account management for the owner (create, disable, reset password)

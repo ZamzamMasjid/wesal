@@ -7,8 +7,8 @@ generated_by: axiom:reindex
 budgets: {}
 activities: []
 active:
-  phase: phase-1-infrastructure
-  section: deployment
+  phase: phase-2-foundations
+  section: staff-access
 ---
 
 # Project Index
@@ -17,8 +17,8 @@ active:
 
 ## Active work
 
-- **Current phase**: phase-1-infrastructure
-- **Current section**: deployment
+- **Current phase**: phase-2-foundations
+- **Current section**: staff-access
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars
@@ -50,7 +50,7 @@ active:
 | `push-notifications` | Push Notifications | planned | later | mobile-app | phase-7-mobile-app/push-notifications |
 | `slot-alerts` | Slot Alerts | planned | later | availability | phase-6-alerts-and-reports/slot-alerts |
 | `slot-schedule` | Slot Schedule | planned | v1 | availability | phase-2-foundations/slot-schedule |
-| `staff-access` | Staff Access | planned | v1 | back-office | phase-2-foundations/staff-access |
+| `staff-access` | Staff Access | in-progress | v1 | back-office | phase-2-foundations/staff-access |
 | `staff-notifications` | Staff Notifications | planned | v1 | messaging | phase-4-operations/staff-notifications |
 | `venue-settings` | Venue Settings | planned | v1 | back-office | phase-2-foundations/venue-settings |
 
@@ -83,8 +83,8 @@ active:
 
 | Phase | Status | Milestone | Sections |
 |---|---|---|---|
-| `phase-1-infrastructure` | in-progress | v1 | project-setup, database, testing, deployment |
-| `phase-2-foundations` | planned | v1 | staff-access, venue-settings, slot-schedule, message-delivery, phone-verification |
+| `phase-1-infrastructure` | shipped | v1 | project-setup, database, testing, deployment |
+| `phase-2-foundations` | in-progress | v1 | staff-access, venue-settings, slot-schedule, message-delivery, phone-verification |
 | `phase-3-booking` | planned | v1 | public-calendar, booking-hold, booking-page, payment-proof |
 | `phase-4-operations` | planned | v1 | payment-review, staff-notifications, booking-management |
 | `phase-5-public-site` | planned | v1 | content-management, landing-page |
@@ -152,6 +152,7 @@ active:
 | `ADR-026` | Define operations once, with a fixed result envelope and one error-code registry | Accepted | phase-1-infrastructure/project-setup |
 | `ADR-027` | Write a small JSON logger and take time from an injected clock | Accepted | phase-1-infrastructure/project-setup |
 | `ADR-028` | Remember the theme in local storage and apply it with a script in the page head | Accepted | phase-1-infrastructure/project-setup |
+| `ADR-029` | Staff log in with a username; Better Auth's email field holds a placeholder | Accepted | phase-2-foundations/staff-access |
 
 ## Recent changes
 

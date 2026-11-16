@@ -21,7 +21,7 @@ ENV NEXT_PUBLIC_VENUE_PHONE=$NEXT_PUBLIC_VENUE_PHONE \
     NEXT_PUBLIC_VENUE_WHATSAPP=$NEXT_PUBLIC_VENUE_WHATSAPP
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npm run build && npm run build:migrate
+RUN npm run build && npm run build:migrate && npm run build:owner
 
 FROM node:${NODE_VERSION}-alpine AS runtime
 WORKDIR /app
@@ -38,6 +38,8 @@ COPY --from=build /app/.next/static ./.next/static
 COPY --from=build /app/public ./public
 # The release command (ADR-021): a bundled migration runner plus the SQL it applies.
 COPY --from=build /app/dist/migrate.mjs ./dist/migrate.mjs
+# One-off: creates the first owner (docs: DEPLOYMENT.md).
+COPY --from=build /app/dist/create-owner.mjs ./dist/create-owner.mjs
 COPY --from=build /app/drizzle ./drizzle
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh

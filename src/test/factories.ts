@@ -13,8 +13,10 @@ export function aStaffUser(
 ): InferInsertModel<typeof staffUser> {
   const n = next();
   return {
+    id: `staff-${n}`,
     name: `Staff ${n}`,
-    login: `staff${n}`,
+    username: `staff${n}`,
+    email: `staff${n}@staff.wesal.invalid`,
     role: "staff",
     ...overrides,
   };

@@ -21,6 +21,7 @@ export default defineConfig({
         "src/i18n/request.ts",
         "src/i18n/navigation.ts",
         "src/components/theme-toggle.tsx",
+        "src/auth/create-owner.ts", // CLI entry; the logic is tested through first-owner.ts
         "src/db/migrate.ts", // CLI entry; runMigrations is exercised by setup.int.test.ts
       ],
       thresholds: { lines: 80, statements: 80, branches: 70 },
