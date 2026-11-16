@@ -55,7 +55,7 @@ The dashboard only shows a staff member what they are allowed to use; the server
 **Adding a staff member.**
 
 1. Owner opens Staff, enters a name and login, and sets an initial password.
-2. Gives the credentials to the staff member, who logs in and is asked to change the password.
+2. Gives the credentials to the staff member, who logs in with them. There is no forced password change; the owner can reset it at any time.
 
 **Removing access.**
 

@@ -8,7 +8,7 @@ budgets: {}
 activities: []
 active:
   phase: phase-2-foundations
-  section: staff-access
+  section: venue-settings
 ---
 
 # Project Index
@@ -18,7 +18,7 @@ active:
 ## Active work
 
 - **Current phase**: phase-2-foundations
-- **Current section**: staff-access
+- **Current section**: venue-settings
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars

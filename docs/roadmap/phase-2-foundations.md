@@ -32,7 +32,7 @@ Dashboard login, roles and the audit log. Extends `web`; data in `postgres`.
 - [x] Implement dashboard shell and login screen in Arabic and English
 - [x] Implement staff account management for the owner (create, disable, reset password)
 - [x] Implement audit-log table and helper recording every staff action
-- [ ] Ask a staff member to set a new password after the first login with an initial password; continue to a deep link after login
+- [x] Continue to the original dashboard link after login when opened while logged out
 
 ### venue-settings
 

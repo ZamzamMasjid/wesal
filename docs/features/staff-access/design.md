@@ -32,4 +32,4 @@ This feature owns the dashboard shell, which every back-office screen sits in. T
 
 ## Interactions
 
-Navigation items a staff role cannot use are not shown. Arriving from a deep link while logged out shows the login form and then continues to the link. Disabling a staff account asks for confirmation and takes effect immediately. A staff member logging in with an initial password is asked to set a new one before continuing.
+Navigation items a staff role cannot use are not shown. Arriving from a deep link while logged out shows the login form and then continues to the link. Disabling a staff account asks for confirmation and takes effect immediately.
