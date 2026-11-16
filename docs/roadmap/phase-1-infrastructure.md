@@ -30,8 +30,8 @@ The Next.js application skeleton that every later section builds on. Builds the 
 - [x] c
 - [x] Add locale routing: Arabic default (RTL) and English, with message catalogs
 - [x] Add `/api/v1` conventions: zod validation, typed error envelope, error codes
-- [ ] Add structured logger and injectable clock used by all services
-- [ ] Add light/dark theme toggle wired to design tokens
+- [x] Add structured logger and injectable clock used by all services
+- [x] Add light/dark theme toggle wired to design tokens
 
 ### database
 

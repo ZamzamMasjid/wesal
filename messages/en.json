@@ -10,5 +10,9 @@
     "title": "Page not found",
     "description": "We could not find the page you were looking for.",
     "backHome": "Back to the home page"
+  },
+  "Theme": {
+    "switchToDark": "Switch to dark mode",
+    "switchToLight": "Switch to light mode"
   }
 }

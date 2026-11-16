@@ -8,7 +8,7 @@ budgets: {}
 activities: []
 active:
   phase: phase-1-infrastructure
-  section: project-setup
+  section: database
 ---
 
 # Project Index
@@ -18,7 +18,7 @@ active:
 ## Active work
 
 - **Current phase**: phase-1-infrastructure
-- **Current section**: project-setup
+- **Current section**: database
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars
@@ -150,6 +150,8 @@ active:
 | `ADR-024` | Feed design tokens to the app as CSS variables | Accepted | phase-1-infrastructure/project-setup |
 | `ADR-025` | Use next-intl for locale routing and message catalogs | Accepted | phase-1-infrastructure/project-setup |
 | `ADR-026` | Define operations once, with a fixed result envelope and one error-code registry | Accepted | phase-1-infrastructure/project-setup |
+| `ADR-027` | Write a small JSON logger and take time from an injected clock | Accepted | phase-1-infrastructure/project-setup |
+| `ADR-028` | Remember the theme in local storage and apply it with a script in the page head | Accepted | phase-1-infrastructure/project-setup |
 
 ## Recent changes
 

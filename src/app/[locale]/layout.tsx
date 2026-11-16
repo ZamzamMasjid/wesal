@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { localeDirection, routing } from "@/i18n/routing";
+import { themeInitScript } from "@/lib/theme";
 import "../globals.css";
 
 // Cairo carries Arabic and English (ADR-024). Bundled, so no third-party
@@ -40,11 +41,17 @@ export default async function LocaleLayout({
   setRequestLocale(locale);
 
   return (
+    // suppressHydrationWarning: the theme script below sets data-theme on <html>
+    // before React hydrates, which the server HTML cannot know.
     <html
       lang={locale}
       dir={localeDirection(locale)}
       className={cairo.variable}
+      suppressHydrationWarning
     >
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body>
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
       </body>

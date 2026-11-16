@@ -21,18 +21,49 @@ const classStringSelectors = [
   "CallExpression[callee.name=/^(cn|cva|clsx)$/] TemplateElement",
 ];
 
+const physicalClassRules = classStringSelectors.map((selector) => ({
+  selector: `${selector}[value=/${PHYSICAL_UTILITY}/]`,
+  message: physicalClassMessage,
+}));
+
+// Server code reads time only from an injected Clock (src/lib/clock.ts), so
+// tests control it. `new Date(value)` with an argument is fine; asking the system
+// for "now" is not.
+const clockRules = [
+  {
+    selector: "NewExpression[callee.name='Date'][arguments.length=0]",
+    message: "Use the injected Clock (ctx.clock.now()), not new Date().",
+  },
+  {
+    selector:
+      "CallExpression[callee.object.name='Date'][callee.property.name='now']",
+    message: "Use the injected Clock (ctx.clock.now()), not Date.now().",
+  },
+];
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
   {
     rules: {
-      "no-restricted-syntax": [
-        "error",
-        ...classStringSelectors.map((selector) => ({
-          selector: `${selector}[value=/${PHYSICAL_UTILITY}/]`,
-          message: physicalClassMessage,
-        })),
-      ],
+      "no-restricted-syntax": ["error", ...physicalClassRules],
+      // Diagnostics go through the structured logger (src/lib/logger.ts, ADR-017).
+      "no-console": "error",
+    },
+  },
+  {
+    // Server code. The browser keeps its own time (countdowns), and tests may
+    // use real time. The clock itself is the one allowed caller.
+    files: [
+      "src/api/**",
+      "src/lib/**",
+      "src/services/**",
+      "src/operations/**",
+      "src/jobs/**",
+    ],
+    ignores: ["src/lib/clock.ts", "**/*.test.ts", "src/test/**"],
+    rules: {
+      "no-restricted-syntax": ["error", ...physicalClassRules, ...clockRules],
     },
   },
   // Must stay last: turns off stylistic rules that would fight Prettier.
