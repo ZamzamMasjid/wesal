@@ -49,7 +49,7 @@ The test tooling and CI gates decided in the testing strategy.
 - [x] Install Vitest + v8 coverage; add `test` and `coverage` scripts
 - [x] Configure Vitest projects: unit, and integration against real Postgres with per-test isolation
 - [x] Add test scaffold under src/test: factories, database helper, fake clock, fake sender
-- [ ] Install Playwright; write smoke test loading the home page in Arabic and English
+- [x] Install Playwright; write smoke test loading the home page in Arabic and English
 - [x] Wire GitHub Actions to run lint, typecheck and tests on every PR; block on failure
 - [x] Enforce 80% line / 70% branch coverage in CI; block on drop
 - [x] Add CONTRIBUTING note pointing to docs/architecture/testing.md as the source of truth

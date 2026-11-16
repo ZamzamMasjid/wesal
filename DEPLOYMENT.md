@@ -84,10 +84,22 @@ ADR-015 requires knowing the procedure before it is needed.
 
 ```bash
 fly volumes snapshots list <volume-id> -a wesal-db
-fly volumes create wesal_pgdata_restore -a wesal-db --region ams --snapshot-id <snapshot-id>
+# Fly schedules the first snapshot only after a day; to test sooner, take one:
+fly volumes snapshots create <volume-id> -a wesal-db
+# The restore volume must be at least as large as the snapshot (3 GB).
+fly volumes create wesal_pgdata_restore -a wesal-db --region ams --size 3 --snapshot-id <snapshot-id>
+fly machine run postgres:17-alpine -a wesal-db --region ams --name restore-check \
+  -v <restore-volume-id>:/var/lib/postgresql/data \
+  -e PGDATA=/var/lib/postgresql/data/pgdata -e POSTGRES_USER=wesal -e POSTGRES_DB=wesal \
+  --vm-size shared-cpu-1x --vm-memory 512
+fly ssh console -a wesal-db --machine <machine-id> -C "psql -U wesal -d wesal -c 'select count(*) from drizzle.__drizzle_migrations'"
+fly machine destroy <machine-id> -a wesal-db --force
+fly volumes destroy <restore-volume-id> -a wesal-db
 ```
 
-Confirm the restored volume mounts and Postgres starts on it (e.g. a throwaway machine), then destroy the restore volume. Record the date here when done.
+On Windows Git Bash, run these with `MSYS_NO_PATHCONV=1`, or the `/var/lib/...` arguments are rewritten into Windows paths. Postgres then ignores the restored data and initializes an empty database, which looks like a failed restore.
+
+**Rehearsed 2026-11-16:** restored an on-demand snapshot to a new volume and started Postgres on it. It recovered from the write-ahead log and held the migration record and the `btree_gist` extension. Restoring to a new volume and pointing the app at it is the recovery path; remember the app reaches the database at `wesal-db.internal`, so a replacement machine must keep that app name.
 
 ## Local image check
 

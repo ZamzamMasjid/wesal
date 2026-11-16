@@ -11,7 +11,8 @@ RUN npm ci
 
 FROM node:${NODE_VERSION}-alpine AS build
 WORKDIR /app
-ENV NEXT_TELEMETRY_DISABLED=1
+ENV NEXT_TELEMETRY_DISABLED=1 \
+    NEXT_OUTPUT=standalone
 # The static fallback notice shows these without touching the database, so they
 # are inlined at build time (src/lib/venue-contact.ts). Set in fly.toml [build.args].
 ARG NEXT_PUBLIC_VENUE_PHONE=""
