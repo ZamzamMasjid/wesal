@@ -34,3 +34,12 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Affected Docs**: staff-access, data-model, ADR-004, ADR-026, ADR-029, phase-2-foundations
 - **Reason**: First item of the staff-access section; the spec left the login identifier open.
 - **Also**: an `owner:create` script creates the first owner on a fresh database (refuses once an active owner exists), so production has a way in without a sign-up route.
+
+## [2026-11-16] — Staff access: roles, dashboard, accounts, audit log
+
+- **Type**: Feature Change
+- **Summary**: The dashboard exists: a bilingual login screen and a shell (side navigation on desktop, bottom tab bar on phones) that shows each role only what it may use. The owner can list, create, disable, enable and reset the password of staff accounts; disabling or resetting ends that user's open sessions at once, and the last active owner cannot be disabled or demoted. Staff actions are recorded in an append-only audit log, enforced by a database trigger. `GET /api/v1/staff/me`, `/staff/users`, `PATCH /staff/users/{id}` and `/staff/audit` are live, owner-only where the spec says so, and one table-driven test proves every registered owner-only operation refuses staff and anonymous callers.
+- **Affected Docs**: staff-access, data-model, phase-2-foundations
+- **Reason**: Remaining items of the staff-access section.
+- **Also**: new error codes `USERNAME_TAKEN` and `LAST_OWNER`. Not yet built: the forced password change after first login, and continuing to a deep link after login (tracked as an open roadmap item).
+

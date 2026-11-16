@@ -138,7 +138,7 @@ Two points are easy to miss. First, slots are not stored rows: a date's slots ar
 - **No overlapping active bookings.** An exclusion constraint on the booking's time range, restricted to rows whose status is `held`, `proof_submitted` or `confirmed`. Because the constraint is on time ranges, it also protects against overlap when a date exception changes slot times. It needs the `btree_gist` extension and is written as SQL in a migration.
 - **Expiry does not depend on a job.** The constraint cannot read the clock, so hold creation runs in one transaction: first mark any `held` booking on that range whose deadline has passed as `expired`, then insert. A constraint violation is reported as the slot-conflict error. Readers treat a `held` row with a past deadline as free (ADR-010).
 - **Unique identifiers.** `public_id` and `access_token` are unique; both are random.
-- **Audit rows are never updated or deleted.**
+- **Audit rows are never updated or deleted.** A trigger on `audit_log` refuses UPDATE and DELETE.
 - **Settings is a single row.**
 
 ## Booking lifecycle

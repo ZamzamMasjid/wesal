@@ -28,10 +28,11 @@ Dashboard login, roles and the audit log. Extends `web`; data in `postgres`.
 
 - [x] Integrate Better Auth with password login and Drizzle-backed sessions
 - [x] Add `owner:create` script that creates the first owner on a fresh production database
-- [ ] Add owner and staff roles with an API authorization guard
-- [ ] Implement dashboard shell and login screen in Arabic and English
-- [ ] Implement staff account management for the owner (create, disable, reset password)
-- [ ] Implement audit-log table and helper recording every staff action
+- [x] Add owner and staff roles with an API authorization guard
+- [x] Implement dashboard shell and login screen in Arabic and English
+- [x] Implement staff account management for the owner (create, disable, reset password)
+- [x] Implement audit-log table and helper recording every staff action
+- [ ] Ask a staff member to set a new password after the first login with an initial password; continue to a deep link after login
 
 ### venue-settings
 

@@ -1,0 +1,16 @@
+export type NavItem = {
+  href: "/dashboard" | "/dashboard/staff";
+  label: "home" | "staff";
+  /** Only owners see it; the server enforces the same rule. */
+  ownerOnly?: boolean;
+};
+
+const ALL_ITEMS: NavItem[] = [
+  { href: "/dashboard", label: "home" },
+  { href: "/dashboard/staff", label: "staff", ownerOnly: true },
+];
+
+/** The navigation a role may see. Items it cannot use are not shown. */
+export function navFor(role: "owner" | "staff"): NavItem[] {
+  return ALL_ITEMS.filter((item) => !item.ownerOnly || role === "owner");
+}

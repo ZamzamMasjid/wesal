@@ -4,7 +4,9 @@
 import {
   boolean,
   index,
+  bigint,
   integer,
+  jsonb,
   pgTable,
   smallint,
   text,
@@ -114,3 +116,32 @@ export const slotPattern = pgTable("slot_pattern", {
   endTime: time("end_time").notNull(),
   ...timestamps,
 });
+
+/**
+ * Append-only record of staff actions (auth architecture, "Audit"). A database
+ * trigger refuses UPDATE and DELETE, so rows are never edited or removed.
+ * `bookingId` has no foreign key yet: the booking table arrives in phase 3,
+ * which adds the constraint.
+ */
+export const auditLog = pgTable(
+  "audit_log",
+  {
+    id: bigint("id", { mode: "number" })
+      .primaryKey()
+      .generatedAlwaysAsIdentity(),
+    actorId: text("actor_id")
+      .notNull()
+      .references(() => staffUser.id),
+    /** A dotted verb, e.g. "staff.create", "staff.disable". */
+    action: text("action").notNull(),
+    /** What the action touched, e.g. "staff_user:abc", "setting:deposit". */
+    target: text("target"),
+    bookingId: integer("booking_id"),
+    detail: jsonb("detail").$type<Record<string, unknown>>(),
+    at: timestamp("at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (t) => [
+    index("audit_log_booking_id_idx").on(t.bookingId),
+    index("audit_log_at_idx").on(t.at),
+  ],
+);

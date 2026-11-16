@@ -12,6 +12,10 @@ export const ERROR_STATUS = {
   INTERNAL: 500,
   SERVICE_UNAVAILABLE: 503,
 
+  // Staff access
+  USERNAME_TAKEN: 409,
+  LAST_OWNER: 409,
+
   // Booking (booking-hold, booking-management, payment-proof)
   SLOT_TAKEN: 409,
   HOLD_EXPIRED: 409,
