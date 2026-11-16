@@ -2,7 +2,7 @@
 id: venue-settings
 type: feature-design
 title: Venue Settings — Design
-last_modified: 2026-11-15
+last_modified: 2026-11-16
 feature: venue-settings
 ---
 
@@ -16,21 +16,21 @@ Inherits from `docs/design/system.md` at dashboard density. Money and percentage
 
 ## Components
 
-- **Settings tabs** — Occasions, Deposit and payment, Booking rules.
-- **Occasions table** — Arabic name, English name, price, active toggle, order controls; Add occasion row.
-- **Deposit field** — percentage with a live example: "Wedding: deposit 2,500 EGP".
-- **Payment details form** — Vodafone Cash number, InstaPay address.
-- **Booking rules form** — hold length, near-slot cutoff, urgent threshold, each with a one-line explanation.
-- **Active-holds warning** — shown when payment details are edited while holds are active.
+The page is one scrolling screen with three sections; there are no tabs.
+
+- **Occasions and prices** — one card per occasion: Arabic name, English name, price, a status line ("Offered at 15,000 EGP" or "Not offered"), a Save button and a Deactivate/Activate button. An Add occasion card sits below. Occasions keep creation order; there are no reorder controls in v1.
+- **Deposit and booking rules** — deposit percentage, hold length, near-slot cutoff and urgent threshold, each with a one-line explanation where the meaning is not obvious.
+- **Payment details** — Vodafone Cash number and InstaPay address, with the always-visible caution about active holds.
+- **No-payment banner** — shown above the payment fields when neither method is set.
 
 ## States
 
 | State | Behavior |
 |---|---|
-| Empty | No occasions: "Add the occasions the venue can be booked for". No payment method: banner explaining that online booking is off until one is set |
-| Loading | Skeleton rows and fields |
-| Error | Validation inline on the field; save failure keeps contents and shows the error at the top of the tab |
+| Empty | No payment method: banner explaining that online booking is off until one is set |
+| Loading | A single "Loading…" line until occasions and settings arrive |
+| Error | Validation failures and save failures show one localized notice at the top of the section; the form keeps its contents |
 
 ## Interactions
 
-Each tab saves on its own with a Save button and warns on leaving with unsaved changes. Deactivating an occasion asks for confirmation and explains that existing bookings are unaffected. Changing a price shows the old and new value in the confirmation toast.
+Occasions save one at a time with their own Save button. Deposit, booking rules and payment details save together with one "Save settings" button. Forms do not use browser validation; the server's validation error is shown as the localized notice. Deactivating an occasion asks for confirmation and explains that existing bookings are unaffected; activating needs none. A successful save shows a short confirmation notice.

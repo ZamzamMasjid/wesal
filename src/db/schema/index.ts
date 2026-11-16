@@ -1,8 +1,10 @@
 // Drizzle schema. Column-level detail lives here and in the migrations;
 // entities and invariants are fixed in docs/architecture/data-model.md.
 // Later sections add their tables (booking, outbox, ...) and re-export them here.
+import { sql } from "drizzle-orm";
 import {
   boolean,
+  check,
   index,
   bigint,
   integer,
@@ -107,6 +109,38 @@ export const occasion = pgTable("occasion", {
   position: integer("position").notNull().default(0),
   ...timestamps,
 });
+
+/**
+ * The venue's booking rules and payment details. Always a single row (id 1,
+ * enforced by a check constraint); read it with `loadSettings`, which creates
+ * the row with these defaults the first time.
+ */
+export const settings = pgTable(
+  "settings",
+  {
+    id: smallint("id").primaryKey().default(1),
+    depositPercent: smallint("deposit_percent").notNull().default(50),
+    holdMinutes: smallint("hold_minutes").notNull().default(20),
+    /** A slot starting sooner than this cannot be held online. */
+    nearSlotCutoffMinutes: integer("near_slot_cutoff_minutes")
+      .notNull()
+      .default(120),
+    /** A hold on a slot starting within this many minutes is flagged urgent. */
+    urgentThresholdMinutes: integer("urgent_threshold_minutes")
+      .notNull()
+      .default(1440),
+    vodafoneCashNumber: text("vodafone_cash_number"),
+    instapayAddress: text("instapay_address"),
+    ...timestamps,
+  },
+  (t) => [
+    check("settings_single_row", sql`${t.id} = 1`),
+    check(
+      "settings_deposit_percent_range",
+      sql`${t.depositPercent} between 1 and 100`,
+    ),
+  ],
+);
 
 /** The default slots for a weekday (0 = Sunday ... 6 = Saturday), in Africa/Cairo wall-clock time. */
 export const slotPattern = pgTable("slot_pattern", {

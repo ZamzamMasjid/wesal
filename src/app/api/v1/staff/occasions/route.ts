@@ -1,0 +1,7 @@
+import { route } from "@/api/http";
+import { occasionOperations } from "@/ops/venue/occasions";
+
+export const dynamic = "force-dynamic";
+
+export const GET = route(occasionOperations.listStaff);
+export const POST = route(occasionOperations.create, { successStatus: 201 });

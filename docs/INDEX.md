@@ -8,7 +8,7 @@ budgets: {}
 activities: []
 active:
   phase: phase-2-foundations
-  section: venue-settings
+  section: slot-schedule
 ---
 
 # Project Index
@@ -18,7 +18,7 @@ active:
 ## Active work
 
 - **Current phase**: phase-2-foundations
-- **Current section**: venue-settings
+- **Current section**: slot-schedule
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars
@@ -52,7 +52,7 @@ active:
 | `slot-schedule` | Slot Schedule | planned | v1 | availability | phase-2-foundations/slot-schedule |
 | `staff-access` | Staff Access | in-progress | v1 | back-office | phase-2-foundations/staff-access |
 | `staff-notifications` | Staff Notifications | planned | v1 | messaging | phase-4-operations/staff-notifications |
-| `venue-settings` | Venue Settings | planned | v1 | back-office | phase-2-foundations/venue-settings |
+| `venue-settings` | Venue Settings | shipped | v1 | back-office | phase-2-foundations/venue-settings |
 
 ## Architecture
 

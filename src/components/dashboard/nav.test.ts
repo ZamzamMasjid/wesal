@@ -5,8 +5,12 @@ import { describe, expect, it } from "vitest";
 import { navFor } from "./nav";
 
 describe("navFor", () => {
-  it("shows the staff page to owners only", () => {
-    expect(navFor("owner").map((i) => i.label)).toEqual(["home", "staff"]);
+  it("shows the settings and staff pages to owners only", () => {
+    expect(navFor("owner").map((i) => i.label)).toEqual([
+      "home",
+      "settings",
+      "staff",
+    ]);
     expect(navFor("staff").map((i) => i.label)).toEqual(["home"]);
   });
 });

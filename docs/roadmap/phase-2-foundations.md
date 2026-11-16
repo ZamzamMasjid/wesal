@@ -38,9 +38,9 @@ Dashboard login, roles and the audit log. Extends `web`; data in `postgres`.
 
 Occasions, prices, deposit and payment details. Extends `web`; data in `postgres`.
 
-- [ ] Implement occasion CRUD API with Arabic/English names and price
-- [ ] Implement settings API: deposit %, payment details, hold length, near-slot cutoff
-- [ ] Implement owner-only settings screens for occasions, deposit and payment details
+- [x] Implement occasion CRUD API with Arabic/English names and price
+- [x] Implement settings API: deposit %, payment details, hold length, near-slot cutoff
+- [x] Implement owner-only settings screens for occasions, deposit and payment details
 
 ### slot-schedule
 

@@ -43,3 +43,17 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Reason**: Remaining items of the staff-access section.
 - **Also**: new error codes `USERNAME_TAKEN` and `LAST_OWNER`. A staff member is not made to change the initial password on first login (decided; removed from the spec). Opening a dashboard link while logged out now continues to that link after login.
 
+
+## [2026-11-16] — Venue settings defaults
+
+- **Type**: Clarification
+- **Summary**: Venue settings are built: owner-only occasion and settings APIs and a bilingual settings screen. Defaults were chosen for the open question: hold 20 minutes, near-slot cutoff 120 minutes, urgent threshold 1440 minutes, deposit 50%. The settings row is created on first read. The caution about changing payment details while holds are active is always shown until bookings exist.
+- **Affected Docs**: venue-settings
+- **Reason**: Implementing `phase-2-foundations/venue-settings`.
+
+## [2026-11-16] — Venue settings design aligned to the shipped page
+
+- **Type**: Design Change
+- **Summary**: The venue settings design now describes the shipped single-page layout: three sections instead of tabs, per-occasion Save, one Save for deposit, rules and payment, a Deactivate/Activate button instead of a toggle, and a localized notice for validation errors. Occasion reordering, the live deposit example, the unsaved-changes warning and the old-to-new price toast are dropped from v1.
+- **Affected Docs**: venue-settings (design)
+- **Reason**: `axiom:ui-check` found the shipped UI differed from the design in these places; the owner chose to align the docs to the code.

@@ -1,5 +1,7 @@
 import { getHealth } from "./health";
 import { staffOperations } from "./staff/staff";
+import { occasionOperations } from "./venue/occasions";
+import { settingsOperations } from "./venue/settings";
 
 import type { Operation } from "@/api/operation";
 
@@ -8,4 +10,6 @@ import type { Operation } from "@/api/operation";
 export const operations: Operation<unknown>[] = [
   getHealth,
   ...Object.values(staffOperations),
+  ...Object.values(occasionOperations),
+  ...Object.values(settingsOperations),
 ];

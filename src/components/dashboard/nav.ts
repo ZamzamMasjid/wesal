@@ -1,12 +1,13 @@
 export type NavItem = {
-  href: "/dashboard" | "/dashboard/staff";
-  label: "home" | "staff";
+  href: "/dashboard" | "/dashboard/staff" | "/dashboard/settings";
+  label: "home" | "staff" | "settings";
   /** Only owners see it; the server enforces the same rule. */
   ownerOnly?: boolean;
 };
 
 const ALL_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "home" },
+  { href: "/dashboard/settings", label: "settings", ownerOnly: true },
   { href: "/dashboard/staff", label: "staff", ownerOnly: true },
 ];
 
