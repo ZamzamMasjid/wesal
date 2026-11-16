@@ -1,0 +1,17 @@
+node_modules
+.next
+.git
+.github
+.idea
+.claude
+coverage
+test-results
+playwright-report
+dist
+docs
+e2e
+.env*
+!.env.example
+*.tsbuildinfo
+fly*.toml
+Dockerfile

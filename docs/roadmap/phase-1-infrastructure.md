@@ -58,8 +58,8 @@ The test tooling and CI gates decided in the testing strategy.
 
 Production on Fly.io. Builds the production `postgres` machine and the `upload-volume` component, and ships `web`.
 
-- [ ] Write Dockerfile and fly.toml for the app (ams region, always on, no auto-stop)
-- [ ] Provision self-run Postgres machine with a volume and daily snapshots
-- [ ] Create and mount the upload volume at /data with media and proofs directories
+- [x] Write Dockerfile and fly.toml for the app (ams region, always on, no auto-stop)
+- [x] Provision self-run Postgres machine with a volume and daily snapshots
+- [x] Create and mount the upload volume at /data with media and proofs directories
 - [ ] Set Fly secrets (database URL, auth secret, Twilio) and document the deploy steps
-- [ ] Add health endpoint and static fallback notice with venue phone and WhatsApp
+- [x] Add health endpoint and static fallback notice with venue phone and WhatsApp

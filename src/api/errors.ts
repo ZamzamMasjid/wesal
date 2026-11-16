@@ -10,6 +10,7 @@ export const ERROR_STATUS = {
   NOT_FOUND: 404,
   RATE_LIMITED: 429,
   INTERNAL: 500,
+  SERVICE_UNAVAILABLE: 503,
 
   // Booking (booking-hold, booking-management, payment-proof)
   SLOT_TAKEN: 409,

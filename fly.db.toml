@@ -1,0 +1,29 @@
+# The database machine: self-run Postgres with its own volume (ADR-002).
+# Not exposed publicly: the app reaches it at wesal-db.internal:5432 over
+# Fly's private network. Deploy with `fly deploy -c fly.db.toml`.
+# Full steps: DEPLOYMENT.md.
+app = "wesal-db"
+primary_region = "ams"
+
+[build]
+  image = "postgres:17-alpine"
+
+[env]
+  POSTGRES_USER = "wesal"
+  POSTGRES_DB = "wesal"
+  # A subdirectory of the mount: Postgres refuses a data directory that holds
+  # lost+found, which a fresh volume contains.
+  PGDATA = "/var/lib/postgresql/data/pgdata"
+
+# POSTGRES_PASSWORD is a Fly secret (DEPLOYMENT.md).
+
+[[mounts]]
+  source = "wesal_pgdata"
+  destination = "/var/lib/postgresql/data"
+  initial_size = "3gb"
+
+# No [http_service] and no [[services]]: nothing is published to the internet.
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

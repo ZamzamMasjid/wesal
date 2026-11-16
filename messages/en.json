@@ -14,5 +14,12 @@
   "Theme": {
     "switchToDark": "Switch to dark mode",
     "switchToLight": "Switch to light mode"
+  },
+  "Unavailable": {
+    "title": "We're temporarily unavailable",
+    "description": "Something went wrong on our side. You can still reach the venue directly to book.",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "retry": "Try again"
   }
 }

@@ -1,0 +1,55 @@
+# The app machine: `web` plus the upload volume (ADR-007, ADR-009, ADR-005).
+# Deploy with `fly deploy`. Full steps: DEPLOYMENT.md.
+app = "wesal"
+primary_region = "ams"
+
+[build]
+  dockerfile = "Dockerfile"
+
+  # Venue contact for the static fallback notice (shown if the database is down).
+  # Fill in before the first deploy; the notice hides a link that is empty.
+  [build.args]
+    NEXT_PUBLIC_VENUE_PHONE = "+201283414467"
+    NEXT_PUBLIC_VENUE_WHATSAPP = "+201283414467"
+
+[env]
+  NODE_ENV = "production"
+  PORT = "3000"
+  UPLOAD_DIR = "/data"
+  LOG_LEVEL = "info"
+
+[deploy]
+  # Migrations run on a temporary machine built from the new image, with no
+  # volume, before the app machine is replaced. A failure aborts the deploy
+  # and the old version keeps serving (ADR-021).
+  release_command = "node dist/migrate.mjs"
+  # One machine, one volume: it is stopped and replaced, never run alongside
+  # a second one (ADR-009).
+  strategy = "immediate"
+
+# The upload volume: venue media and payment proofs (ADR-005).
+[[mounts]]
+  source = "wesal_data"
+  destination = "/data"
+  initial_size = "3gb"
+
+[http_service]
+  internal_port = 3000
+  force_https = true
+  # Always on: the in-process job loop must keep running (ADR-007, ADR-009).
+  auto_stop_machines = "off"
+  auto_start_machines = false
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    method = "GET"
+    # ?probe=web checks the process only, so a database outage leaves the
+    # machine in rotation and visitors see the fallback notice.
+    path = "/api/v1/health?probe=web"
+    interval = "15s"
+    timeout = "5s"
+    grace_period = "30s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"
