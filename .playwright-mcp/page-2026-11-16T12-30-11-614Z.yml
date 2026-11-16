@@ -1,0 +1,16 @@
+- generic [active] [ref=e1]:
+  - main [ref=e2]:
+    - generic [ref=e3]:
+      - heading "دخول الموظفين" [level=1] [ref=e4]
+      - button "التبديل إلى الوضع الداكن" [ref=e5]
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - text: اسم الدخول
+        - textbox "اسم الدخول" [ref=e8]
+      - generic [ref=e9]:
+        - text: كلمة المرور
+        - generic [ref=e10]:
+          - textbox "كلمة المرور" [ref=e11]
+          - button "إظهار كلمة المرور" [ref=e12]
+      - button "دخول" [ref=e13]
+  - button "Open Next.js Dev Tools" [ref=e19] [cursor=pointer]

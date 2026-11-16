@@ -16,6 +16,10 @@ export const ERROR_STATUS = {
   USERNAME_TAKEN: 409,
   LAST_OWNER: 409,
 
+  // Slot schedule: the edit would remove or change a slot that has an active
+  // booking. `details.bookings` lists them.
+  SCHEDULE_CONFLICT: 409,
+
   // Booking (booking-hold, booking-management, payment-proof)
   SLOT_TAKEN: 409,
   HOLD_EXPIRED: 409,

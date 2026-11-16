@@ -2,8 +2,8 @@
 id: slot-schedule
 type: feature
 title: Slot Schedule
-status: planned
-last_modified: 2026-11-15
+status: shipped
+last_modified: 2026-11-16
 milestone: v1
 pillar: availability
 depends_on: [staff-access]
@@ -41,10 +41,11 @@ Slots are computed, not stored per date. A booking keeps its own start and end, 
 
 ## Surface
 
-- `GET /api/v1/staff/schedule/pattern`, `PUT /api/v1/staff/schedule/pattern` — owner only; the whole weekly pattern.
-- `GET /api/v1/staff/schedule/exceptions?from&to` — owner only.
-- `PUT /api/v1/staff/schedule/exceptions/{date}`, `DELETE /api/v1/staff/schedule/exceptions/{date}` — owner only.
-- Internal: the slot resolver, used by `public-calendar` and `booking-hold`.
+- `GET /api/v1/staff/schedule/pattern`, `PUT /api/v1/staff/schedule/pattern` — owner only; the whole weekly pattern (`{ slots: [{ weekday, start, end }] }`, weekday 0 = Sunday, times `HH:MM`). `PUT` replaces the pattern.
+- `GET /api/v1/staff/schedule/exceptions?from&to` — owner only; exceptions with their slots, from `from` (default today, Africa/Cairo) to `to` (default no limit).
+- `PUT /api/v1/staff/schedule/exceptions/{date}`, `DELETE /api/v1/staff/schedule/exceptions/{date}` — owner only. `PUT` takes `{ closed, note?, slots }` and replaces any exception on that date; a closed date has no slots, an open one has at least one. Dates before today are refused.
+- Internal: the slot resolver (`resolveSlots`, `resolveRange`, and the pure `resolveDay`), used by `public-calendar` and `booking-hold`.
+- Errors: `VALIDATION_FAILED` for overlap, end-not-after-start or a bad date (the issue path names the offending slot, e.g. `slots.2.start`); `SCHEDULE_CONFLICT` (409) when active bookings block the edit, with `details.bookings` listing them.
 
 ## Workflows
 
@@ -67,9 +68,12 @@ Slots are computed, not stored per date. A booking keeps its own start and end, 
 
 - An edit that would remove or change a slot on a date with an active booking is refused, with a list of the affected bookings. The owner cancels or waits first.
 - Pattern changes apply to future dates only in effect: existing bookings keep their stored times.
-- All times are Africa/Cairo. A slot may not cross midnight in v1.
+- All times are Africa/Cairo. A slot may not cross midnight in v1, so its end is after its start on the same day and no later than 23:59.
 - Closing a date with active bookings is refused for the same reason as other conflicting edits.
-- Every schedule change writes an audit row.
+- The guard compares a date's slots before and after the edit. On a date whose slots change, every active booking must still match one of the new slots exactly (same start and end); otherwise the edit is refused. A pattern change does not affect dates that have their own exception.
+- The guard asks for active bookings through an injected finder. Until the booking table exists (phase 3, `booking-hold`) the finder returns nothing, so no edit can conflict yet; `booking-hold` supplies the real query.
+- Schedule edits are serialized with a database advisory lock, so the guard reads a stable schedule. The booking exclusion constraint remains the final protection against overlap.
+- Every schedule change writes an audit row (`schedule.pattern.update`, `schedule.exception.create`, `.update`, `.delete`) with the old and new values. A pattern save that changes nothing writes none.
 
 ## Open questions
 

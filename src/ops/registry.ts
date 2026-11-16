@@ -1,5 +1,6 @@
 import { getHealth } from "./health";
 import { staffOperations } from "./staff/staff";
+import { scheduleOperations } from "./schedule/schedule";
 import { occasionOperations } from "./venue/occasions";
 import { settingsOperations } from "./venue/settings";
 
@@ -12,4 +13,5 @@ export const operations: Operation<unknown>[] = [
   ...Object.values(staffOperations),
   ...Object.values(occasionOperations),
   ...Object.values(settingsOperations),
+  ...Object.values(scheduleOperations),
 ];

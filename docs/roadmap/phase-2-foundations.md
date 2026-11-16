@@ -46,11 +46,11 @@ Occasions, prices, deposit and payment details. Extends `web`; data in `postgres
 
 The weekly slot pattern, date exceptions and blocked dates. Extends `web`; data in `postgres`.
 
-- [ ] Implement weekly slot pattern schema and API with overlap validation
-- [ ] Implement date exceptions: custom slots for a date, or the date closed
-- [ ] Implement slot resolver returning a date's slots from pattern plus exceptions
-- [ ] Guard schedule edits against dates that have active bookings
-- [ ] Implement schedule-editor view: weekly grid, exceptions list, block a date
+- [x] Implement weekly slot pattern schema and API with overlap validation
+- [x] Implement date exceptions: custom slots for a date, or the date closed
+- [x] Implement slot resolver returning a date's slots from pattern plus exceptions
+- [x] Guard schedule edits against dates that have active bookings
+- [x] Implement schedule-editor view: weekly grid, exceptions list, block a date
 
 ### message-delivery
 

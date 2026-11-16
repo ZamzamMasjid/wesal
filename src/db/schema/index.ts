@@ -5,6 +5,7 @@ import { sql } from "drizzle-orm";
 import {
   boolean,
   check,
+  date,
   index,
   bigint,
   integer,
@@ -143,13 +144,51 @@ export const settings = pgTable(
 );
 
 /** The default slots for a weekday (0 = Sunday ... 6 = Saturday), in Africa/Cairo wall-clock time. */
-export const slotPattern = pgTable("slot_pattern", {
-  id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
-  weekday: smallint("weekday").notNull(),
-  startTime: time("start_time").notNull(),
-  endTime: time("end_time").notNull(),
+export const slotPattern = pgTable(
+  "slot_pattern",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    weekday: smallint("weekday").notNull(),
+    startTime: time("start_time").notNull(),
+    endTime: time("end_time").notNull(),
+    ...timestamps,
+  },
+  (t) => [
+    check("slot_pattern_weekday_range", sql`${t.weekday} between 0 and 6`),
+    check("slot_pattern_ends_after_start", sql`${t.endTime} > ${t.startTime}`),
+  ],
+);
+
+/**
+ * A date whose slots differ from the weekly pattern: either closed, or replaced
+ * by its own `exceptionSlot` rows. `day` is a Africa/Cairo calendar date.
+ */
+export const dateException = pgTable("date_exception", {
+  day: date("day", { mode: "string" }).primaryKey(),
+  closed: boolean("closed").notNull().default(false),
+  note: text("note"),
   ...timestamps,
 });
+
+/** One of the custom slots of a date exception (empty when the date is closed). */
+export const exceptionSlot = pgTable(
+  "exception_slot",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    day: date("day", { mode: "string" })
+      .notNull()
+      .references(() => dateException.day, { onDelete: "cascade" }),
+    startTime: time("start_time").notNull(),
+    endTime: time("end_time").notNull(),
+  },
+  (t) => [
+    index("exception_slot_day_idx").on(t.day),
+    check(
+      "exception_slot_ends_after_start",
+      sql`${t.endTime} > ${t.startTime}`,
+    ),
+  ],
+);
 
 /**
  * Append-only record of staff actions (auth architecture, "Audit"). A database

@@ -2,7 +2,7 @@
 id: schedule-editor
 type: view
 title: Slot Schedule
-last_modified: 2026-11-15
+last_modified: 2026-11-16
 feature: slot-schedule
 mockup: none
 ---
@@ -62,12 +62,13 @@ Exceptions
 
 ## Interactions
 
-- "+ slot" adds a slot to a day; tapping a chip edits its times; the remove button deletes it.
+- "Add slot" adds a slot to a day (one hour, starting where the last ends); each slot is two time inputs, always editable, with a remove button.
 - "Copy to" copies a day's slots to selected other days.
 - "Save pattern" saves the whole week after validation.
 - "Block a date" opens the exception dialog with closed preselected.
-- "Custom slots for a date" opens it with the weekday's pattern prefilled for editing.
-- Removing an exception returns the date to the weekly pattern.
+- "Custom slots for a date" opens it; choosing the date prefills the weekday's pattern until the owner edits a slot. The dialog is a modal; the date of an existing exception cannot be changed.
+- Removing an exception asks for confirmation, then returns the date to the weekly pattern.
+- The conflict panel lists the blocking bookings by number and start time; they become links when booking management exists.
 
 ## Responsive behavior
 

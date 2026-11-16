@@ -36,6 +36,13 @@
       "when": 1794831731196,
       "tag": "0004_mighty_scarecrow",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794836767915,
+      "tag": "0005_living_william_stryker",
+      "breakpoints": true
     }
   ]
 }

@@ -8,6 +8,7 @@ describe("navFor", () => {
   it("shows the settings and staff pages to owners only", () => {
     expect(navFor("owner").map((i) => i.label)).toEqual([
       "home",
+      "schedule",
       "settings",
       "staff",
     ]);

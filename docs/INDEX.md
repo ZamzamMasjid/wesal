@@ -8,7 +8,7 @@ budgets: {}
 activities: []
 active:
   phase: phase-2-foundations
-  section: slot-schedule
+  section: message-delivery
 ---
 
 # Project Index
@@ -18,7 +18,7 @@ active:
 ## Active work
 
 - **Current phase**: phase-2-foundations
-- **Current section**: slot-schedule
+- **Current section**: message-delivery
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars
@@ -49,7 +49,7 @@ active:
 | `public-calendar` | Public Calendar | planned | v1 | availability | phase-3-booking/public-calendar |
 | `push-notifications` | Push Notifications | planned | later | mobile-app | phase-7-mobile-app/push-notifications |
 | `slot-alerts` | Slot Alerts | planned | later | availability | phase-6-alerts-and-reports/slot-alerts |
-| `slot-schedule` | Slot Schedule | planned | v1 | availability | phase-2-foundations/slot-schedule |
+| `slot-schedule` | Slot Schedule | shipped | v1 | availability | phase-2-foundations/slot-schedule |
 | `staff-access` | Staff Access | in-progress | v1 | back-office | phase-2-foundations/staff-access |
 | `staff-notifications` | Staff Notifications | planned | v1 | messaging | phase-4-operations/staff-notifications |
 | `venue-settings` | Venue Settings | shipped | v1 | back-office | phase-2-foundations/venue-settings |

@@ -1,6 +1,6 @@
 "use client";
 
-import { Home, LogOut, Settings, Users } from "lucide-react";
+import { CalendarClock, Home, LogOut, Settings, Users } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -10,7 +10,12 @@ import { routing } from "@/i18n/routing";
 
 import { navFor, type NavItem } from "./nav";
 
-const icons = { home: Home, settings: Settings, staff: Users } as const;
+const icons = {
+  home: Home,
+  schedule: CalendarClock,
+  settings: Settings,
+  staff: Users,
+} as const;
 
 interface ShellProps {
   user: { name: string; role: "owner" | "staff" };

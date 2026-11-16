@@ -1,0 +1,129 @@
+- generic [ref=e1]:
+  - button "Open Next.js Dev Tools" [ref=e19] [cursor=pointer]
+  - alert [ref=e23]: إعدادات القاعة
+  - generic [ref=e32]:
+    - complementary [ref=e33]:
+      - generic [ref=e34]: وصال
+      - navigation "قائمة لوحة التحكم" [ref=e35]:
+        - link "الرئيسية" [ref=e36] [cursor=pointer]:
+          - /url: /dashboard
+        - link "الإعدادات" [ref=e40] [cursor=pointer]:
+          - /url: /dashboard/settings
+        - link "الموظفون" [ref=e44] [cursor=pointer]:
+          - /url: /dashboard/staff
+    - generic [ref=e50]:
+      - banner [ref=e51]:
+        - group "قائمة الحساب" [ref=e52]:
+          - generic [ref=e53]: Ownerالمالك
+          - link "English" [ref=e54] [cursor=pointer]:
+            - /url: /en/dashboard/settings
+          - button "التبديل إلى الوضع الداكن" [ref=e55]
+          - button "تسجيل الخروج" [ref=e56]
+      - main [ref=e57]:
+        - generic [ref=e58]:
+          - heading "إعدادات القاعة" [level=1] [ref=e59]
+          - generic [ref=e60]:
+            - region "المناسبات والأسعار" [ref=e61]:
+              - heading "المناسبات والأسعار" [level=2] [ref=e62]
+              - paragraph [ref=e63]: لكل مناسبة سعر واحد مهما كان الموعد. المناسبة المعطّلة لا تُعرض، وتحتفظ الحجوزات القائمة بسعرها.
+              - list [ref=e64]:
+                - listitem [ref=e65]:
+                  - generic [ref=e66]:
+                    - generic [ref=e67]:
+                      - text: الاسم بالعربية
+                      - textbox "الاسم بالعربية" [ref=e68]: حفل زفاف
+                    - generic [ref=e69]:
+                      - text: الاسم بالإنجليزية
+                      - textbox "الاسم بالإنجليزية" [ref=e70]: Wedding
+                    - generic [ref=e71]:
+                      - text: السعر (جنيه)
+                      - spinbutton "السعر (جنيه)" [ref=e72]: "15000"
+                    - generic [ref=e73]:
+                      - generic [ref=e74]: غير متاحة
+                      - button "حفظ" [ref=e75]
+                      - button "تفعيل" [active] [ref=e144]
+                - listitem [ref=e77]:
+                  - generic [ref=e78]:
+                    - generic [ref=e79]:
+                      - text: الاسم بالعربية
+                      - textbox "الاسم بالعربية" [ref=e80]: حفل خطوبة
+                    - generic [ref=e81]:
+                      - text: الاسم بالإنجليزية
+                      - textbox "الاسم بالإنجليزية" [ref=e82]: Engagement party
+                    - generic [ref=e83]:
+                      - text: السعر (جنيه)
+                      - spinbutton "السعر (جنيه)" [ref=e84]: "8000"
+                    - generic [ref=e85]:
+                      - generic [ref=e86]: متاحة بسعر ‏8,000 ج.م.‏
+                      - button "حفظ" [ref=e87]
+                      - button "تعطيل" [ref=e88]
+                - listitem [ref=e89]:
+                  - generic [ref=e90]:
+                    - generic [ref=e91]:
+                      - text: الاسم بالعربية
+                      - textbox "الاسم بالعربية" [ref=e92]: كتب كتاب
+                    - generic [ref=e93]:
+                      - text: الاسم بالإنجليزية
+                      - textbox "الاسم بالإنجليزية" [ref=e94]: Nikah
+                    - generic [ref=e95]:
+                      - text: السعر (جنيه)
+                      - spinbutton "السعر (جنيه)" [ref=e96]: "5000"
+                    - generic [ref=e97]:
+                      - generic [ref=e98]: متاحة بسعر ‏5,000 ج.م.‏
+                      - button "حفظ" [ref=e99]
+                      - button "تعطيل" [ref=e100]
+                - listitem [ref=e101]:
+                  - generic [ref=e102]:
+                    - generic [ref=e103]:
+                      - text: الاسم بالعربية
+                      - textbox "الاسم بالعربية" [ref=e104]: عزاء
+                    - generic [ref=e105]:
+                      - text: الاسم بالإنجليزية
+                      - textbox "الاسم بالإنجليزية" [ref=e106]: Funeral
+                    - generic [ref=e107]:
+                      - text: السعر (جنيه)
+                      - spinbutton "السعر (جنيه)" [ref=e108]: "3000"
+                    - generic [ref=e109]:
+                      - generic [ref=e110]: متاحة بسعر ‏3,000 ج.م.‏
+                      - button "حفظ" [ref=e111]
+                      - button "تعطيل" [ref=e112]
+              - generic [ref=e113]:
+                - heading "إضافة مناسبة" [level=3] [ref=e114]
+                - generic [ref=e115]:
+                  - text: الاسم بالعربية
+                  - textbox "الاسم بالعربية" [ref=e116]
+                - generic [ref=e117]:
+                  - text: الاسم بالإنجليزية
+                  - textbox "الاسم بالإنجليزية" [ref=e118]
+                - generic [ref=e119]:
+                  - text: السعر (جنيه)
+                  - spinbutton "السعر (جنيه)" [ref=e120]
+                - button "إضافة" [ref=e121]
+            - form "العربون وقواعد الحجز" [ref=e122]:
+              - heading "العربون وقواعد الحجز" [level=2] [ref=e123]
+              - generic [ref=e124]:
+                - generic [ref=e125]:
+                  - text: العربون (٪ من السعر)
+                  - spinbutton "العربون (٪ من السعر) بين ١ و١٠٠. يُقرَّب إلى جنيه كامل لكل حجز." [ref=e126]: "150"
+                  - generic [ref=e127]: بين ١ و١٠٠. يُقرَّب إلى جنيه كامل لكل حجز.
+                - generic [ref=e128]:
+                  - text: مدة الحجز المؤقت (دقائق)
+                  - spinbutton "مدة الحجز المؤقت (دقائق)" [ref=e129]: "0"
+                - generic [ref=e130]:
+                  - text: حدّ القرب من الموعد (دقائق)
+                  - spinbutton "حدّ القرب من الموعد (دقائق) لا يمكن حجز موعد يبدأ قبل هذه المدة عبر الموقع." [ref=e131]: "120"
+                  - generic [ref=e132]: لا يمكن حجز موعد يبدأ قبل هذه المدة عبر الموقع.
+                - generic [ref=e133]:
+                  - text: حدّ الاستعجال (دقائق)
+                  - spinbutton "حدّ الاستعجال (دقائق) الحجز المؤقت لموعد يبدأ خلال هذه المدة يُعلَّم بأنه عاجل." [ref=e134]: "1440"
+                  - generic [ref=e135]: الحجز المؤقت لموعد يبدأ خلال هذه المدة يُعلَّم بأنه عاجل.
+              - heading "بيانات الدفع" [level=2] [ref=e136]
+              - generic [ref=e137]:
+                - generic [ref=e138]:
+                  - text: رقم فودافون كاش
+                  - textbox "رقم فودافون كاش" [ref=e139]: "01012345678"
+                - generic [ref=e140]:
+                  - text: عنوان إنستاباي
+                  - textbox "عنوان إنستاباي" [ref=e141]
+                - paragraph [ref=e142]: تغيير هذه البيانات أثناء وجود حجوزات مؤقتة قد يعني أن بعض العملاء حوّلوا بالفعل إلى البيانات القديمة.
+              - button "حفظ الإعدادات" [ref=e143]

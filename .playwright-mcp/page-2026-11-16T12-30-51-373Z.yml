@@ -1,0 +1,24 @@
+- generic [active] [ref=f1e1]:
+  - generic [ref=f1e2]:
+    - complementary [ref=f1e3]:
+      - generic [ref=f1e4]: وصال
+      - navigation "Dashboard navigation" [ref=f1e5]:
+        - link "Home" [ref=f1e6] [cursor=pointer]:
+          - /url: /en/dashboard
+        - link "Settings" [ref=f1e10] [cursor=pointer]:
+          - /url: /en/dashboard/settings
+        - link "Staff" [ref=f1e14] [cursor=pointer]:
+          - /url: /en/dashboard/staff
+    - generic [ref=f1e20]:
+      - banner [ref=f1e21]:
+        - group "Account menu" [ref=f1e22]:
+          - generic [ref=f1e23]: OwnerOwner
+          - link "العربية" [ref=f1e24] [cursor=pointer]:
+            - /url: /ar/dashboard/settings
+          - button "Switch to dark mode" [ref=f1e25]
+          - button "Log out" [ref=f1e26]
+      - main [ref=f1e27]:
+        - generic [ref=f1e28]:
+          - heading "Venue settings" [level=1] [ref=f1e29]
+          - paragraph [ref=f1e30]: Loading…
+  - button "Open Next.js Dev Tools" [ref=f1e36] [cursor=pointer]

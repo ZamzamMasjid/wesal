@@ -2,7 +2,7 @@
 id: slot-schedule
 type: feature-design
 title: Slot Schedule — Design
-last_modified: 2026-11-15
+last_modified: 2026-11-16
 feature: slot-schedule
 ---
 
@@ -17,7 +17,7 @@ Inherits from `docs/design/system.md` at dashboard density. The week starts on S
 ## Components
 
 - **Weekly grid** — seven day columns (stacked as an accordion on phones), each listing its slots as chips with start and end.
-- **Slot editor** — two time pickers and a remove button; inline overlap error.
+- **Slot editor** — two time inputs and a remove button, always editable; inline overlap error.
 - **Copy day** — copy one weekday's slots to others.
 - **Exceptions list** — upcoming date exceptions, each marked "closed" or "custom slots".
 - **Exception dialog** — date picker, closed toggle, optional note, slot editor when not closed.
