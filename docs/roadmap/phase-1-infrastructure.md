@@ -3,7 +3,7 @@ id: phase-1-infrastructure
 type: roadmap-phase
 title: Phase 1 — Infrastructure
 status: in-progress
-last_modified: 2026-11-15
+last_modified: 2026-11-16
 milestone: v1
 phase_number: 1
 sections: [project-setup, database, testing, deployment]
@@ -37,10 +37,10 @@ The Next.js application skeleton that every later section builds on. Builds the 
 
 The data layer. Builds the `postgres` component for local development and test, with Drizzle migrations.
 
-- [ ] Add docker-compose Postgres for local development and tests
-- [ ] Configure Drizzle with migrations and a typed database client
-- [ ] Enable the btree_gist extension in the first migration
-- [ ] Add dev seed script: owner account, sample occasions, weekly slot pattern
+- [x] Add docker-compose Postgres for local development and tests
+- [x] Configure Drizzle with migrations and a typed database client
+- [x] Enable the btree_gist extension in the first migration
+- [x] Add dev seed script: owner account, sample occasions, weekly slot pattern
 
 ### testing
 

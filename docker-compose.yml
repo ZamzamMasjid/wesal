@@ -1,0 +1,24 @@
+# Local development and integration-test Postgres (docs/architecture/testing.md).
+# One server, two databases: `wesal` for dev and `wesal_test` for tests.
+# Production runs on Fly, not here (ADR-002).
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: wesal
+      POSTGRES_PASSWORD: wesal
+      POSTGRES_DB: wesal
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./db/init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U wesal -d wesal"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pgdata:

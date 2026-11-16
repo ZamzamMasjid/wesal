@@ -8,7 +8,7 @@ budgets: {}
 activities: []
 active:
   phase: phase-1-infrastructure
-  section: database
+  section: testing
 ---
 
 # Project Index
@@ -18,7 +18,7 @@ active:
 ## Active work
 
 - **Current phase**: phase-1-infrastructure
-- **Current section**: database
+- **Current section**: testing
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars
