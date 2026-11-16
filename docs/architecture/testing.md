@@ -2,7 +2,7 @@
 id: testing
 type: architecture
 title: Testing Strategy
-last_modified: 2026-11-15
+last_modified: 2026-11-16
 ---
 
 # Testing Strategy
@@ -58,7 +58,7 @@ These are the product's success criteria as tests; they are written once in phas
 | Branches | 70% | block |
 | Statements | tracks lines | |
 
-Exemptions: generated code, Drizzle migrations, type-only files, shadcn/ui component source copied into the repo, and configuration files.
+Exemptions: generated code, Drizzle migrations, type-only files, shadcn/ui component source copied into the repo, configuration files, and framework entry points with no logic of their own (pages and layouts under `src/app`, `src/proxy.ts`, the next-intl request and navigation wiring, CLI entry files) — those are covered by the Playwright suite instead.
 
 ## CI gating
 

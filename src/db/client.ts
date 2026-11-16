@@ -14,7 +14,7 @@ export function createDb(connectionString: string) {
 }
 
 export function requireDatabaseUrl(
-  env: NodeJS.ProcessEnv = process.env,
+  env: Record<string, string | undefined> = process.env,
 ): string {
   const url = env.DATABASE_URL;
   if (!url) {

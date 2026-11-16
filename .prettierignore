@@ -8,3 +8,5 @@ docs
 .claude
 .idea
 drizzle
+playwright-report
+test-results
