@@ -3,6 +3,7 @@ import { runtime } from "@/lib/runtime";
 import { createLogSender } from "./log-sender";
 import type { MessageSender } from "./sender";
 import { createTwilioSender } from "./twilio";
+import { createWhatSendSender } from "./whatsend";
 
 // Chooses the messaging provider from the environment. Development and tests
 // never reach Twilio: without MESSAGING_PROVIDER=twilio the sender only logs.
@@ -25,6 +26,18 @@ export function twilioStatusUrl(env: Env = process.env): string {
 }
 
 export function createSenderFromEnv(env: Env = process.env): MessageSender {
+  if (env.MESSAGING_PROVIDER === "whatsend") {
+    const need = (name: string): string => {
+      const value = env[name];
+      if (!value) throw new Error(`${name} is not set.`);
+      return value;
+    };
+    return createWhatSendSender({
+      workerUrl: need("WHATSEND_WORKER_URL"),
+      secret: need("WHATSEND_WORKER_SECRET"),
+      sessionId: need("WHATSEND_SESSION_ID"),
+    });
+  }
   if (env.MESSAGING_PROVIDER !== "twilio") {
     if (env.NODE_ENV === "production") {
       runtime.logger.warn(

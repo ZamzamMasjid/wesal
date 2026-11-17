@@ -37,16 +37,17 @@ The `media` and `proofs` directories under `/data` are created on every start by
 
 ### 3. Secrets
 
-| Secret                                    | Used by              | Value                                                               |
-| ----------------------------------------- | -------------------- | ------------------------------------------------------------------- |
-| `DATABASE_URL`                            | app, release command | `postgres://wesal:<POSTGRES_PASSWORD>@wesal-db.internal:5432/wesal` |
-| `BETTER_AUTH_SECRET`                      | staff-access         | `openssl rand -hex 32`                                              |
-| `BETTER_AUTH_URL`                         | staff-access         | The public site URL, e.g. `https://wesal.fly.dev`                   |
-| `TWILIO_ACCOUNT_SID`                      | message-delivery     | From the Twilio console                                             |
-| `TWILIO_AUTH_TOKEN`                       | message-delivery     | From the Twilio console                                             |
-| `TWILIO_WHATSAPP_FROM`, `TWILIO_SMS_FROM` | message-delivery     | WhatsApp sender (e.g. `+14155238886`, the sandbox) and SMS sender   |
-| `MESSAGING_PROVIDER`                      | message-delivery     | `twilio`; without it messages are only logged and none are sent     |
-| `PUBLIC_BASE_URL`                         | message-delivery     | Optional; the public origin for the status webhook (defaults to `BETTER_AUTH_URL`) |
+| Secret                                                                 | Used by              | Value                                                                               |
+| ---------------------------------------------------------------------- | -------------------- | ----------------------------------------------------------------------------------- |
+| `DATABASE_URL`                                                         | app, release command | `postgres://wesal:<POSTGRES_PASSWORD>@wesal-db.internal:5432/wesal`                 |
+| `BETTER_AUTH_SECRET`                                                   | staff-access         | `openssl rand -hex 32`                                                              |
+| `BETTER_AUTH_URL`                                                      | staff-access         | The public site URL, e.g. `https://wesal.fly.dev`                                   |
+| `TWILIO_ACCOUNT_SID`                                                   | message-delivery     | From the Twilio console                                                             |
+| `TWILIO_AUTH_TOKEN`                                                    | message-delivery     | From the Twilio console                                                             |
+| `TWILIO_WHATSAPP_FROM`, `TWILIO_SMS_FROM`                              | message-delivery     | WhatsApp sender (e.g. `+14155238886`, the sandbox) and SMS sender                   |
+| `MESSAGING_PROVIDER`                                                   | message-delivery     | `twilio` or `whatsend`; without it messages are only logged and none are sent       |
+| `WHATSEND_WORKER_URL`, `WHATSEND_WORKER_SECRET`, `WHATSEND_SESSION_ID` | message-delivery     | With `whatsend`: the WhatSend worker address, its secret, and the linked session id |
+| `PUBLIC_BASE_URL`                                                      | message-delivery     | Optional; the public origin for the status webhook (defaults to `BETTER_AUTH_URL`)  |
 
 ```bash
 fly secrets set -a wesal DATABASE_URL="postgres://wesal:...@wesal-db.internal:5432/wesal" --stage
@@ -55,6 +56,32 @@ fly secrets set -a wesal BETTER_AUTH_SECRET="$(openssl rand -hex 32)" --stage
 ```
 
 `--stage` queues secrets without restarting; they apply on the next deploy. Never commit secrets; `.env*` is git-ignored.
+
+### 4. WhatsApp worker (only with `MESSAGING_PROVIDER=whatsend`, ADR-031)
+
+A third app, `wesal-worker`, holds the live WhatsApp connection. It has no public address; the app reaches it at `http://wesal-worker.internal:3001`. Its files live in the WhatSend project (`whatsend/whatsapp-worker`: `Dockerfile`, `fly.toml`).
+
+```bash
+cd <whatsend>/whatsapp-worker
+fly apps create wesal-worker
+fly volumes create wesal_worker_data -a wesal-worker --region ams --size 1
+SECRET="$(openssl rand -hex 32)"
+fly secrets set -a wesal-worker WHATSAPP_WORKER_SECRET="$SECRET" WHATSAPP_STORAGE_KEY="$(openssl rand -hex 32)" --stage
+fly deploy
+fly secrets set -a wesal MESSAGING_PROVIDER=whatsend WHATSEND_WORKER_URL=http://wesal-worker.internal:3001 WHATSEND_WORKER_SECRET="$SECRET" WHATSEND_SESSION_ID="$(uuidgen)" --stage
+```
+
+Keep `WHATSAPP_STORAGE_KEY` in a password manager: without it the saved session cannot be read and the QR code must be scanned again. Back up the `wesal_worker_data` volume like the others.
+
+Link the venue phone once, from your computer, through a private tunnel (use the session id you set above):
+
+```bash
+fly proxy 3001:3001 -a wesal-worker
+curl -X POST -H "Authorization: Bearer $SECRET" http://localhost:3001/api/v1/sessions/<session-id>/connect
+curl -H "Authorization: Bearer $SECRET" http://localhost:3001/api/v1/sessions/<session-id>/qr
+```
+
+The QR response holds `png_base64` (a PNG image, valid for 45 seconds): decode it to a file, open it, and scan it in WhatsApp → Linked devices. `GET .../status` shows `connected` when it worked. Use a dedicated venue number. Then deploy `wesal` so it picks up the secrets.
 
 ## Deploying
 

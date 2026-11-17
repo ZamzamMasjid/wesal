@@ -72,3 +72,10 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Summary**: Message delivery is built: a messaging adapter with a Twilio implementation (plain HTTP), a log-only sender for development and the recording fake for tests; an `outbox_message` table written in the caller's transaction; an in-process job loop (isolated, time-limited runs, tick heartbeat, watchdog exit) that sends due messages with retry and backoff; `POST /api/v1/webhooks/twilio/status` with signature check, which sends an undelivered WhatsApp message again by SMS; and bilingual `code`, `booking-link` and `staff-alert` templates. The open question on attempts and backoff is settled: five attempts per channel at 30 s, 2 min, 10 min and 30 min, then SMS, then failed. Providers are chosen by `MESSAGING_PROVIDER`; without `twilio` nothing is sent.
 - **Affected Docs**: message-delivery, ADR-030, phase-2-foundations
 - **Reason**: Implementing `phase-2-foundations/message-delivery`.
+
+## [2026-11-17] — Fee-free WhatsApp provider
+
+- **Type**: Feature Change
+- **Summary**: Added a second messaging provider, `MESSAGING_PROVIDER=whatsend`, that sends WhatsApp through the WhatSend worker (a QR-linked device) at no per-message fee. It is WhatsApp-only: SMS fails instead of falling back to a paid channel.
+- **Affected Docs**: message-delivery, ADR-031
+- **Reason**: Avoid messaging costs until volume justifies Twilio.

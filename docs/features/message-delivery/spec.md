@@ -8,7 +8,7 @@ milestone: v1
 pillar: messaging
 depends_on: []
 views: []
-adrs: [ADR-006, ADR-007, ADR-009, ADR-011, ADR-017, ADR-018, ADR-022, ADR-023, ADR-030]
+adrs: [ADR-006, ADR-007, ADR-009, ADR-011, ADR-017, ADR-018, ADR-022, ADR-023, ADR-030, ADR-031]
 roadmap_sections: [phase-2-foundations/message-delivery]
 architecture: [overview, data-model, flows, testing]
 components: [web, postgres]

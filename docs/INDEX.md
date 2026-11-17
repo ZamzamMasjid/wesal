@@ -2,7 +2,7 @@
 id: index
 type: index
 title: Project Index
-last_modified: 2026-11-16
+last_modified: 2026-11-17
 generated_by: axiom:reindex
 budgets: {}
 activities: []
@@ -154,6 +154,7 @@ active:
 | `ADR-028` | Remember the theme in local storage and apply it with a script in the page head | Accepted | phase-1-infrastructure/project-setup |
 | `ADR-029` | Staff log in with a username; Better Auth's email field holds a placeholder | Accepted | phase-2-foundations/staff-access |
 | `ADR-030` | Call Twilio over plain HTTP and give each channel five attempts with growing delays | Accepted | phase-2-foundations/message-delivery |
+| `ADR-031` | Use the WhatSend worker as a fee-free WhatsApp provider for now | Accepted | phase-2-foundations/message-delivery |
 
 ## Recent changes
 
