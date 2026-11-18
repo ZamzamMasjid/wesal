@@ -99,7 +99,7 @@ export function route<Output>(
       const caller = await resolveCaller(request);
       const result = await operation(
         raw,
-        createCallContext(caller, { requestId }),
+        createCallContext(caller, { requestId, ip: clientIp(request) }),
       );
       return respond(result, requestId, options.successStatus);
     } catch (error) {
@@ -129,4 +129,19 @@ export function apiNotFound(): Response {
     failure({ requestId }, "NOT_FOUND", "No such endpoint."),
     requestId,
   );
+}
+
+/**
+ * The caller's address. Fly sets `fly-client-ip`; behind another proxy the first
+ * `x-forwarded-for` entry is the client. Undefined when neither is present, so a
+ * per-IP limit is skipped rather than applied to every caller as one.
+ */
+export function clientIp(request: Request): string | undefined {
+  const fly = request.headers.get("fly-client-ip")?.trim();
+  if (fly) return fly;
+  const forwarded = request.headers
+    .get("x-forwarded-for")
+    ?.split(",")[0]
+    ?.trim();
+  return forwarded || undefined;
 }

@@ -79,3 +79,11 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Summary**: Added a second messaging provider, `MESSAGING_PROVIDER=whatsend`, that sends WhatsApp through the WhatSend worker (a QR-linked device) at no per-message fee. It is WhatsApp-only: SMS fails instead of falling back to a paid channel.
 - **Affected Docs**: message-delivery, ADR-031
 - **Reason**: Avoid messaging costs until volume justifies Twilio.
+
+## [2026-11-17] — Phone verification
+
+- **Type**: Feature Change
+- **Summary**: Phone verification is built: `POST /api/v1/verification/request` stores a hashed six-digit code and sends it inline (not through the outbox), and `POST /api/v1/verification/check` compares it in constant time and returns a ten-minute verified-phone token signed for that phone. Requests are limited to one per phone per 60 seconds, five per phone per hour and twenty per IP per hour (`RATE_LIMITED`); codes live five minutes and allow five attempts (`CODE_EXPIRED`, `TOO_MANY_ATTEMPTS`). When neither WhatsApp nor SMS delivers, the request fails with `CODE_DELIVERY_FAILED` carrying the venue's phone and WhatsApp contact and no hold is created. The open question is settled at five minutes, five attempts and 60 seconds. The code-entry step (six boxes, auto-submit, resend timer, delivery-failure panel) is in place in Arabic and English, ready for `booking-hold` to mount.
+- **Affected Docs**: phone-verification, phase-2-foundations
+- **Reason**: Implementing `phase-2-foundations/phone-verification`.
+

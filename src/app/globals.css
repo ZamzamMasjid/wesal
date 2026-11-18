@@ -241,3 +241,18 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* A wrong verification code shakes once; the reduced-motion block above
+   collapses it to a single imperceptible frame. */
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}

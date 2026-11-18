@@ -4,6 +4,7 @@ import { staffOperations } from "./staff/staff";
 import { scheduleOperations } from "./schedule/schedule";
 import { occasionOperations } from "./venue/occasions";
 import { settingsOperations } from "./venue/settings";
+import { verificationOperations } from "./verification/verification";
 
 import type { Operation } from "@/api/operation";
 
@@ -16,4 +17,5 @@ export const operations: Operation<unknown>[] = [
   ...Object.values(occasionOperations),
   ...Object.values(settingsOperations),
   ...Object.values(scheduleOperations),
+  ...Object.values(verificationOperations),
 ];

@@ -6,6 +6,8 @@ export interface CreateCallContextOptions {
   requestId?: string;
   /** Defaults to the production runtime; tests pass a fake clock and logger. */
   deps?: Runtime;
+  /** The caller's address, used by per-IP rate limits. */
+  ip?: string;
 }
 
 /**
@@ -17,11 +19,12 @@ export function createCallContext(
   caller: Caller,
   options: CreateCallContextOptions = {},
 ): CallContext {
-  const { requestId = crypto.randomUUID(), deps = runtime } = options;
+  const { requestId = crypto.randomUUID(), deps = runtime, ip } = options;
   return {
     caller,
     requestId,
     clock: deps.clock,
     log: deps.logger.child({ requestId }),
+    ...(ip ? { ip } : {}),
   };
 }

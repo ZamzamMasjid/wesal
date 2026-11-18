@@ -24,6 +24,8 @@ export interface CallContext {
   clock: Clock;
   /** A logger whose lines all carry this call's requestId. */
   log: Logger;
+  /** The caller's address, when the HTTP layer could determine it. */
+  ip?: string;
 }
 
 export const ANONYMOUS: Caller = { kind: "anonymous" };

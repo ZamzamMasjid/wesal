@@ -220,6 +220,36 @@ export const auditLog = pgTable(
 );
 
 /**
+ * One request for a phone verification code (docs/features/phone-verification).
+ * The code itself is never stored: `codeHash` is an HMAC over the phone and the
+ * six-digit code, so a leaked table cannot be used to guess a live code. A row
+ * is consumed by a successful check; expired rows are ignored and may be pruned.
+ */
+export const phoneVerification = pgTable(
+  "phone_verification",
+  {
+    id: bigint("id", { mode: "number" })
+      .primaryKey()
+      .generatedAlwaysAsIdentity(),
+    /** E.164, e.g. +201001234567. */
+    phone: text("phone").notNull(),
+    codeHash: text("code_hash").notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    /** Wrong checks so far; the code stops working at the attempt limit. */
+    attempts: integer("attempts").notNull().default(0),
+    /** Set by the check that matched, so a code works only once. */
+    consumedAt: timestamp("consumed_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    index("phone_verification_phone_created_idx").on(t.phone, t.createdAt),
+    index("phone_verification_expires_idx").on(t.expiresAt),
+  ],
+);
+
+/**
  * A message waiting to be sent, or already sent, by the job loop (ADR-011).
  * Written in the same transaction as the change that causes it. `channel` is
  * the channel the next attempt uses; WhatsApp falls back to SMS by changing it.

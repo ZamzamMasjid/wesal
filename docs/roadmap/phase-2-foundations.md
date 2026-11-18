@@ -2,8 +2,8 @@
 id: phase-2-foundations
 type: roadmap-phase
 title: Phase 2 — Foundations
-status: in-progress
-last_modified: 2026-11-16
+status: shipped
+last_modified: 2026-11-17
 milestone: v1
 phase_number: 2
 sections: [staff-access, venue-settings, slot-schedule, message-delivery, phone-verification]
@@ -65,7 +65,7 @@ The messaging adapter, the outbox and the in-process job loop inside `web`; talk
 
 One-time codes that gate a hold. Extends `web`; data in `postgres`.
 
-- [ ] Implement request-code endpoint: hashed code, expiry, rate limits per phone and IP
-- [ ] Implement check-code endpoint issuing a short-lived verified-phone token
-- [ ] Implement delivery-failure response carrying venue phone and WhatsApp contact
-- [ ] Implement code entry step UI with resend timer and error states
+- [x] Implement request-code endpoint: hashed code, expiry, rate limits per phone and IP
+- [x] Implement check-code endpoint issuing a short-lived verified-phone token
+- [x] Implement delivery-failure response carrying venue phone and WhatsApp contact
+- [x] Implement code entry step UI with resend timer and error states

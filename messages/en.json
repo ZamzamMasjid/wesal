@@ -34,6 +34,26 @@
     "tooMany": "Too many attempts. Wait a minute and try again.",
     "failed": "Could not log in. Check your connection and try again."
   },
+  "Verification": {
+    "sentTo": "We sent a code to {phone}",
+    "changeNumber": "Change number",
+    "codeLabel": "Verification code",
+    "sending": "Sending the code…",
+    "checking": "Checking the code…",
+    "resendIn": "Resend code in {time}",
+    "resend": "Resend code",
+    "attemptsLeft": "{count, plural, =0 {No attempts left} one {1 attempt left} other {# attempts left}}",
+    "errorInvalid": "That code is not correct.",
+    "errorExpired": "That code has expired. Request a new one.",
+    "errorTooMany": "Too many wrong attempts. Request a new code.",
+    "errorRateLimited": "Wait {seconds} seconds before trying again.",
+    "errorNetwork": "Could not reach the server. Check your connection and try again.",
+    "deliveryTitle": "We cannot send codes right now",
+    "deliveryBody": "Please contact the venue to book by phone or WhatsApp.",
+    "call": "Call",
+    "whatsapp": "WhatsApp",
+    "retry": "Try again"
+  },
   "Dashboard": {
     "welcome": "Welcome, {name}",
     "welcomeHint": "Booking tools will appear here as they are built.",
