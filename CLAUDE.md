@@ -24,6 +24,7 @@ Full skill catalog: see the axiom plugin's `framework/system-preamble.md`, or ru
 - Arabic is the default language and layout direction (RTL); every user-facing string exists in Arabic and English.
 - All slot times are in the venue's timezone, Africa/Cairo. Prices are in EGP.
 - Every server operation is a versioned JSON endpoint under `/api/v1`; the web UI calls the same endpoints.
+- Git: stage every file that belongs to the work (leave ignored files and unrelated `.idea/*` noise out). Commit each completed roadmap section without being asked, using the convention in [AGENTS.md](AGENTS.md#commit-message-convention): `<type>: <phase-id>, section <section-slug>:` followed by `-` bullets. Do not push unless asked.
 
 ## What this project has learned
 
