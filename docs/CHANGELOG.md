@@ -87,3 +87,10 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Affected Docs**: phone-verification, phase-2-foundations
 - **Reason**: Implementing `phase-2-foundations/phone-verification`.
 
+## [2026-11-18] — Public calendar
+
+- **Type**: Feature Change
+- **Summary**: The public calendar is built. `GET /api/v1/availability` returns every day in a range with its closed flag and each slot's state (free, awaiting payment, awaiting review, confirmed), computed at request time — a held slot whose deadline has passed reads free even before the sweep marks it. Each free slot carries a server-computed action: `book`, `call` inside the near-slot cutoff, or `none` once past or started. The bilingual page at `/[locale]/calendar` shows the month with a free-versus-full marker per day, the selected day's slots with state badges, the legend and the call/WhatsApp fallback; it refreshes every 30 seconds while visible and on focus, keeping the previous states so nothing flashes empty. The month shows no count of free slots (the open question is settled). The `booking` table is introduced as availability's read dependency, with no exclusion constraint yet — `booking-hold` adds it.
+- **Affected Docs**: public-calendar, calendar (view), phase-3-booking
+- **Reason**: Implementing `phase-3-booking/public-calendar`.
+

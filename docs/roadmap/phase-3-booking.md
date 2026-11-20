@@ -2,8 +2,8 @@
 id: phase-3-booking
 type: roadmap-phase
 title: Phase 3 — Booking
-status: planned
-last_modified: 2026-11-15
+status: in-progress
+last_modified: 2026-11-18
 milestone: v1
 phase_number: 3
 sections: [public-calendar, booking-hold, booking-page, payment-proof]
@@ -26,9 +26,9 @@ Phase 2: the slot schedule, venue settings, phone verification and message deliv
 
 The public view of availability. Extends `web`; reads `postgres`.
 
-- [ ] Implement availability API: slot states for a date range with expiry by timestamp
-- [ ] Implement calendar view: month picker, day slots, state labels, disabled taken slots
-- [ ] Add 30-second and on-focus refresh of slot states
+- [x] Implement availability API: slot states for a date range with expiry by timestamp
+- [x] Implement calendar view: month picker, day slots, state labels, disabled taken slots
+- [x] Add 30-second and on-focus refresh of slot states
 
 ### booking-hold
 

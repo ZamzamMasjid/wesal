@@ -8,7 +8,7 @@ budgets: {}
 activities: []
 active:
   phase: phase-3-booking
-  section: public-calendar
+  section: booking-hold
 ---
 
 # Project Index
@@ -18,7 +18,7 @@ active:
 ## Active work
 
 - **Current phase**: phase-3-booking
-- **Current section**: public-calendar
+- **Current section**: booking-hold
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars
@@ -46,7 +46,7 @@ active:
 | `payment-proof` | Payment Proof | planned | v1 | booking | phase-3-booking/payment-proof |
 | `payment-review` | Payment Review | planned | v1 | back-office | phase-4-operations/payment-review |
 | `phone-verification` | Phone Verification | shipped | v1 | booking | phase-2-foundations/phone-verification |
-| `public-calendar` | Public Calendar | planned | v1 | availability | phase-3-booking/public-calendar |
+| `public-calendar` | Public Calendar | shipped | v1 | availability | phase-3-booking/public-calendar |
 | `push-notifications` | Push Notifications | planned | later | mobile-app | phase-7-mobile-app/push-notifications |
 | `slot-alerts` | Slot Alerts | planned | later | availability | phase-6-alerts-and-reports/slot-alerts |
 | `slot-schedule` | Slot Schedule | shipped | v1 | availability | phase-2-foundations/slot-schedule |
@@ -85,7 +85,7 @@ active:
 |---|---|---|---|
 | `phase-1-infrastructure` | shipped | v1 | project-setup, database, testing, deployment |
 | `phase-2-foundations` | shipped | v1 | staff-access, venue-settings, slot-schedule, message-delivery, phone-verification |
-| `phase-3-booking` | planned | v1 | public-calendar, booking-hold, booking-page, payment-proof |
+| `phase-3-booking` | in-progress | v1 | public-calendar, booking-hold, booking-page, payment-proof |
 | `phase-4-operations` | planned | v1 | payment-review, staff-notifications, booking-management |
 | `phase-5-public-site` | planned | v1 | content-management, landing-page |
 | `phase-6-alerts-and-reports` | planned | later | slot-alerts, booking-reports |

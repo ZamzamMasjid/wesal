@@ -2,8 +2,8 @@
 id: public-calendar
 type: feature
 title: Public Calendar
-status: planned
-last_modified: 2026-11-15
+status: shipped
+last_modified: 2026-11-18
 milestone: v1
 pillar: availability
 depends_on: [slot-schedule]
@@ -30,9 +30,11 @@ A visitor picks a day and sees that day's slots with their times. Each slot is i
 | Awaiting payment | Held; deposit not yet uploaded | No |
 | Awaiting review | Proof uploaded; owner has not decided | No |
 | Confirmed | Booked | No |
-| Closed | The owner closed the date | No |
+| Closed | The owner closed the date; the day lists no slots | No |
 
 Selecting a free slot leads to the booking form. Slot states refresh about every 30 seconds and whenever the page regains focus. No customer details are ever shown on the calendar.
+
+The response also tells the page what a visitor may do with a free slot, so the rule lives in one place: `book` (open the booking form), `call` (the slot is inside the near-slot cutoff, so show the venue's contact instead), or `none` (past or already started). Taken slots always carry `none`.
 
 ## Data
 
@@ -42,7 +44,7 @@ A held booking whose deadline has passed counts as free, whether or not the swee
 
 ## Surface
 
-- `GET /api/v1/availability?from=YYYY-MM-DD&to=YYYY-MM-DD` — for each date: closed flag, and slots with start, end and state. Public, cacheable for a few seconds.
+- `GET /api/v1/availability?from=YYYY-MM-DD&to=YYYY-MM-DD` — public. For each date: `day`, `closed`, and `slots` with `start`, `end`, `state` and `action`. The envelope also carries `from`, `to`, `today` (the venue's date, used to dim past days) and `refreshedAt`. The range may span at most 62 days and must be real dates in order. Served with `Cache-Control: public, max-age=5`; the response is at most 30 seconds stale by ADR-014, and the hold endpoint still refuses a double booking.
 
 ## Workflows
 
@@ -68,4 +70,4 @@ A held booking whose deadline has passed counts as free, whether or not the swee
 
 ## Open questions
 
-- Should the month view show how many slots are free per day, or only free versus full?
+Settled: the month view shows only a free-versus-full marker per day, with no count of free slots. A count invites comparison shopping against the detailed day panel and dates faster than a 30-second poll can keep it right.

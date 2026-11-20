@@ -191,6 +191,63 @@ export const exceptionSlot = pgTable(
 );
 
 /**
+ * A reservation of one slot (docs/architecture/data-model.md). It stores its own
+ * start and end, so later schedule edits never move a booking, and it snapshots
+ * the occasion's price and the deposit, so later price changes never alter what
+ * a customer was quoted.
+ *
+ * `held` is the only state with a clock: readers treat a held row whose
+ * `holdExpiresAt` has passed as free (ADR-010), and hold creation expires the
+ * overdue row in its own transaction. The exclusion constraint that forbids two
+ * active bookings on one range is added by `booking-hold`, together with the
+ * code that creates bookings; this table is read by the public calendar.
+ */
+export const booking = pgTable(
+  "booking",
+  {
+    id: integer("id").primaryKey().generatedAlwaysAsIdentity(),
+    /** Short random code shown to the customer. */
+    publicId: text("public_id").notNull().unique(),
+    /** The secret in the private booking page's link. */
+    accessToken: text("access_token").notNull().unique(),
+    occasionId: integer("occasion_id")
+      .notNull()
+      .references(() => occasion.id),
+    startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
+    endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
+    status: text("status", {
+      enum: [
+        "held",
+        "proof_submitted",
+        "confirmed",
+        "expired",
+        "rejected",
+        "cancelled",
+      ],
+    })
+      .notNull()
+      .default("held"),
+    /** Online holds versus bookings staff entered by phone or in person. */
+    source: text("source", { enum: ["online", "staff"] }).notNull(),
+    customerName: text("customer_name").notNull(),
+    /** E.164, e.g. +201001234567. */
+    customerPhone: text("customer_phone").notNull(),
+    locale: text("locale", { enum: ["ar", "en"] }).notNull(),
+    priceEgp: integer("price_egp").notNull(),
+    depositEgp: integer("deposit_egp").notNull(),
+    /** When a held booking stops blocking its slot. Null once proof is in. */
+    holdExpiresAt: timestamp("hold_expires_at", { withTimezone: true }),
+    urgent: boolean("urgent").notNull().default(false),
+    remainderPaid: boolean("remainder_paid").notNull().default(false),
+    ...timestamps,
+  },
+  (t) => [
+    index("booking_starts_at_idx").on(t.startsAt),
+    index("booking_status_hold_expires_idx").on(t.status, t.holdExpiresAt),
+  ],
+);
+
+/**
  * Append-only record of staff actions (auth architecture, "Audit"). A database
  * trigger refuses UPDATE and DELETE, so rows are never edited or removed.
  * `bookingId` has no foreign key yet: the booking table arrives in phase 3,

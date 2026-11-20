@@ -57,6 +57,13 @@
       "when": 1794932162999,
       "tag": "0007_worthless_reavers",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795004779616,
+      "tag": "0008_youthful_marvel_zombies",
+      "breakpoints": true
     }
   ]
 }

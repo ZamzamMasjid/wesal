@@ -256,3 +256,17 @@
     transform: translateX(4px);
   }
 }
+
+/* A slot whose state changed on refresh pops its badge once; the reduced-motion
+   block above collapses it to a single imperceptible frame. */
+@keyframes badge-pop {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.08);
+  }
+  100% {
+    transform: scale(1);
+  }
+}

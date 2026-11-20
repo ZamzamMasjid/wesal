@@ -34,6 +34,35 @@ export function cairoDay(instant: Date): string {
   return cairoParts(instant).day;
 }
 
+/** The venue's wall clock read back as if it were UTC, for offset arithmetic. */
+function wallClockAsUtc(day: string, time: string): number {
+  const [year, month, date] = day.split("-").map(Number);
+  const [hour, minute] = time.split(":").map(Number);
+  return Date.UTC(year!, month! - 1, date!, hour!, minute!);
+}
+
+/** How far Cairo is from UTC at `instant`, in minutes (120 or 180 with DST). */
+function cairoOffsetMinutes(instant: Date): number {
+  return (
+    (wallClockAsUtc(cairoParts(instant).day, cairoParts(instant).time) -
+      instant.getTime()) /
+    60_000
+  );
+}
+
+/**
+ * The instant at which the venue's wall clock reads `day` `time`. Used to turn a
+ * resolved slot (`HH:MM` in Africa/Cairo) into the exact range a booking or the
+ * exclusion constraint compares. Checked twice so the summer-time offset that
+ * applies on the date is the one used. The hour skipped when summer time starts
+ * does not exist; it resolves to the instant just after the jump.
+ */
+export function cairoInstant(day: string, time: string): Date {
+  const wall = wallClockAsUtc(day, time);
+  const first = wall - cairoOffsetMinutes(new Date(wall)) * 60_000;
+  return new Date(wall - cairoOffsetMinutes(new Date(first)) * 60_000);
+}
+
 /** Weekday of a `YYYY-MM-DD` date: 0 = Sunday ... 6 = Saturday. */
 export function weekdayOf(day: string): number {
   return new Date(`${day}T00:00:00Z`).getUTCDay();

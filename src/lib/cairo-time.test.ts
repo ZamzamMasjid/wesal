@@ -5,6 +5,7 @@ import { describe, expect, it } from "vitest";
 import {
   addDays,
   cairoDay,
+  cairoInstant,
   cairoParts,
   isValidDay,
   weekdayOf,
@@ -27,6 +28,23 @@ describe("cairoParts", () => {
       day: "2026-07-01",
       time: "23:30",
     });
+  });
+});
+
+describe("cairoInstant", () => {
+  it("turns a wall-clock slot into the right instant in winter", () => {
+    expect(cairoInstant("2026-12-25", "16:30").toISOString()).toBe(
+      "2026-12-25T14:30:00.000Z",
+    );
+    expect(cairoInstant("2026-12-25", "00:00").toISOString()).toBe(
+      "2026-12-24T22:00:00.000Z",
+    );
+  });
+
+  it("uses the summer offset", () => {
+    expect(cairoInstant("2026-07-01", "16:30").toISOString()).toBe(
+      "2026-07-01T13:30:00.000Z",
+    );
   });
 });
 

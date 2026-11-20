@@ -3,7 +3,7 @@
 // aBooking() and friends beside these.
 import type { InferInsertModel } from "drizzle-orm";
 
-import type { occasion, slotPattern, staffUser } from "@/db/schema";
+import type { booking, occasion, slotPattern, staffUser } from "@/db/schema";
 
 let counter = 0;
 const next = () => ++counter;
@@ -38,4 +38,26 @@ export function aSlotPattern(
   overrides: Partial<InferInsertModel<typeof slotPattern>> = {},
 ): InferInsertModel<typeof slotPattern> {
   return { weekday: 5, startTime: "18:00", endTime: "22:00", ...overrides };
+}
+
+export function aBooking(
+  overrides: Partial<InferInsertModel<typeof booking>> = {},
+): InferInsertModel<typeof booking> {
+  const n = next();
+  return {
+    publicId: `B${n}`,
+    accessToken: `token-${n}`,
+    occasionId: 1,
+    startsAt: new Date("2026-12-25T16:00:00Z"),
+    endsAt: new Date("2026-12-25T18:00:00Z"),
+    status: "held",
+    source: "online",
+    customerName: `Customer ${n}`,
+    customerPhone: "+201001234567",
+    locale: "ar",
+    priceEgp: 1000,
+    depositEgp: 500,
+    holdExpiresAt: new Date("2026-12-25T16:20:00Z"),
+    ...overrides,
+  };
 }

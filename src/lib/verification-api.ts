@@ -2,15 +2,9 @@
 // makes. Every answer uses the API envelope (ADR-026), so a failure always has
 // a stable code the UI can translate.
 
-export interface ApiEnvelope<T> {
-  ok: boolean;
-  data?: T;
-  error?: {
-    code: string;
-    message?: string;
-    details?: Record<string, unknown>;
-  };
-}
+import type { ApiEnvelope } from "./api-envelope";
+
+export type { ApiEnvelope };
 
 export interface CodeRequestResult {
   phone: string;

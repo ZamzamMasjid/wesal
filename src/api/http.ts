@@ -16,6 +16,12 @@ export interface RouteOptions {
   /** Status for a successful result. Default 200; use 201 for creates. */
   successStatus?: number;
   /**
+   * `cache-control` for the answer. Defaults to `no-store`; a public read whose
+   * staleness is harmless (the availability poll, ADR-014) may opt into a short
+   * shared cache.
+   */
+  cacheControl?: string;
+  /**
    * Builds the operation's raw input from the request. The default reads the
    * query string (GET, HEAD, DELETE) or a JSON body (other methods), merged with
    * the path parameters. Replace it for multipart uploads.
@@ -70,14 +76,14 @@ export function respond<T>(
   result: ApiResult<T>,
   requestId: string,
   successStatus = 200,
+  cacheControl = "no-store",
 ): Response {
   const status = result.ok ? successStatus : statusForCode(result.error.code);
   return Response.json(result, {
     status,
     headers: {
       "x-request-id": requestId,
-      // API answers are per-caller and polled for freshness (ADR-014).
-      "cache-control": "no-store",
+      "cache-control": cacheControl,
     },
   });
 }
@@ -101,7 +107,12 @@ export function route<Output>(
         raw,
         createCallContext(caller, { requestId, ip: clientIp(request) }),
       );
-      return respond(result, requestId, options.successStatus);
+      return respond(
+        result,
+        requestId,
+        options.successStatus,
+        options.cacheControl,
+      );
     } catch (error) {
       // Input building failed (bad JSON, bad multipart) or something unexpected.
       if (error instanceof ApiError) {
