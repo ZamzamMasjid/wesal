@@ -2,13 +2,13 @@
 id: booking-page
 type: feature
 title: Booking Page
-status: planned
-last_modified: 2026-11-15
+status: shipped
+last_modified: 2026-11-20
 milestone: v1
 pillar: booking
 depends_on: [booking-hold]
 views: [booking-status]
-adrs: [ADR-012, ADR-018]
+adrs: [ADR-010, ADR-012, ADR-018]
 roadmap_sections: [phase-3-booking/booking-page]
 architecture: [auth, data-model, testing]
 components: [web, postgres]
@@ -38,7 +38,8 @@ No entities of its own. Reads one booking and the payment details and policy fro
 
 ## Surface
 
-- `GET /b/{token}` — the page.
+- `GET /[locale]/booking/{token}` — the page.
+- `GET /[locale]/find-booking` — the find-my-booking form.
 - `GET /api/v1/bookings/by-token/{token}` — the booking as its holder may see it.
 - `GET /api/v1/bookings/lookup?bookingId=` — returns the link token for a matching ID; rate-limited.
 
@@ -66,4 +67,4 @@ No entities of its own. Reads one booking and the payment details and policy fro
 
 ## Open questions
 
-- Booking ID format: length and alphabet (for example `W-` plus eight unambiguous characters).
+None. A booking ID is six characters from `ABCDEFGHJKLMNPQRSTUVWXYZ23456789` (no `I`, `O`, `0` or `1`), shown and typed without a prefix.

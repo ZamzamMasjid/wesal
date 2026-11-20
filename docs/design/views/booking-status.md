@@ -2,7 +2,7 @@
 id: booking-status
 type: view
 title: Booking Page
-last_modified: 2026-11-15
+last_modified: 2026-11-20
 feature: booking-page
 mockup: none
 ---
@@ -31,7 +31,7 @@ Held (awaiting payment)
 |        [ Upload transfer screenshot ]            |
 |        or send it on WhatsApp                    |
 +--------------------------------------------------+
-|  Booking  W-7K3M9QXT                   [copy]    |
+|  Booking  7K3M9Q                      [copy]    |
 |  Wedding, Saturday 5 December, 2:00 - 4:00 pm    |
 |  Name: ...                                       |
 +--------------------------------------------------+
@@ -50,7 +50,7 @@ Rejected/expired/cancelled: what happened, [ Book again ]
 - Status header with badge
 - Countdown
 - Transfer details with copy buttons
-- Upload area and WhatsApp alternative (from `payment-proof`)
+- Upload area and WhatsApp alternative (from `payment-proof`; this feature shows the transfer details and the venue contact until that section ships)
 - Booking summary
 - Confirmation card
 - Contact footer

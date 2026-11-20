@@ -101,3 +101,10 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Affected Docs**: booking-hold, booking-form (view), phase-3-booking
 - **Reason**: Implementing `phase-3-booking/booking-hold`.
 
+## [2026-11-20] — Booking page
+
+- **Type**: Feature Change
+- **Summary**: The private booking page is built. `GET /api/v1/bookings/by-token/{token}` returns one booking as its holder may see it — occasion, day and slot, name, price, deposit and remainder, and the booking ID — never the phone number. A `held` row past its deadline reads expired without waiting for the sweep (ADR-010), and the transfer details appear only while the booking is still payable. `GET /api/v1/bookings/lookup?bookingId=` turns a typed ID into the page's token; it normalizes case, spaces, hyphens and Arabic-Indic digits, is limited to ten tries a minute per address, and answers a malformed ID exactly like an unknown one. The page at `/[locale]/booking/{token}` shows the status badge and what to do now, the deposit and copyable Vodafone Cash and InstaPay details, a countdown measured from the server's deadline and `refreshedAt` rather than the page load, the booking summary with a copyable ID, a framed confirmation card with the balance due at the venue, and Book again on expired, rejected or cancelled bookings. It refreshes every 30 seconds while visible and on focus, keeps the last known status with a "not live" note and Retry when a refresh fails, switches to expired at zero without a reload, announces a status change assertively, and announces the countdown each minute then every second of the last ten. `/[locale]/find-booking` and the empty state of the page carry the find-my-booking form. The booking ID format is settled at six characters from `ABCDEFGHJKLMNPQRSTUVWXYZ23456789`. The proof upload arrives with `payment-proof`.
+- **Affected Docs**: booking-page, booking-status (view), phase-3-booking
+- **Reason**: Implementing `phase-3-booking/booking-page`.
+

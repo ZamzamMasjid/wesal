@@ -45,9 +45,9 @@ Creating a 20-minute hold with no double booking. Extends `web`; constraint live
 
 The private page a customer returns to. Extends `web`; reads `postgres`.
 
-- [ ] Implement booking read API by link token and rate-limited lookup by booking ID
-- [ ] Implement booking-status view: transfer details, deposit, countdown, status
-- [ ] Implement find-my-booking form by booking ID
+- [x] Implement booking read API by link token and rate-limited lookup by booking ID
+- [x] Implement booking-status view: transfer details, deposit, countdown, status
+- [x] Implement find-my-booking form by booking ID
 
 ### payment-proof
 

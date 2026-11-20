@@ -2,7 +2,7 @@
 id: booking-page
 type: feature-design
 title: Booking Page — Design
-last_modified: 2026-11-15
+last_modified: 2026-11-20
 feature: booking-page
 ---
 
@@ -12,7 +12,7 @@ feature: booking-page
 
 ## Visual conventions specific to this feature
 
-The page has one dominant element per status. While held, it is the countdown and the transfer details. Once confirmed, it is a formal confirmation card with the geometric border used on the landing page, suitable for showing at the venue. Booking ID, payment numbers, amounts and the countdown use the monospace face and are left-to-right in both languages.
+The page has one dominant element per status. While held, it is the countdown and the transfer details. Once confirmed, it is a formal confirmation card with the booking details and the remaining balance due at the venue, suitable for showing at the venue. Booking ID, payment numbers, amounts and the countdown use the monospace face and are left-to-right in both languages.
 
 ## Components
 

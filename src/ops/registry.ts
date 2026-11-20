@@ -1,4 +1,5 @@
 import { bookingOperations } from "./booking/hold";
+import { bookingReadOperations } from "./booking/read";
 import { calendarOperations } from "./calendar/availability";
 import { getHealth } from "./health";
 import { twilioStatusOperation } from "./messaging/twilio-status";
@@ -16,6 +17,7 @@ export const operations: Operation<unknown>[] = [
   getHealth,
   twilioStatusOperation,
   ...Object.values(bookingOperations),
+  ...Object.values(bookingReadOperations),
   ...Object.values(calendarOperations),
   ...Object.values(staffOperations),
   ...Object.values(occasionOperations),

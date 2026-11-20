@@ -8,7 +8,7 @@ budgets: {}
 activities: []
 active:
   phase: phase-3-booking
-  section: booking-page
+  section: payment-proof
 ---
 
 # Project Index
@@ -18,7 +18,7 @@ active:
 ## Active work
 
 - **Current phase**: phase-3-booking
-- **Current section**: booking-page
+- **Current section**: payment-proof
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars
@@ -37,7 +37,7 @@ active:
 |---|---|---|---|---|---|
 | `booking-hold` | Booking Hold | shipped | v1 | booking | phase-3-booking/booking-hold |
 | `booking-management` | Booking Management | planned | v1 | back-office | phase-4-operations/booking-management |
-| `booking-page` | Booking Page | planned | v1 | booking | phase-3-booking/booking-page |
+| `booking-page` | Booking Page | shipped | v1 | booking | phase-3-booking/booking-page |
 | `booking-reports` | Booking Reports | planned | later | reporting | phase-6-alerts-and-reports/booking-reports |
 | `content-management` | Content Management | planned | v1 | public-site | phase-5-public-site/content-management |
 | `customer-mobile-app` | Customer Mobile App | planned | later | mobile-app | phase-7-mobile-app/customer-mobile-app |
