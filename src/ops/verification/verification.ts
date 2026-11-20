@@ -7,6 +7,7 @@ import { getDb, type Database } from "@/db/client";
 import { phoneVerification } from "@/db/schema";
 import { createRateLimiter, type RateLimiter } from "@/lib/rate-limit";
 import { venueContact, type VenueContact } from "@/lib/venue-contact";
+import { verificationSecret } from "@/lib/verification-secret";
 import { getSender } from "@/messaging/config";
 import { MessageDeliveryError, sendInline } from "@/messaging/outbox";
 import type { Channel, MessageSender } from "@/messaging/sender";
@@ -274,17 +275,6 @@ export function createVerificationOperations(resolve: () => VerificationDeps) {
 }
 
 const limiter = createRateLimiter();
-
-function verificationSecret(): string {
-  const secret =
-    process.env.VERIFICATION_TOKEN_SECRET ?? process.env.BETTER_AUTH_SECRET;
-  if (!secret) {
-    throw new Error(
-      "VERIFICATION_TOKEN_SECRET (or BETTER_AUTH_SECRET) is not set.",
-    );
-  }
-  return secret;
-}
 
 export const verificationOperations = createVerificationOperations(() => ({
   db: getDb(),

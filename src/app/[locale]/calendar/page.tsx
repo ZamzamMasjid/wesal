@@ -6,10 +6,10 @@ import { notFound } from "next/navigation";
 import { ANONYMOUS } from "@/api/caller";
 import { createCallContext } from "@/api/context";
 import { CalendarView } from "@/components/calendar/calendar-view";
-import { ThemeToggle } from "@/components/theme-toggle";
+import { SiteHeader } from "@/components/site-header";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
-import { cairoDay } from "@/lib/cairo-time";
+import { cairoDay, isValidDay } from "@/lib/cairo-time";
 import { firstDayOfMonth, lastDayOfMonth, monthOf } from "@/lib/calendar-grid";
 import { runtime } from "@/lib/runtime";
 import { calendarOperations } from "@/ops/calendar/availability";
@@ -22,17 +22,21 @@ export const dynamic = "force-dynamic";
 
 export default async function CalendarPage({
   params,
+  searchParams,
 }: PageProps<"/[locale]/calendar">) {
   const { locale } = await params;
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
   const t = await getTranslations("Calendar");
-  const home = await getTranslations("Home");
-  const other = routing.locales.find((l) => l !== locale) ?? locale;
+  const requested = (await searchParams).day;
+  const requestedDay =
+    typeof requested === "string" && isValidDay(requested)
+      ? requested
+      : undefined;
 
   const today = cairoDay(runtime.clock.now());
-  const month = monthOf(today);
+  const month = monthOf(requestedDay ?? today);
   const result = await calendarOperations.availability(
     { from: firstDayOfMonth(month), to: lastDayOfMonth(month) },
     createCallContext(ANONYMOUS),
@@ -44,28 +48,7 @@ export default async function CalendarPage({
 
   return (
     <>
-      <header className="mx-auto flex h-20 max-w-content items-center justify-between px-6">
-        <Link
-          href="/"
-          aria-label={t("homeLabel")}
-          className="text-4xl leading-none font-bold text-brand"
-        >
-          {home("heading")}
-        </Link>
-        <nav
-          aria-label={t("navLabel")}
-          className="flex items-center gap-1 rounded-full bg-surface p-1 shadow-md"
-        >
-          <Link
-            href="/calendar"
-            locale={other}
-            className="flex h-(--size-touch-dense) items-center rounded-full px-3 text-sm font-medium hover:bg-fill"
-          >
-            {t("language")}
-          </Link>
-          <ThemeToggle />
-        </nav>
-      </header>
+      <SiteHeader locale={locale} />
 
       <main className="mx-auto max-w-content px-6 pb-16">
         <div className="py-6 md:pb-8">
@@ -84,7 +67,7 @@ export default async function CalendarPage({
           <p className="text-muted">{t("intro")}</p>
         </div>
 
-        <CalendarView initial={result.data} />
+        <CalendarView initial={result.data} initialDay={requestedDay} />
       </main>
     </>
   );

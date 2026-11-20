@@ -94,3 +94,10 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Affected Docs**: public-calendar, calendar (view), phase-3-booking
 - **Reason**: Implementing `phase-3-booking/public-calendar`.
 
+## [2026-11-20] — Booking hold
+
+- **Type**: Feature Change
+- **Summary**: The slot hold is built. `POST /api/v1/bookings` takes the day, slot start and end, occasion, name, phone, verified-phone token and locale, and in one transaction expires the caller's overdue holds, refuses a second live hold from the same phone (`PHONE_HOLD_EXISTS`), re-checks the slot against the schedule, refuses a closed, missing, started or near-slot slot (`SLOT_UNAVAILABLE`), writes the held booking with the quoted price and 50% deposit, and queues the `booking-link` message. Two customers racing for one slot yield exactly one hold and one `SLOT_TAKEN`, backed by a database exclusion constraint over the active time ranges of held, proof-submitted and confirmed bookings (migration 0009). The deadline is the earlier of 20 minutes and the 2-hour near-slot cutoff; a slot inside 24 hours is flagged urgent. The `holds` job marks overdue holds expired, though expiry is by timestamp for every read and write. The booking form at `/[locale]/book` shows the slot, occasion radio cards with prices, the deposit for the chosen occasion, name and phone with inline errors, the what-happens-next list and a change-slot link; it mounts the existing verification step, then shows the booking ID, deadline, deposit and a link to the private booking page, or the conflict panel when the slot is taken. A visitor reaching the form for a slot that is not bookable is sent back to the calendar with that day open.
+- **Affected Docs**: booking-hold, booking-form (view), phase-3-booking
+- **Reason**: Implementing `phase-3-booking/booking-hold`.
+

@@ -3,7 +3,7 @@ id: phase-3-booking
 type: roadmap-phase
 title: Phase 3 — Booking
 status: in-progress
-last_modified: 2026-11-18
+last_modified: 2026-11-20
 milestone: v1
 phase_number: 3
 sections: [public-calendar, booking-hold, booking-page, payment-proof]
@@ -34,12 +34,12 @@ The public view of availability. Extends `web`; reads `postgres`.
 
 Creating a 20-minute hold with no double booking. Extends `web`; constraint lives in `postgres`.
 
-- [ ] Add bookings table with exclusion constraint on overlapping active time ranges
-- [ ] Implement create-hold endpoint: verified phone, transaction, conflict error
-- [ ] Implement near-slot deadline cutoff and urgent flag
-- [ ] Implement tidy-up sweep in the job loop marking overdue holds expired
-- [ ] Implement booking-form view: occasion, name, phone, conflict message
-- [ ] Queue the booking-link message on hold creation
+- [x] Add bookings table with exclusion constraint on overlapping active time ranges
+- [x] Implement create-hold endpoint: verified phone, transaction, conflict error
+- [x] Implement near-slot deadline cutoff and urgent flag
+- [x] Implement tidy-up sweep in the job loop marking overdue holds expired
+- [x] Implement booking-form view: occasion, name, phone, conflict message
+- [x] Queue the booking-link message on hold creation
 
 ### booking-page
 

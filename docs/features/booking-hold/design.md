@@ -2,7 +2,7 @@
 id: booking-hold
 type: feature-design
 title: Booking Hold — Design
-last_modified: 2026-11-15
+last_modified: 2026-11-20
 feature: booking-hold
 ---
 

@@ -2,8 +2,8 @@
 id: booking-hold
 type: feature
 title: Booking Hold
-status: planned
-last_modified: 2026-11-15
+status: shipped
+last_modified: 2026-11-20
 milestone: v1
 pillar: booking
 depends_on: [public-calendar, phone-verification, venue-settings, message-delivery]
@@ -67,5 +67,6 @@ The price is the occasion's price at the time of booking; the deposit is the sit
 
 ## Open questions
 
-- The near-slot cutoff value and what "soon" means for the urgent flag were not fixed in the interview. Both are settings; defaults need choosing (for example cutoff 2 hours, urgent within 24 hours).
-- The 20-minute window is tight for a customer who has to top up a wallet first. Carried from the idea brief as a noted risk.
+Settled: the near-slot cutoff is 2 hours (120 minutes) and a slot starting within 24 hours (1440 minutes) is flagged urgent; the hold is 20 minutes and the deposit is 50% of the price. All four are settings. A hold's deadline is the earlier of now plus the hold length and the near-slot cutoff, so a hold made close to the slot never outlives the moment it could still be paid for online.
+
+Still open: the 20-minute window is tight for a customer who has to top up a wallet first. Carried from the idea brief as a noted risk; not addressed here.

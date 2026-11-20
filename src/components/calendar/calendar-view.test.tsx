@@ -77,11 +77,11 @@ const response = (data: Availability) => ({
   json: async () => ({ ok: true, data }),
 });
 
-function renderView(fetchMock: ReturnType<typeof vi.fn>) {
+function renderView(fetchMock: ReturnType<typeof vi.fn>, initialDay?: string) {
   vi.stubGlobal("fetch", fetchMock);
   render(
     <NextIntlClientProvider locale="en" messages={messages}>
-      <CalendarView initial={initial} />
+      <CalendarView initial={initial} initialDay={initialDay} />
     </NextIntlClientProvider>,
   );
 }
@@ -109,6 +109,16 @@ describe("CalendarView", () => {
       document.getElementById("calendar-day-heading")?.textContent,
     ).toContain("Sunday, November 15");
     expect(screen.getByText("Updated just now")).toBeTruthy();
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("opens on the day the booking form sent the customer back to", () => {
+    const fetchMock = vi.fn(async () => response(taken));
+    renderView(fetchMock, "2026-11-16");
+
+    expect(
+      document.getElementById("calendar-day-heading")?.textContent,
+    ).toContain("Monday, November 16");
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

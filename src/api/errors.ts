@@ -22,7 +22,15 @@ export const ERROR_STATUS = {
 
   // Booking (booking-hold, booking-management, payment-proof)
   SLOT_TAKEN: 409,
+  /** The date is closed, the slot is gone, has started, or is inside the cutoff. */
+  SLOT_UNAVAILABLE: 409,
   HOLD_EXPIRED: 409,
+  /** This phone already has a hold that has not expired (`details.bookingId`). */
+  PHONE_HOLD_EXISTS: 409,
+  /** The verified-phone token is missing, expired or issued for another number. */
+  PHONE_NOT_VERIFIED: 403,
+  /** The occasion is unknown or no longer offered. */
+  OCCASION_UNAVAILABLE: 422,
   INVALID_FILE: 422,
   FILE_TOO_LARGE: 413,
 

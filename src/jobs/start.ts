@@ -1,7 +1,8 @@
 import { getDb } from "@/db/client";
+import { runtime } from "@/lib/runtime";
 import { getSender } from "@/messaging/config";
 import { processOutbox } from "@/messaging/outbox";
-import { runtime } from "@/lib/runtime";
+import { expireOverdueHolds } from "@/ops/booking/sweep";
 
 import { createJobLoop, type JobLoop } from "./loop";
 
@@ -29,6 +30,16 @@ export function startJobs(
             clock,
             logger: log,
           }),
+      },
+      {
+        name: "holds",
+        run: async ({ log }) => {
+          const summary = await expireOverdueHolds({ db: getDb(), clock });
+          if (summary.expired > 0) {
+            log.info("overdue holds expired", { expired: summary.expired });
+          }
+          return summary;
+        },
       },
     ],
     // Exit non-zero so Fly's restart policy starts the machine again (ADR-022).

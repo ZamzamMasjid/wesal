@@ -2,13 +2,13 @@
 id: index
 type: index
 title: Project Index
-last_modified: 2026-11-18
+last_modified: 2026-11-20
 generated_by: axiom:reindex
 budgets: {}
 activities: []
 active:
   phase: phase-3-booking
-  section: booking-hold
+  section: booking-page
 ---
 
 # Project Index
@@ -18,7 +18,7 @@ active:
 ## Active work
 
 - **Current phase**: phase-3-booking
-- **Current section**: booking-hold
+- **Current section**: booking-page
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars
@@ -35,7 +35,7 @@ active:
 
 | ID | Title | Status | Milestone | Pillar | Roadmap |
 |---|---|---|---|---|---|
-| `booking-hold` | Booking Hold | planned | v1 | booking | phase-3-booking/booking-hold |
+| `booking-hold` | Booking Hold | shipped | v1 | booking | phase-3-booking/booking-hold |
 | `booking-management` | Booking Management | planned | v1 | back-office | phase-4-operations/booking-management |
 | `booking-page` | Booking Page | planned | v1 | booking | phase-3-booking/booking-page |
 | `booking-reports` | Booking Reports | planned | later | reporting | phase-6-alerts-and-reports/booking-reports |

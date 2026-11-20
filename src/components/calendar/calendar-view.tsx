@@ -26,14 +26,25 @@ import { MonthGrid } from "./month-grid";
 
 const POLL_INTERVAL_MS = 30_000;
 
-export function CalendarView({ initial }: { initial: Availability }) {
+export function CalendarView({
+  initial,
+  initialDay,
+}: {
+  initial: Availability;
+  /** A day to open, e.g. returning from the booking form. */
+  initialDay?: string;
+}) {
   const t = useTranslations("Calendar");
   const locale = useLocale() === "ar" ? "ar" : "en";
+  const openOn =
+    initialDay && initial.days.some((entry) => entry.day === initialDay)
+      ? initialDay
+      : undefined;
 
   const [data, setData] = useState(initial);
-  const [month, setMonth] = useState(() => monthOf(initial.from));
-  const [selected, setSelected] = useState(() =>
-    firstOpenDay(initial.days, initial.today),
+  const [month, setMonth] = useState(() => monthOf(openOn ?? initial.from));
+  const [selected, setSelected] = useState(
+    () => openOn ?? firstOpenDay(initial.days, initial.today),
   );
   const [failed, setFailed] = useState(false);
   const [changed, setChanged] = useState<ReadonlySet<string>>(new Set());
