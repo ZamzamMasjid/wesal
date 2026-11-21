@@ -33,6 +33,8 @@ export const ERROR_STATUS = {
   OCCASION_UNAVAILABLE: 422,
   INVALID_FILE: 422,
   FILE_TOO_LARGE: 413,
+  /** The volume has no room for this upload. */
+  STORAGE_FULL: 507,
   /** Another staff member already decided this booking (`details.status`). */
   BOOKING_STATUS_CHANGED: 409,
 

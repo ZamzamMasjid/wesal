@@ -8,6 +8,8 @@ import { defineOperation } from "@/api/operation";
 import { getDb, type Database } from "@/db/client";
 import { siteContent } from "@/db/schema";
 
+import { listMedia } from "./media-list";
+
 // Site content operations (docs/features/content-management): the owner-editable
 // description, policy and contact details, each in Arabic and English. Anyone
 // may read the text; only the owner may change it. The fixed key registry is
@@ -165,6 +167,7 @@ export function createContentOperations(resolve: () => ContentDeps) {
     input: z.object({}),
     handler: async () => ({
       content: await readContent(resolve().db),
+      media: await listMedia(resolve().db),
     }),
   });
 
@@ -176,6 +179,7 @@ export function createContentOperations(resolve: () => ContentDeps) {
     input: z.object({}),
     handler: async () => ({
       content: await readContent(resolve().db),
+      media: await listMedia(resolve().db),
     }),
   });
 

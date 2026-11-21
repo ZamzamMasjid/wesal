@@ -156,3 +156,10 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Summary**: Site content is stored and editable. `site_content` keeps one row per fixed key (`description`, `policy`, `contact_phone`, `contact_whatsapp`) with an Arabic and an English value. `GET /api/v1/content` reads them anonymously; `GET` and `PUT /api/v1/staff/content` are owner-only, and a save upserts the supplied keys in one transaction and writes one append-only audit row naming every changed key with its before and after. Empty text clears a value; a contact number is stored once and read in both languages; unknown keys, duplicate keys and text past each key's limit are refused.
 - **Affected Docs**: content-management, data-model, phase-5-public-site
 - **Reason**: Implementing `phase-5-public-site/content-management`, first item.
+
+## [2026-11-21] — Venue media upload and ordering
+
+- **Type**: Feature Change
+- **Summary**: The owner can upload, order, describe and remove venue photos and videos. `media_asset` stores the kind, file path, MIME type, byte size, position and Arabic/English alternative text; files are streamed to random names under `media/` on the upload volume and are never purged. `POST /api/v1/staff/media` takes a multipart upload and checks the type and the size limit before writing, `PATCH` and `DELETE /api/v1/staff/media/{id}` change the text/order and remove the row with its file, and `GET /api/v1/staff/media` returns the ordered list with the limits and free disk space. `GET /api/v1/media/{id}` streams a file anonymously with an immutable cache header. The public content answer now carries the ordered media list. Venue settings gain `maxPhotoMb` (20 default) and `maxVideoMb` (200 default), editable on the settings screen. A full volume refuses the upload with `STORAGE_FULL`.
+- **Affected Docs**: content-management, venue-settings, data-model, phase-5-public-site
+- **Reason**: Implementing `phase-5-public-site/content-management`, second item.

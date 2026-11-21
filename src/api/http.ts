@@ -1,9 +1,10 @@
 import { runtime } from "@/lib/runtime";
+import { createReadStream } from "node:fs";
+import { Readable } from "node:stream";
 import { resolveCaller } from "./caller";
 import { createCallContext } from "./context";
 import { ApiError, statusForCode, type ApiResult } from "./errors";
 import { failure, type Operation } from "./operation";
-
 // The HTTP wrapper: turns a Request into operation input, calls the operation,
 // and writes the envelope. It holds no authorization or business logic (ADR-020).
 
@@ -93,6 +94,15 @@ export interface FileAnswer {
   bytes: Uint8Array;
   contentType: string;
   fileName?: string;
+  cacheControl?: string;
+}
+
+/** What a streamed media operation answers with: an immutable file on the volume. */
+export interface MediaSource {
+  filePath: string;
+  contentType: string;
+  byteSize: number;
+  etag: string;
   cacheControl?: string;
 }
 
@@ -201,8 +211,79 @@ export function fileRoute<Output extends FileAnswer>(
   };
 }
 
-/** The envelope answer for a path under /api/v1 that no route handles. */
-export function apiNotFound(): Response {
+/**
+ * Wraps a media operation as a Next.js route handler that streams the file from
+ * the volume instead of buffering it. A media file never changes once written, so
+ * its answer is public and immutable; the name is random and the row is the only
+ * way to find it. Range handling arrives with the landing-page serving item; until
+ * then the whole file is sent and the `accept-ranges` header is honest only once
+ * that item lands.
+ */
+export function mediaRoute<Output extends MediaSource>(
+  operation: Operation<Output>,
+) {
+  return async (
+    request: Request,
+    context?: RouteContextLike,
+  ): Promise<Response> => {
+    const requestId = crypto.randomUUID();
+    try {
+      const params = (await context?.params) ?? {};
+      const raw = await defaultInput(request, params);
+      const caller = await resolveCaller(request);
+      const result = await operation(
+        raw,
+        createCallContext(caller, { requestId, ip: clientIp(request) }),
+      );
+      if (!result.ok) return respond(result, requestId);
+
+      const media = result.data;
+      const headers: Record<string, string> = {
+        "content-type": media.contentType,
+        "content-length": String(media.byteSize),
+        "cache-control":
+          media.cacheControl ?? "public, max-age=31536000, immutable",
+        etag: media.etag,
+        "x-content-type-options": "nosniff",
+        "x-request-id": requestId,
+      };
+      if (request.headers.get("if-none-match") === media.etag) {
+        return new Response(null, { status: 304, headers });
+      }
+
+      const stream = createReadStream(media.filePath);
+      const body = Readable.toWeb(stream) as ReadableStream<Uint8Array>;
+      return new Response(body, { status: 200, headers });
+    } catch (error) {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        (error as { code?: unknown }).code === "ENOENT"
+      ) {
+        return respond(
+          failure({ requestId }, "NOT_FOUND", "No such media."),
+          requestId,
+        );
+      }
+      if (error instanceof ApiError) {
+        return respond(
+          failure({ requestId }, error.code, error.message, error.details),
+          requestId,
+        );
+      }
+      runtime.logger.child({ requestId }).error("unhandled media route error", {
+        operation: operation.operationName,
+        err: error,
+      });
+      return respond(
+        failure({ requestId }, "INTERNAL", "Something went wrong."),
+        requestId,
+      );
+    }
+  };
+}
+
+/** The envelope answer for a path under /api/v1 that no route handles. */ export function apiNotFound(): Response {
   const requestId = crypto.randomUUID();
   return respond(
     failure({ requestId }, "NOT_FOUND", "No such endpoint."),

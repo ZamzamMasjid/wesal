@@ -31,6 +31,8 @@ const valid = {
   holdMinutes: 20,
   nearSlotCutoffMinutes: 120,
   urgentThresholdMinutes: 1440,
+  maxPhotoMb: 25,
+  maxVideoMb: 300,
   vodafoneCashNumber: "01012345678",
   instapayAddress: "wesal@instapay",
 };
@@ -44,6 +46,8 @@ describe("staff.settings.get", () => {
       holdMinutes: 20,
       nearSlotCutoffMinutes: 120,
       urgentThresholdMinutes: 1440,
+      maxPhotoMb: 20,
+      maxVideoMb: 200,
       vodafoneCashNumber: null,
       instapayAddress: null,
     });

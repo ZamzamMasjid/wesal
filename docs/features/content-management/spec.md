@@ -61,4 +61,4 @@ In the dashboard the owner edits each text in Arabic and English side by side, u
 
 ## Open questions
 
-- What are sensible maximum sizes for a photo and a video on the chosen Fly volume?
+- Sensible maximum sizes are settings, not constants: the venue settings gain a photo limit (20 MB default) and a video limit (200 MB default), editable by the owner.

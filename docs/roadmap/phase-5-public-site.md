@@ -27,7 +27,7 @@ Phase 2 (staff access, venue settings) and phase 3 (the calendar the landing pag
 Owner-editable content and media. Extends `web`; files on `upload-volume`.
 
 - [x] Implement site content API: description, policy, contact in Arabic and English
-- [ ] Implement media upload and ordering for photos and videos on the volume
+- [x] Implement media upload and ordering for photos and videos on the volume
 - [ ] Implement owner-only content editor screens
 
 ### landing-page

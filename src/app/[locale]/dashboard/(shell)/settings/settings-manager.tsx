@@ -18,6 +18,8 @@ interface VenueSettings {
   holdMinutes: number;
   nearSlotCutoffMinutes: number;
   urgentThresholdMinutes: number;
+  maxPhotoMb: number;
+  maxVideoMb: number;
   vodafoneCashNumber: string | null;
   instapayAddress: string | null;
 }
@@ -190,6 +192,8 @@ export function SettingsManager() {
       holdMinutes: num(data.get("holdMinutes")),
       nearSlotCutoffMinutes: num(data.get("nearSlotCutoffMinutes")),
       urgentThresholdMinutes: num(data.get("urgentThresholdMinutes")),
+      maxPhotoMb: num(data.get("maxPhotoMb")),
+      maxVideoMb: num(data.get("maxVideoMb")),
       vodafoneCashNumber: text("vodafoneCashNumber") || null,
       instapayAddress: text("instapayAddress") || null,
     });
@@ -402,6 +406,33 @@ export function SettingsManager() {
               className={inputClass}
             />
             <span className="block text-muted">{t("urgentHint")}</span>
+          </label>
+          <label className="space-y-1 text-sm">
+            {t("maxPhotoMb")}
+            <input
+              name="maxPhotoMb"
+              type="number"
+              dir="ltr"
+              min={1}
+              step={1}
+              required
+              defaultValue={settings.maxPhotoMb}
+              className={inputClass}
+            />
+          </label>
+          <label className="space-y-1 text-sm">
+            {t("maxVideoMb")}
+            <input
+              name="maxVideoMb"
+              type="number"
+              dir="ltr"
+              min={1}
+              step={1}
+              required
+              defaultValue={settings.maxVideoMb}
+              className={inputClass}
+            />
+            <span className="block text-muted">{t("mediaHint")}</span>
           </label>
         </div>
 

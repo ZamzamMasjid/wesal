@@ -30,12 +30,14 @@ Holds the numbers and details that define a booking at Wesal: which occasions ca
 
 **Booking rules.** The hold length (default 20 minutes), the near-slot cutoff (default 120 minutes), and the urgent threshold (default 1440 minutes). The deposit defaults to 50%. The settings row is created with these defaults the first time it is read.
 
+**Media limits.** The largest photo (default 20 MB) and the largest video (default 200 MB) the content editor accepts. The limits belong to settings so the owner can change them without a deploy.
+
 Changes take effect for new bookings. A booking already made keeps the price and deposit it was quoted.
 
 ## Data
 
 - **Occasion** — name in Arabic and English, price in EGP, active flag, display order.
-- **Settings** — a single row: deposit percent, hold minutes, near-slot cutoff minutes, urgent threshold, Vodafone Cash number, InstaPay address.
+- **Settings** — a single row: deposit percent, hold minutes, near-slot cutoff minutes, urgent threshold, maximum photo and video size in MB, Vodafone Cash number, InstaPay address.
 
 ## Surface
 

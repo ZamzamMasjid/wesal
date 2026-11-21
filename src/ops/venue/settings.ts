@@ -20,6 +20,8 @@ const columns = {
   holdMinutes: settings.holdMinutes,
   nearSlotCutoffMinutes: settings.nearSlotCutoffMinutes,
   urgentThresholdMinutes: settings.urgentThresholdMinutes,
+  maxPhotoMb: settings.maxPhotoMb,
+  maxVideoMb: settings.maxVideoMb,
   vodafoneCashNumber: settings.vodafoneCashNumber,
   instapayAddress: settings.instapayAddress,
 };
@@ -29,6 +31,8 @@ export type VenueSettings = {
   holdMinutes: number;
   nearSlotCutoffMinutes: number;
   urgentThresholdMinutes: number;
+  maxPhotoMb: number;
+  maxVideoMb: number;
   vodafoneCashNumber: string | null;
   instapayAddress: string | null;
 };
@@ -83,6 +87,8 @@ export function createSettingsOperations(resolve: () => SettingsDeps) {
       holdMinutes: z.number().int().min(1).max(1440),
       nearSlotCutoffMinutes: minutes,
       urgentThresholdMinutes: minutes,
+      maxPhotoMb: z.number().int().min(1).max(2_000),
+      maxVideoMb: z.number().int().min(1).max(20_000),
       vodafoneCashNumber: optionalText(30),
       instapayAddress: optionalText(100),
     }),

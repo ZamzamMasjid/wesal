@@ -136,6 +136,10 @@ export const settings = pgTable(
     urgentThresholdMinutes: integer("urgent_threshold_minutes")
       .notNull()
       .default(1440),
+    /** The largest photo the content editor accepts, in megabytes. */
+    maxPhotoMb: integer("max_photo_mb").notNull().default(20),
+    /** The largest video the content editor accepts, in megabytes. */
+    maxVideoMb: integer("max_video_mb").notNull().default(200),
     vodafoneCashNumber: text("vodafone_cash_number"),
     instapayAddress: text("instapay_address"),
     ...timestamps,
@@ -301,6 +305,32 @@ export const siteContent = pgTable("site_content", {
   valueEn: text("value_en").notNull().default(""),
   ...timestamps,
 });
+
+/**
+ * One photo or video shown on the public site (docs/features/content-management).
+ * The file lives on `upload-volume`; `filePath` is relative to `UPLOAD_DIR` and
+ * is null-free by construction. Unlike payment screenshots, venue media is never
+ * purged. `position` fixes the gallery order, and the alternative text is
+ * editable in both languages, falling back to Arabic on the English page.
+ */
+export const mediaAsset = pgTable(
+  "media_asset",
+  {
+    id: bigint("id", { mode: "number" })
+      .primaryKey()
+      .generatedAlwaysAsIdentity(),
+    kind: text("kind", { enum: ["photo", "video"] }).notNull(),
+    /** Example: "media/9f2c...a1b2c3.jpg". */
+    filePath: text("file_path").notNull().unique(),
+    mimeType: text("mime_type").notNull(),
+    byteSize: bigint("byte_size", { mode: "number" }).notNull(),
+    altAr: text("alt_ar").notNull().default(""),
+    altEn: text("alt_en").notNull().default(""),
+    position: integer("position").notNull().default(0),
+    ...timestamps,
+  },
+  (t) => [index("media_asset_position_idx").on(t.position, t.id)],
+);
 
 /**
  * Append-only record of staff actions (auth architecture, "Audit"). A database
