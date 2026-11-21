@@ -35,6 +35,8 @@ export interface BookingFormProps {
   occasions: BookingOccasion[];
   depositPercent: number;
   holdMinutes: number;
+  /** The occasion chosen on the landing page, when it is still offered. */
+  initialOccasionId?: number;
 }
 
 type Step = "details" | "code" | "held";
@@ -57,6 +59,7 @@ export function BookingForm({
   occasions,
   depositPercent,
   holdMinutes,
+  initialOccasionId,
 }: BookingFormProps) {
   const t = useTranslations("Booking");
   const locale = useLocale() === "ar" ? "ar" : "en";
@@ -72,7 +75,12 @@ export function BookingForm({
   const previousStep = useRef<Step>("details");
 
   const [step, setStep] = useState<Step>("details");
-  const [occasionId, setOccasionId] = useState<number | null>(null);
+  const [occasionId, setOccasionId] = useState<number | null>(() =>
+    initialOccasionId !== undefined &&
+    occasions.some((occasion) => occasion.id === initialOccasionId)
+      ? initialOccasionId
+      : null,
+  );
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [errors, setErrors] = useState<FieldErrors>({});

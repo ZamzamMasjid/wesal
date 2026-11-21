@@ -177,3 +177,10 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Summary**: The public home page is live at `/` (Arabic) and `/en`. It is server-rendered from content management and venue settings: the first photo is the hero, the description is set as paragraphs beside the venue name, and the remaining photos and videos fill a gallery whose first tile is double width. The gallery opens a focus-trapping lightbox with arrow-key and button navigation, and videos play only on tap, muted. Occasion cards show the localized name and price with the deposit percentage beside them, the policy text is a collapsible numbered list (one rule per line), and the contact block carries the phone and WhatsApp actions with a sticky bar on phones. Empty occasions become a contact prompt; no media omits the hero and gallery. The header gains "Find my booking" on the landing page, and the language switch stays on the same page.
 - **Affected Docs**: landing-page, content-management, home (view), phase-5-public-site
 - **Reason**: Implementing `phase-5-public-site/landing-page`, first item.
+
+## [2026-11-21] — Landing page calendar entry
+
+- **Type**: Feature Change
+- **Summary**: The landing page's occasion cards and its primary action lead into the calendar, and the occasion survives the rest of the path: the calendar accepts `?occasion={id}`, carries it into every bookable slot's link, and the booking form starts with that occasion selected, showing its deposit. An occasion that is no longer offered is ignored, so the form still asks for a choice.
+- **Affected Docs**: landing-page, phase-5-public-site
+- **Reason**: Implementing `phase-5-public-site/landing-page`, second item.

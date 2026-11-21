@@ -33,6 +33,8 @@ export interface DayPanelProps {
   changed?: ReadonlySet<string>;
   contact?: VenueContact;
   headingRef?: RefObject<HTMLHeadingElement | null>;
+  /** An occasion chosen on the landing page, carried into every booking link. */
+  occasionId?: number;
 }
 
 export function DayPanel({
@@ -42,6 +44,7 @@ export function DayPanel({
   changed,
   contact = venueContact,
   headingRef,
+  occasionId,
 }: DayPanelProps) {
   const t = useTranslations("Calendar");
   const locale = useLocale() === "ar" ? "ar" : "en";
@@ -96,6 +99,7 @@ export function DayPanel({
               slot={slot}
               locale={locale}
               contact={contact}
+              occasionId={occasionId}
               changed={changed?.has(`${day}|${slot.start}`) ?? false}
             />
           ))}
@@ -131,23 +135,27 @@ function SlotRow({
   locale,
   contact,
   changed,
+  occasionId,
 }: {
   day: string;
   slot: AvailabilitySlot;
   locale: string;
   contact: VenueContact;
   changed: boolean;
+  occasionId?: number;
 }) {
   const t = useTranslations("Calendar");
   const start = formatTime(slot.start, locale);
   const end = formatTime(slot.end, locale);
   const open = slot.state === "free" && slot.action !== "none";
   const bookable = slot.action === "book";
-  const bookHref = `/book?${new URLSearchParams({
+  const query = new URLSearchParams({
     day,
     start: slot.start,
     end: slot.end,
-  })}`;
+  });
+  if (occasionId !== undefined) query.set("occasion", String(occasionId));
+  const bookHref = `/book?${query}`;
 
   return (
     <li

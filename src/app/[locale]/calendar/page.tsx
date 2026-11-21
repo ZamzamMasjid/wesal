@@ -34,6 +34,13 @@ export default async function CalendarPage({
     typeof requested === "string" && isValidDay(requested)
       ? requested
       : undefined;
+  // The landing page's occasion cards arrive as `?occasion=3`; an unknown or
+  // malformed value simply means no occasion is preselected.
+  const occasionValue = Number((await searchParams).occasion);
+  const occasionId =
+    Number.isInteger(occasionValue) && occasionValue > 0
+      ? occasionValue
+      : undefined;
 
   const today = cairoDay(runtime.clock.now());
   const month = monthOf(requestedDay ?? today);
@@ -67,7 +74,11 @@ export default async function CalendarPage({
           <p className="text-muted">{t("intro")}</p>
         </div>
 
-        <CalendarView initial={result.data} initialDay={requestedDay} />
+        <CalendarView
+          initial={result.data}
+          initialDay={requestedDay}
+          occasionId={occasionId}
+        />
       </main>
     </>
   );

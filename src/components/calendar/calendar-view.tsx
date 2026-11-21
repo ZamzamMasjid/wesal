@@ -29,10 +29,13 @@ const POLL_INTERVAL_MS = 30_000;
 export function CalendarView({
   initial,
   initialDay,
+  occasionId,
 }: {
   initial: Availability;
   /** A day to open, e.g. returning from the booking form. */
   initialDay?: string;
+  /** An occasion chosen on the landing page, carried into every booking link. */
+  occasionId?: number;
 }) {
   const t = useTranslations("Calendar");
   const locale = useLocale() === "ar" ? "ar" : "en";
@@ -240,6 +243,7 @@ export function CalendarView({
                 today={data.today}
                 changed={changed}
                 headingRef={headingRef}
+                occasionId={occasionId}
               />
             </>
           ) : (

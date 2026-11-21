@@ -85,10 +85,20 @@ describe("DayPanel", () => {
     expect(href).toContain("day=2026-11-15");
     expect(href).toContain("start=18%3A30");
     expect(href).toContain("end=21%3A00");
+    expect(href).not.toContain("occasion=");
 
     expect(
       screen.queryByRole("link", { name: /Book the 10:00 AM/ }),
     ).toBeNull();
+  });
+
+  it("carries the landing page's occasion into the booking link", () => {
+    renderDay({ occasionId: 2 });
+
+    const book = screen.getByRole("link", {
+      name: /Book the 6:30 PM to 9:00 PM slot/,
+    });
+    expect(book.getAttribute("href")).toContain("occasion=2");
   });
 
   it("offers the phone and WhatsApp instead of booking inside the cutoff", () => {

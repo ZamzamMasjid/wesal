@@ -38,6 +38,11 @@ export default async function BookPage({
   const day = text(search.day);
   const start = text(search.start);
   const end = text(search.end);
+  const requestedOccasion = Number(text(search.occasion));
+  const occasionId =
+    Number.isInteger(requestedOccasion) && requestedOccasion > 0
+      ? requestedOccasion
+      : undefined;
 
   if (!isValidDay(day)) return redirect({ href: "/calendar", locale });
   const calendarHref = `/calendar?day=${day}`;
@@ -77,6 +82,7 @@ export default async function BookPage({
           occasions={occasions.data.occasions}
           depositPercent={settings.depositPercent}
           holdMinutes={settings.holdMinutes}
+          initialOccasionId={occasionId}
         />
       </main>
     </>

@@ -85,7 +85,7 @@ afterEach(() => {
   vi.clearAllMocks();
 });
 
-function renderForm() {
+function renderForm(props: Partial<Parameters<typeof BookingForm>[0]> = {}) {
   render(
     <NextIntlClientProvider locale="en" messages={messages}>
       <BookingForm
@@ -95,6 +95,7 @@ function renderForm() {
         occasions={occasions}
         depositPercent={50}
         holdMinutes={20}
+        {...props}
       />
     </NextIntlClientProvider>,
   );
@@ -128,6 +129,26 @@ describe("BookingForm", () => {
       screen.queryByText("Choose an occasion to see the deposit."),
     ).toBeNull();
     expect(screen.getByText(/5,000/)).toBeTruthy();
+  });
+
+  it("preselects the occasion the landing page carried in", () => {
+    renderForm({ initialOccasionId: 2 });
+
+    const funeral = screen.getByRole("radio", {
+      name: /Funeral/,
+    }) as HTMLInputElement;
+    expect(funeral.checked).toBe(true);
+    expect(
+      screen.queryByText("Choose an occasion to see the deposit."),
+    ).toBeNull();
+    expect(screen.getByText(/1,000/)).toBeTruthy();
+  });
+
+  it("ignores an occasion id that is no longer offered", () => {
+    renderForm({ initialOccasionId: 99 });
+    expect(
+      screen.getByText("Choose an occasion to see the deposit."),
+    ).toBeTruthy();
   });
 
   it("refuses an empty name, phone or occasion inline", () => {
