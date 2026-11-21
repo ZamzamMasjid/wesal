@@ -15,6 +15,7 @@ import {
   text,
   time,
   timestamp,
+  uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 const timestamps = {
@@ -388,6 +389,42 @@ export const phoneVerification = pgTable(
   (t) => [
     index("phone_verification_phone_created_idx").on(t.phone, t.createdAt),
     index("phone_verification_expires_idx").on(t.expiresAt),
+  ],
+);
+
+/**
+ * A visitor watching a taken slot (docs/features/slot-alerts). One row per phone
+ * per slot: subscribing again refreshes the row. `token` is the secret in the
+ * unsubscribe link; `notifiedAt` is stamped when the slot frees and the messages
+ * are queued, so a slot is announced to a subscriber once.
+ */
+export const slotAlert = pgTable(
+  "slot_alert",
+  {
+    id: bigint("id", { mode: "number" })
+      .primaryKey()
+      .generatedAlwaysAsIdentity(),
+    startsAt: timestamp("starts_at", { withTimezone: true }).notNull(),
+    endsAt: timestamp("ends_at", { withTimezone: true }).notNull(),
+    /** E.164, e.g. +201001234567. */
+    phone: text("phone").notNull(),
+    locale: text("locale", { enum: ["ar", "en"] }).notNull(),
+    /** The secret in the unsubscribe link. */
+    token: text("token").notNull().unique(),
+    /** Set when the "slot is free" message was queued. */
+    notifiedAt: timestamp("notified_at", { withTimezone: true }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (t) => [
+    uniqueIndex("slot_alert_phone_slot_unique").on(
+      t.phone,
+      t.startsAt,
+      t.endsAt,
+    ),
+    index("slot_alert_slot_idx").on(t.startsAt, t.endsAt),
+    index("slot_alert_pending_idx").on(t.notifiedAt, t.startsAt),
   ],
 );
 

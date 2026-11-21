@@ -14,6 +14,8 @@ export interface AvailabilitySlot {
   end: string;
   state: SlotState;
   action: SlotAction;
+  /** Whether the visitor can ask to be told if this taken slot frees up. */
+  alert: boolean;
 }
 
 export interface AvailabilityDay {

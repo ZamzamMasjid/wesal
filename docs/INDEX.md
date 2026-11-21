@@ -48,9 +48,9 @@ active:
 | `phone-verification` | Phone Verification | shipped | v1 | booking | phase-2-foundations/phone-verification |
 | `public-calendar` | Public Calendar | shipped | v1 | availability | phase-3-booking/public-calendar |
 | `push-notifications` | Push Notifications | planned | later | mobile-app | phase-7-mobile-app/push-notifications |
-| `slot-alerts` | Slot Alerts | planned | later | availability | phase-6-alerts-and-reports/slot-alerts |
+| `slot-alerts` | Slot Alerts | in-progress | later | availability | phase-6-alerts-and-reports/slot-alerts |
 | `slot-schedule` | Slot Schedule | shipped | v1 | availability | phase-2-foundations/slot-schedule |
-| `staff-access` | Staff Access | in-progress | v1 | back-office | phase-2-foundations/staff-access |
+| `staff-access` | Staff Access | shipped | v1 | back-office | phase-2-foundations/staff-access |
 | `staff-notifications` | Staff Notifications | shipped | v1 | messaging | phase-4-operations/staff-notifications |
 | `venue-settings` | Venue Settings | shipped | v1 | back-office | phase-2-foundations/venue-settings |
 

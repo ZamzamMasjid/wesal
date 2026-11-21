@@ -2,7 +2,7 @@
 id: slot-alerts
 type: feature
 title: Slot Alerts
-status: planned
+status: in-progress
 last_modified: 2026-11-21
 milestone: later
 pillar: availability

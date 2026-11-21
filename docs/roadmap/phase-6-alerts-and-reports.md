@@ -26,7 +26,7 @@ The first push (phases 1 to 5) shipped, with real bookings accumulated for repor
 
 "Tell me if this slot frees up" for people watching a taken slot.
 
-- [ ] Implement alert signup on a taken slot with phone verification
+- [x] Implement alert signup on a taken slot with phone verification
 - [ ] Notify subscribers through the outbox when the slot becomes free
 
 ### booking-reports

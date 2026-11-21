@@ -76,6 +76,14 @@ erDiagram
     timestamptz expires_at
     int attempts
   }
+  SLOT_ALERT {
+    timestamptz starts_at
+    timestamptz ends_at
+    string phone
+    string locale
+    string token
+    timestamptz notified_at
+  }
   OUTBOX_MESSAGE {
     string recipient
     string channel
@@ -131,6 +139,7 @@ Two points are easy to miss. First, slots are not stored rows: a date's slots ar
 | Booking | `web` | `postgres` | Strong; overlap of active bookings rejected by the database |
 | Payment proof | `web` | Row in `postgres`, file on `upload-volume` | Strong for the row; the file is removed after one day |
 | Phone verification | `web` | `postgres` | Strong |
+| Slot alert | `web` | `postgres` | Strong; one row per phone and slot |
 | Outbox message | `web` | `postgres` | Strong; delivery is at-least-once |
 | Staff user, session | `web` (Better Auth) | `postgres` | Strong |
 | Audit log | `web` | `postgres` | Strong; append-only |

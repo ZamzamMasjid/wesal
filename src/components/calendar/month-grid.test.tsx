@@ -16,13 +16,27 @@ const days: AvailabilityDay[] = [
   {
     day: "2026-11-15",
     closed: false,
-    slots: [{ start: "18:30", end: "21:00", state: "free", action: "book" }],
+    slots: [
+      {
+        start: "18:30",
+        end: "21:00",
+        state: "free",
+        action: "book",
+        alert: false,
+      },
+    ],
   },
   {
     day: "2026-11-16",
     closed: false,
     slots: [
-      { start: "18:30", end: "21:00", state: "confirmed", action: "none" },
+      {
+        start: "18:30",
+        end: "21:00",
+        state: "confirmed",
+        action: "none",
+        alert: false,
+      },
     ],
   },
   { day: "2026-11-20", closed: true, slots: [] },

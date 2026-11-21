@@ -70,6 +70,7 @@
     "slotsFree": "{count, plural, =0 {No free slots} one {1 free slot} other {# free slots}}",
     "refreshedJustNow": "Updated just now",
     "slotChanged": "{time}: now {state}",
+    "notifySubscribed": "You will be notified",
     "noSlotsTitle": "The venue is not available on this day",
     "noSlotsBody": "Pick another day from the calendar, or contact us if you have a question.",
     "errorTitle": "We couldn't load the times",
@@ -81,6 +82,35 @@
     "or": "or",
     "call": "Call us",
     "whatsapp": "WhatsApp"
+  },
+  "Alerts": {
+    "notify": "Notify me",
+    "notifySlot": "Notify me if the {time} slot frees up",
+    "title": "Notify me if this slot frees up",
+    "description": "Enter your phone and confirm the code. If the slot becomes free we will message you; the first person to complete a booking gets it.",
+    "phone": "Phone",
+    "phoneHint": "Egyptian number: 01xxxxxxxxx. Other country: +country code and number.",
+    "phoneRequired": "Enter a phone number.",
+    "sendCode": "Send code",
+    "subscribing": "Subscribing…",
+    "subscribedTitle": "You will be notified",
+    "subscribedBody": "We will message {phone} if this slot frees up.",
+    "reservesNothing": "This does not reserve the slot. The first person to complete a booking gets it.",
+    "backToCalendar": "Back to calendar",
+    "close": "Close",
+    "limitReached": "You are watching too many slots. Wait for one of them to free up, or contact the venue.",
+    "slotUnavailable": "This slot is no longer waiting on anyone. Check the calendar again.",
+    "notVerified": "The phone verification expired. Enter the code again.",
+    "failed": "Something went wrong. Try again.",
+    "unsubscribe": {
+      "title": "Stop slot alerts",
+      "body": "Stop receiving a message when this slot frees up?",
+      "confirm": "Stop alerts",
+      "working": "Removing…",
+      "done": "You will no longer be told about this slot.",
+      "back": "Back to the calendar",
+      "failed": "Could not stop the alerts. Try again."
+    }
   },
   "Unavailable": {
     "title": "We're temporarily unavailable",

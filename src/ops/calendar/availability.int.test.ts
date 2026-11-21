@@ -73,7 +73,13 @@ describe("availability.get", () => {
     const open = result.data.days[1];
     expect(open).toMatchObject({ closed: false });
     expect(open?.slots).toEqual([
-      { start: "18:00", end: "20:00", state: "free", action: "book" },
+      {
+        start: "18:00",
+        end: "20:00",
+        state: "free",
+        action: "book",
+        alert: false,
+      },
     ]);
   });
 
@@ -98,14 +104,17 @@ describe("availability.get", () => {
     expect(slot("2026-12-25")).toMatchObject({
       state: "confirmed",
       action: "none",
+      alert: false,
     });
     expect(slot("2027-01-01")).toMatchObject({
       state: "awaiting_review",
       action: "none",
+      alert: true,
     });
     expect(slot("2027-01-08")).toMatchObject({
       state: "awaiting_payment",
       action: "none",
+      alert: true,
     });
   });
 

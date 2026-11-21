@@ -36,10 +36,34 @@ const day: AvailabilityDay = {
   day: "2026-11-15",
   closed: false,
   slots: [
-    { start: "10:00", end: "12:00", state: "confirmed", action: "none" },
-    { start: "12:30", end: "15:00", state: "awaiting_review", action: "none" },
-    { start: "15:30", end: "18:00", state: "free", action: "call" },
-    { start: "18:30", end: "21:00", state: "free", action: "book" },
+    {
+      start: "10:00",
+      end: "12:00",
+      state: "confirmed",
+      action: "none",
+      alert: false,
+    },
+    {
+      start: "12:30",
+      end: "15:00",
+      state: "awaiting_review",
+      action: "none",
+      alert: true,
+    },
+    {
+      start: "15:30",
+      end: "18:00",
+      state: "free",
+      action: "call",
+      alert: false,
+    },
+    {
+      start: "18:30",
+      end: "21:00",
+      state: "free",
+      action: "book",
+      alert: false,
+    },
   ],
 };
 
@@ -117,6 +141,22 @@ describe("DayPanel", () => {
         .getAttribute("href"),
     ).toBe("https://wa.me/201012345678");
     expect(screen.queryByRole("link", { name: /Book the 3:30 PM/ })).toBeNull();
+  });
+
+  it("offers Notify me only on a taken slot that can still free up", () => {
+    renderDay();
+
+    expect(
+      screen.getByRole("button", {
+        name: /Notify me if the 12:30 PM slot frees up/,
+      }),
+    ).toBeTruthy();
+    expect(
+      screen.queryByRole("button", { name: /Notify me if the 10:00 AM/ }),
+    ).toBeNull();
+    expect(
+      screen.queryByRole("button", { name: /Notify me if the 6:30 PM/ }),
+    ).toBeNull();
   });
 
   it("shows the empty moment with the contact fallback on a closed day", () => {

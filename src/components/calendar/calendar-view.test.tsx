@@ -40,12 +40,28 @@ const initial: Availability = {
     {
       day: "2026-11-15",
       closed: false,
-      slots: [{ start: "18:30", end: "21:00", state: "free", action: "book" }],
+      slots: [
+        {
+          start: "18:30",
+          end: "21:00",
+          state: "free",
+          action: "book",
+          alert: false,
+        },
+      ],
     },
     {
       day: "2026-11-16",
       closed: false,
-      slots: [{ start: "18:30", end: "21:00", state: "free", action: "book" }],
+      slots: [
+        {
+          start: "18:30",
+          end: "21:00",
+          state: "free",
+          action: "book",
+          alert: false,
+        },
+      ],
     },
   ],
 };
@@ -58,7 +74,13 @@ const taken: Availability = {
       day: "2026-11-15",
       closed: false,
       slots: [
-        { start: "18:30", end: "21:00", state: "confirmed", action: "none" },
+        {
+          start: "18:30",
+          end: "21:00",
+          state: "confirmed",
+          action: "none",
+          alert: false,
+        },
       ],
     },
     initial.days[1]!,

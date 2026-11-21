@@ -38,6 +38,10 @@ export const ERROR_STATUS = {
   /** Another staff member already decided this booking (`details.status`). */
   BOOKING_STATUS_CHANGED: 409,
 
+  // Slot alerts
+  /** This phone is already watching as many slots as it may. */
+  ALERT_LIMIT_REACHED: 429,
+
   // Phone verification
   CODE_INVALID: 422,
   CODE_EXPIRED: 422,

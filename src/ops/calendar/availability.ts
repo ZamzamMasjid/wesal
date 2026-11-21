@@ -33,6 +33,8 @@ export interface PublicSlot {
   end: string;
   state: SlotState;
   action: SlotAction;
+  /** Whether a visitor can ask to be told if this taken slot frees up. */
+  alert: boolean;
 }
 
 export interface PublicDay {
@@ -140,6 +142,11 @@ export async function buildAvailability(
             now,
             settings.nearSlotCutoffMinutes,
           ),
+          // Watching makes sense only while someone is holding or awaiting review
+          // and the slot has not started yet.
+          alert:
+            (state === "awaiting_payment" || state === "awaiting_review") &&
+            startsAt.getTime() > now.getTime(),
         };
       }),
     })),
