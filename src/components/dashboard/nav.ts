@@ -1,16 +1,18 @@
 export type NavItem = {
   href:
     | "/dashboard"
+    | "/dashboard/review"
     | "/dashboard/staff"
     | "/dashboard/settings"
     | "/dashboard/schedule";
-  label: "home" | "staff" | "settings" | "schedule";
+  label: "home" | "review" | "staff" | "settings" | "schedule";
   /** Only owners see it; the server enforces the same rule. */
   ownerOnly?: boolean;
 };
 
 const ALL_ITEMS: NavItem[] = [
   { href: "/dashboard", label: "home" },
+  { href: "/dashboard/review", label: "review" },
   { href: "/dashboard/schedule", label: "schedule", ownerOnly: true },
   { href: "/dashboard/settings", label: "settings", ownerOnly: true },
   { href: "/dashboard/staff", label: "staff", ownerOnly: true },

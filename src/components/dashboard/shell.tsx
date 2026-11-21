@@ -1,17 +1,27 @@
 "use client";
 
-import { CalendarClock, Home, LogOut, Settings, Users } from "lucide-react";
+import {
+  CalendarClock,
+  Eye,
+  Home,
+  LogOut,
+  Settings,
+  Users,
+} from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
+import { useCallback, useEffect, useState } from "react";
 
 import { ThemeToggle } from "@/components/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import { fetchReviewQueue } from "@/lib/review-api";
 
 import { navFor, type NavItem } from "./nav";
 
 const icons = {
   home: Home,
+  review: Eye,
   schedule: CalendarClock,
   settings: Settings,
   staff: Users,
@@ -20,6 +30,37 @@ const icons = {
 interface ShellProps {
   user: { name: string; role: "owner" | "staff" };
   children: React.ReactNode;
+}
+
+const REVIEW_POLL_MS = 30_000;
+
+/**
+ * How many payments are waiting, for the Review badge. Refreshed on focus and
+ * every 30 seconds, the same cadence as the queue itself (ADR-014's pattern).
+ */
+function useReviewCount(): number {
+  const [count, setCount] = useState(0);
+  const refresh = useCallback(async () => {
+    const result = await fetchReviewQueue();
+    if (result.ok && result.data) setCount(result.data.items.length);
+  }, []);
+
+  useEffect(() => {
+    // The badge is refreshed from the network; the state update follows the answer.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void refresh();
+    const poll = () => {
+      if (document.visibilityState === "visible") void refresh();
+    };
+    const timer = setInterval(poll, REVIEW_POLL_MS);
+    window.addEventListener("focus", poll);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener("focus", poll);
+    };
+  }, [refresh]);
+
+  return count;
 }
 
 /**
@@ -34,6 +75,7 @@ export function DashboardShell({ user, children }: ShellProps) {
   const locale = useLocale();
   const other = routing.locales.find((l) => l !== locale) ?? locale;
   const items = navFor(user.role);
+  const reviewCount = useReviewCount();
 
   async function logout() {
     try {
@@ -68,6 +110,19 @@ export function DashboardShell({ user, children }: ShellProps) {
       >
         <Icon className="size-5" aria-hidden />
         {t(`nav.${item.label}`)}
+        {item.label === "review" && reviewCount > 0 && (
+          <>
+            <span
+              aria-hidden
+              className="ms-auto min-w-5 rounded-full bg-brand px-1.5 text-center text-xs font-semibold text-brand-fg tabular-nums"
+            >
+              {reviewCount}
+            </span>
+            <span className="sr-only">
+              {t("nav.reviewBadge", { count: reviewCount })}
+            </span>
+          </>
+        )}
       </Link>
     );
   };

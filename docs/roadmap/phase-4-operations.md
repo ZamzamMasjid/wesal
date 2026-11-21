@@ -2,8 +2,8 @@
 id: phase-4-operations
 type: roadmap-phase
 title: Phase 4 — Operations
-status: planned
-last_modified: 2026-11-15
+status: in-progress
+last_modified: 2026-11-21
 milestone: v1
 phase_number: 4
 sections: [payment-review, staff-notifications, booking-management]
@@ -26,11 +26,11 @@ Phase 3: holds and payment proofs exist to review. Phase 2: staff access and the
 
 Staff confirm or reject uploaded proofs. Extends `web`; reads `upload-volume`.
 
-- [ ] Implement review queue API and confirm/reject endpoints with audit entries
-- [ ] Implement review-queue view with screenshot viewer and confirm/reject actions
-- [ ] Implement deep link from a staff alert to that booking's review page after login
-- [ ] Implement mark-proof-received for screenshots sent over WhatsApp
-- [ ] Write e2e test: staff reviews, confirms and rejects a booking
+- [x] Implement review queue API and confirm/reject endpoints with audit entries
+- [x] Implement review-queue view with screenshot viewer and confirm/reject actions
+- [x] Implement deep link from a staff alert to that booking's review page after login
+- [x] Implement mark-proof-received for screenshots sent over WhatsApp
+- [x] Write e2e test: staff reviews, confirms and rejects a booking
 
 ### staff-notifications
 

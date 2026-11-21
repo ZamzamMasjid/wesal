@@ -2,8 +2,8 @@
 id: payment-review
 type: feature
 title: Payment Review
-status: planned
-last_modified: 2026-11-15
+status: shipped
+last_modified: 2026-11-21
 milestone: v1
 pillar: back-office
 depends_on: [staff-access, payment-proof]
@@ -38,6 +38,7 @@ No entities of its own. Changes booking status, reads payment proofs, writes aud
 ## Surface
 
 - `GET /api/v1/staff/review-queue` — bookings in `proof_submitted`, plus urgent `held` bookings for visibility.
+- `GET /api/v1/staff/review-queue/{bookingId}` — one booking with its proofs, newest first, for the review page and its after-decision state.
 - `POST /api/v1/staff/bookings/{id}/confirm`
 - `POST /api/v1/staff/bookings/{id}/reject` — reason required.
 - `POST /api/v1/staff/bookings/{id}/proof-received` — for proofs sent over WhatsApp.

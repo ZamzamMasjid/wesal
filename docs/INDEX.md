@@ -8,7 +8,7 @@ budgets: {}
 activities: []
 active:
   phase: phase-4-operations
-  section: payment-review
+  section: staff-notifications
 ---
 
 # Project Index
@@ -18,7 +18,7 @@ active:
 ## Active work
 
 - **Current phase**: phase-4-operations
-- **Current section**: payment-review
+- **Current section**: staff-notifications
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars
@@ -44,7 +44,7 @@ active:
 | `landing-page` | Landing Page | planned | v1 | public-site | phase-5-public-site/landing-page |
 | `message-delivery` | Message Delivery | shipped | v1 | messaging | phase-2-foundations/message-delivery |
 | `payment-proof` | Payment Proof | shipped | v1 | booking | phase-3-booking/payment-proof |
-| `payment-review` | Payment Review | planned | v1 | back-office | phase-4-operations/payment-review |
+| `payment-review` | Payment Review | shipped | v1 | back-office | phase-4-operations/payment-review |
 | `phone-verification` | Phone Verification | shipped | v1 | booking | phase-2-foundations/phone-verification |
 | `public-calendar` | Public Calendar | shipped | v1 | availability | phase-3-booking/public-calendar |
 | `push-notifications` | Push Notifications | planned | later | mobile-app | phase-7-mobile-app/push-notifications |
@@ -86,7 +86,7 @@ active:
 | `phase-1-infrastructure` | shipped | v1 | project-setup, database, testing, deployment |
 | `phase-2-foundations` | shipped | v1 | staff-access, venue-settings, slot-schedule, message-delivery, phone-verification |
 | `phase-3-booking` | shipped | v1 | public-calendar, booking-hold, booking-page, payment-proof |
-| `phase-4-operations` | planned | v1 | payment-review, staff-notifications, booking-management |
+| `phase-4-operations` | in-progress | v1 | payment-review, staff-notifications, booking-management |
 | `phase-5-public-site` | planned | v1 | content-management, landing-page |
 | `phase-6-alerts-and-reports` | planned | later | slot-alerts, booking-reports |
 | `phase-7-mobile-app` | planned | later | customer-mobile-app, push-notifications |
