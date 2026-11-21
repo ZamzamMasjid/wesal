@@ -38,7 +38,7 @@ Messages are written from templates in Arabic and English and sent in the recipi
 - Internal: `sendInline({ sender, logger }, { template, recipient, values, locale })` for inline sends (the provider's channels; throws `MessageDeliveryError` when every channel it offers fails); `queueMessage(tx, clock, { template, recipient, values, locale, bookingId?, expiresAt? })` for outbox sends inside a transaction. Values are validated against the template before anything is written.
 - Internal: `MessageSender` (`src/messaging/sender.ts`), implemented by Twilio (`src/messaging/twilio.ts`), the WhatSend worker (`src/messaging/whatsend.ts`), a log-only sender for development, and the recording fake in `src/test/`. `MESSAGING_PROVIDER=twilio` selects Twilio, `whatsend` selects the worker and requires `WHATSEND_WORKER_URL`, `WHATSEND_WORKER_SECRET` and `WHATSEND_SESSION_ID`; anything else only logs.
 - Internal: the job loop (`src/jobs/loop.ts`, started from `src/instrumentation.ts`; `JOBS=off` disables it) and its outbox sender `processOutbox`.
-- Templates: `code`, `booking-link`, `staff-alert` (kind `proof` or `urgent`; a link to the review page, never the screenshot), each in Arabic and English, times shown in Africa/Cairo.
+- Templates: `code`, `booking-link`, `booking-confirmed` (a staff-entered booking's booking-page link, with no deadline), `staff-alert` (kind `proof` or `urgent`; a link to the review page, never the screenshot), each in Arabic and English, times shown in Africa/Cairo.
 - `POST /api/v1/webhooks/twilio/status` — delivery status callbacks, Twilio mode only (form-encoded, `X-Twilio-Signature` checked against the auth token and the public URL). Answers `FORBIDDEN` for a bad signature and success for any signed call, including an unknown message, so Twilio does not retry. `delivered`/`read` mark the message delivered; `undelivered`/`failed` send a WhatsApp message again by SMS, or mark an SMS failed. The WhatSend worker sends no callbacks.
 
 ## Workflows
@@ -48,6 +48,11 @@ Messages are written from templates in Arabic and English and sent in the recipi
 1. A hold is created; in the same transaction a booking-link message is queued.
 2. The job loop sends it by WhatsApp within seconds.
 3. In Twilio mode, Twilio reports it undelivered; the loop sends it by SMS. In WhatSend mode there is no callback and no fallback: the message is treated as sent when the worker accepts it.
+
+**Confirmed staff entry.**
+
+1. Staff enter a phone or walk-in booking; in the same transaction a booking-confirmed message is queued with the customer's booking-page link.
+2. The job loop sends it by WhatsApp; it carries no deadline, so it is not time-limited.
 
 **Provider outage.**
 

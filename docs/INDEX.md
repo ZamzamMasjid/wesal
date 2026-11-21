@@ -7,8 +7,8 @@ generated_by: axiom:reindex
 budgets: {}
 activities: []
 active:
-  phase: phase-4-operations
-  section: booking-management
+  phase: phase-5-public-site
+  section: content-management
 ---
 
 # Project Index
@@ -17,8 +17,8 @@ active:
 
 ## Active work
 
-- **Current phase**: phase-4-operations
-- **Current section**: booking-management
+- **Current phase**: phase-5-public-site
+- **Current section**: content-management
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars
@@ -36,7 +36,7 @@ active:
 | ID | Title | Status | Milestone | Pillar | Roadmap |
 |---|---|---|---|---|---|
 | `booking-hold` | Booking Hold | shipped | v1 | booking | phase-3-booking/booking-hold |
-| `booking-management` | Booking Management | planned | v1 | back-office | phase-4-operations/booking-management |
+| `booking-management` | Booking Management | shipped | v1 | back-office | phase-4-operations/booking-management |
 | `booking-page` | Booking Page | shipped | v1 | booking | phase-3-booking/booking-page |
 | `booking-reports` | Booking Reports | planned | later | reporting | phase-6-alerts-and-reports/booking-reports |
 | `content-management` | Content Management | planned | v1 | public-site | phase-5-public-site/content-management |
@@ -86,7 +86,7 @@ active:
 | `phase-1-infrastructure` | shipped | v1 | project-setup, database, testing, deployment |
 | `phase-2-foundations` | shipped | v1 | staff-access, venue-settings, slot-schedule, message-delivery, phone-verification |
 | `phase-3-booking` | shipped | v1 | public-calendar, booking-hold, booking-page, payment-proof |
-| `phase-4-operations` | in-progress | v1 | payment-review, staff-notifications, booking-management |
+| `phase-4-operations` | shipped | v1 | payment-review, staff-notifications, booking-management |
 | `phase-5-public-site` | planned | v1 | content-management, landing-page |
 | `phase-6-alerts-and-reports` | planned | later | slot-alerts, booking-reports |
 | `phase-7-mobile-app` | planned | later | customer-mobile-app, push-notifications |

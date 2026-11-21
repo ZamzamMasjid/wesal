@@ -15,6 +15,9 @@ const SAMPLE: { [T in TemplateName]: TemplateValues<T> } = {
     link: "https://wesal.example/ar/b/abc",
     deadlineAt: "2026-12-24T16:20:00Z",
   },
+  "booking-confirmed": {
+    link: "https://wesal.example/ar/b/abc",
+  },
   "staff-alert": {
     kind: "proof",
     link: "https://wesal.example/ar/dashboard/bookings/7",

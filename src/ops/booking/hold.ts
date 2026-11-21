@@ -6,6 +6,7 @@ import { z } from "zod";
 import { ApiError } from "@/api/errors";
 import { defineOperation } from "@/api/operation";
 import { getDb, type Database } from "@/db/client";
+import { isExclusionViolation, isUniqueViolation } from "@/db/pg-error";
 import { booking, occasion } from "@/db/schema";
 import { absoluteBookingLink, type BookingLocale } from "@/lib/booking-link";
 import { cairoInstant, isValidDay } from "@/lib/cairo-time";
@@ -110,30 +111,10 @@ export interface HoldDeps {
   baseUrl: string;
 }
 
-interface PostgresError {
-  code?: string;
-  constraint?: string;
-}
-
-/** Drizzle wraps driver errors; find the Postgres error in the cause chain. */
-function postgresError(error: unknown): PostgresError | null {
-  let current: unknown = error;
-  for (let depth = 0; depth < 5 && current; depth++) {
-    if (typeof current !== "object" || current === null) return null;
-    const candidate = current as Record<string, unknown>;
-    if (typeof candidate.code === "string") return candidate as PostgresError;
-    current = candidate.cause;
-  }
-  return null;
-}
-
-function uniqueIdConflict(error: PostgresError): boolean {
-  return (
-    error.code === "23505" &&
-    (error.constraint === "booking_public_id_unique" ||
-      error.constraint === "booking_access_token_unique")
-  );
-}
+const ID_CONSTRAINTS = [
+  "booking_public_id_unique",
+  "booking_access_token_unique",
+];
 
 export function createBookingOperations(resolve: () => HoldDeps) {
   const create = defineOperation({
@@ -351,14 +332,13 @@ export function createBookingOperations(resolve: () => HoldDeps) {
           };
         } catch (error) {
           if (error instanceof ApiError) throw error;
-          const pg = postgresError(error);
-          if (pg?.code === "23P01") {
+          if (isExclusionViolation(error)) {
             throw new ApiError(
               "SLOT_TAKEN",
               "Another customer is booking this slot.",
             );
           }
-          if (pg && uniqueIdConflict(pg)) continue;
+          if (isUniqueViolation(error, ID_CONSTRAINTS)) continue;
           throw error;
         }
       }

@@ -2,6 +2,7 @@
 
 import {
   CalendarClock,
+  CalendarDays,
   Eye,
   Home,
   LogOut,
@@ -22,6 +23,7 @@ import { navFor, type NavItem } from "./nav";
 const icons = {
   home: Home,
   review: Eye,
+  bookings: CalendarDays,
   schedule: CalendarClock,
   settings: Settings,
   staff: Users,

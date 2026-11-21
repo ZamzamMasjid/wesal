@@ -2,7 +2,7 @@
 id: phase-4-operations
 type: roadmap-phase
 title: Phase 4 — Operations
-status: in-progress
+status: shipped
 last_modified: 2026-11-21
 milestone: v1
 phase_number: 4
@@ -44,7 +44,7 @@ Alerts to owner and staff through the outbox in `web`.
 
 The full list of bookings and manual entry. Extends `web`.
 
-- [ ] Implement bookings list API with filters by date, status and source
-- [ ] Implement phone/walk-in booking entry with conflict handling
-- [ ] Implement cancel booking and mark remainder paid, with audit entries
-- [ ] Implement bookings view: list, detail, add-booking dialog
+- [x] Implement bookings list API with filters by date, status and source
+- [x] Implement phone/walk-in booking entry with conflict handling
+- [x] Implement cancel booking and mark remainder paid, with audit entries
+- [x] Implement bookings view: list, detail, add-booking dialog

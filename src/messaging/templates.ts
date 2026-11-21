@@ -7,7 +7,8 @@ import { VENUE_TIME_ZONE } from "@/lib/clock";
 // are plain strings so they can be stored on the outbox row as-is.
 
 export type Locale = "ar" | "en";
-export type TemplateName = "code" | "booking-link" | "staff-alert";
+export type TemplateName =
+  "code" | "booking-link" | "booking-confirmed" | "staff-alert";
 
 const text = z.string().min(1).max(500);
 const instant = z.iso.datetime({ offset: true });
@@ -18,6 +19,11 @@ export const TEMPLATE_VALUES = {
   code: z.object({ code: z.string().regex(/^\d{4,8}$/), minutes: z.string() }),
   /** The customer's private booking link and the hold deadline. */
   "booking-link": z.object({ link: z.url(), deadlineAt: instant }),
+  /**
+   * A booking staff entered by phone or in person, which starts confirmed: the
+   * customer gets the booking page link, with no deadline to beat.
+   */
+  "booking-confirmed": z.object({ link: z.url() }),
   /**
    * Alert to staff: a link to the review page, never the screenshot (ADR-013).
    * `kind` is "proof" (a proof is waiting) or "urgent" (a hold close to its slot).
@@ -79,6 +85,10 @@ const RENDERERS: Record<TemplateName, Record<Locale, Renderer>> = {
       `تم حجز موعدك مؤقتًا في وصال. ارفع إثبات دفع العربون قبل الساعة ${time(v.deadlineAt!, l)} وإلا يُلغى الحجز.\n${v.link}`,
     en: (v, l) =>
       `Your Wesal slot is held. Upload your deposit proof before ${time(v.deadlineAt!, l)} or the hold is released.\n${v.link}`,
+  },
+  "booking-confirmed": {
+    ar: (v) => `تم تأكيد حجزك في وصال. رابط حجزك:\n${v.link}`,
+    en: (v) => `Your Wesal booking is confirmed. Your booking link:\n${v.link}`,
   },
   "staff-alert": {
     ar: (v, l) =>
