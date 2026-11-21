@@ -39,7 +39,7 @@ active:
 | `booking-management` | Booking Management | shipped | v1 | back-office | phase-4-operations/booking-management |
 | `booking-page` | Booking Page | shipped | v1 | booking | phase-3-booking/booking-page |
 | `booking-reports` | Booking Reports | planned | later | reporting | phase-6-alerts-and-reports/booking-reports |
-| `content-management` | Content Management | planned | v1 | public-site | phase-5-public-site/content-management |
+| `content-management` | Content Management | in-progress | v1 | public-site | phase-5-public-site/content-management |
 | `customer-mobile-app` | Customer Mobile App | planned | later | mobile-app | phase-7-mobile-app/customer-mobile-app |
 | `landing-page` | Landing Page | planned | v1 | public-site | phase-5-public-site/landing-page |
 | `message-delivery` | Message Delivery | shipped | v1 | messaging | phase-2-foundations/message-delivery |
@@ -87,7 +87,7 @@ active:
 | `phase-2-foundations` | shipped | v1 | staff-access, venue-settings, slot-schedule, message-delivery, phone-verification |
 | `phase-3-booking` | shipped | v1 | public-calendar, booking-hold, booking-page, payment-proof |
 | `phase-4-operations` | shipped | v1 | payment-review, staff-notifications, booking-management |
-| `phase-5-public-site` | planned | v1 | content-management, landing-page |
+| `phase-5-public-site` | in-progress | v1 | content-management, landing-page |
 | `phase-6-alerts-and-reports` | planned | later | slot-alerts, booking-reports |
 | `phase-7-mobile-app` | planned | later | customer-mobile-app, push-notifications |
 

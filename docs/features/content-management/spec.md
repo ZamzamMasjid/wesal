@@ -2,8 +2,8 @@
 id: content-management
 type: feature
 title: Content Management
-status: planned
-last_modified: 2026-11-15
+status: in-progress
+last_modified: 2026-11-21
 milestone: v1
 pillar: public-site
 depends_on: [staff-access]

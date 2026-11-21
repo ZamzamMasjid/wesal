@@ -2,8 +2,8 @@
 id: phase-5-public-site
 type: roadmap-phase
 title: Phase 5 — Public Site
-status: planned
-last_modified: 2026-11-15
+status: in-progress
+last_modified: 2026-11-21
 milestone: v1
 phase_number: 5
 sections: [content-management, landing-page]
@@ -26,7 +26,7 @@ Phase 2 (staff access, venue settings) and phase 3 (the calendar the landing pag
 
 Owner-editable content and media. Extends `web`; files on `upload-volume`.
 
-- [ ] Implement site content API: description, policy, contact in Arabic and English
+- [x] Implement site content API: description, policy, contact in Arabic and English
 - [ ] Implement media upload and ordering for photos and videos on the volume
 - [ ] Implement owner-only content editor screens
 

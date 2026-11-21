@@ -290,6 +290,19 @@ export const paymentProof = pgTable(
 );
 
 /**
+ * The owner-editable texts of the public site, one row per key
+ * (docs/features/content-management). Arabic is the default; an empty English
+ * value falls back to the Arabic text when the English page is rendered. The
+ * key registry and length limits live in `src/ops/content/content.ts`.
+ */
+export const siteContent = pgTable("site_content", {
+  key: text("key").primaryKey(),
+  valueAr: text("value_ar").notNull().default(""),
+  valueEn: text("value_en").notNull().default(""),
+  ...timestamps,
+});
+
+/**
  * Append-only record of staff actions (auth architecture, "Audit"). A database
  * trigger refuses UPDATE and DELETE, so rows are never edited or removed.
  * `bookingId` has no foreign key yet: the booking table arrives in phase 3,
