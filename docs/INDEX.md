@@ -8,7 +8,7 @@ budgets: {}
 activities: []
 active:
   phase: phase-5-public-site
-  section: landing-page
+  section: null
 ---
 
 # Project Index
@@ -18,7 +18,7 @@ active:
 ## Active work
 
 - **Current phase**: phase-5-public-site
-- **Current section**: landing-page
+- **Current section**: <none>
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars

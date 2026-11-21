@@ -193,14 +193,15 @@ export function MonthGrid({
 
                 const classes = [
                   "relative mx-auto flex size-12 items-center justify-center rounded-full text-base font-medium tabular-nums transition-colors motion-reduce:transition-none",
-                  "hover:bg-fill",
+                  !isSelected && "hover:bg-fill",
                   "disabled:cursor-default disabled:bg-transparent disabled:text-muted disabled:opacity-55",
-                  closed ? "text-muted line-through" : "text-fg",
-                  day === today
-                    ? "shadow-[inset_0_0_0_2px_var(--color-border)]"
-                    : "",
                   isSelected
                     ? "bg-brand font-bold text-brand-fg shadow-none hover:bg-brand"
+                    : closed
+                      ? "text-muted line-through"
+                      : "text-fg",
+                  day === today
+                    ? "shadow-[inset_0_0_0_2px_var(--color-border)]"
                     : "",
                 ].join(" ");
 

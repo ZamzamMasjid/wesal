@@ -39,4 +39,4 @@ The public home page. Extends `web`.
 - [x] Add SEO metadata, Open Graph and hreflang for Arabic and English
 - [x] Serve media with range requests and caching headers
 - [x] Write e2e test: booking journey from home to uploaded proof in both languages
-- [ ] Run WCAG AA pass on public views and fix findings
+- [x] Run WCAG AA pass on public views and fix findings

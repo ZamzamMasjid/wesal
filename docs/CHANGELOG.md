@@ -205,3 +205,10 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Summary**: A Playwright test walks the whole customer path in Arabic and English: open the home page, pick an occasion card, land on the calendar carrying that occasion, open a free day, follow the slot's book link, submit the details, receive the verification code, hold the slot, open the private booking page and upload the transfer screenshot. It asserts the booking reaches `proof_submitted` with its file in the database, seeds its own verification code so it needs no provider, and removes its bookings, codes and files afterwards. The Playwright server now runs the log-only message sender and its own base URL.
 - **Affected Docs**: landing-page, phase-5-public-site
 - **Reason**: Implementing `phase-5-public-site/landing-page`, fifth item.
+
+## [2026-11-21] — Public views pass WCAG AA
+
+- **Type**: Feature Change
+- **Summary**: The public views are audited with axe-core against the WCAG 2.0/2.1/2.2 A and AA tags in a Playwright test: home in Arabic, English and dark mode, the calendar in light and dark, the booking form, find-booking and a private booking page. Each scan must report zero violations, and the home and calendar must not scroll sideways at 360px. The audit found one real defect: a selected calendar day carried `text-fg` as well as `text-brand-fg`, so the day number rendered dark on the oxblood pill at 1.47:1; the unselected colours are now applied only when unselected. The phones-only contact bar became a labelled navigation landmark.
+- **Affected Docs**: landing-page, home (view), calendar (view), phase-5-public-site
+- **Reason**: Implementing `phase-5-public-site/landing-page`, sixth item.

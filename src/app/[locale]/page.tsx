@@ -341,7 +341,10 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
       </footer>
 
       {hasContact && (
-        <div className="fixed inset-x-0 bottom-0 z-10 flex gap-2 bg-surface p-2 shadow-lg sm:hidden">
+        <nav
+          aria-label={t("contact")}
+          className="fixed inset-x-0 bottom-0 z-10 flex gap-2 bg-surface p-2 shadow-lg sm:hidden"
+        >
           {phone && (
             <a href={`tel:${dialable(phone)}`} className={`${primary} flex-1`}>
               <Phone aria-hidden="true" className="size-5" />
@@ -354,7 +357,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
               {t("whatsapp")}
             </a>
           )}
-        </div>
+        </nav>
       )}
     </>
   );
