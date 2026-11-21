@@ -35,7 +35,7 @@ Prices in the mockup are placeholders; real values come from venue settings.
 - Header with "Find my booking", language switch and theme toggle
 - Hero photograph
 - Introduction block (venue name and description)
-- Gallery grid with lightbox (Radix Dialog); video tiles show a duration chip
+- Gallery grid with lightbox (Radix Dialog); video tiles show a play chip
 - Occasion price cards, each with name, price and a go arrow
 - Primary action "Check availability"
 - Policy block (Radix Collapsible)
@@ -47,7 +47,7 @@ Prices in the mockup are placeholders; real values come from venue settings.
 | State | Description |
 |---|---|
 | Default | All sections populated from content and settings |
-| Loading | Server-rendered; images fade in from blurred placeholders |
+| Loading | Server-rendered; images sit on the fill color until they load |
 | Empty | No media: gallery omitted. No occasions: the price cards and primary action are replaced by a card with a contact prompt, Call and WhatsApp |
 | Error | Database unavailable: the page body is replaced by one centered notice with the phone number, Call and WhatsApp |
 

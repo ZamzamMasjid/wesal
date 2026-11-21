@@ -188,6 +188,27 @@ describe("ContentManager", () => {
     window.confirm = original;
   });
 
+  it("asks before an in-app link when text is unsaved", async () => {
+    renderManager();
+    const english = await screen.findByRole("textbox", {
+      name: /Description — English/i,
+    });
+    const original = window.confirm;
+    const confirm = vi.fn(() => false);
+    window.confirm = confirm;
+    fireEvent.change(english, { target: { value: "Changed" } });
+
+    const link = document.createElement("a");
+    link.href = "/dashboard";
+    link.textContent = "Dashboard";
+    document.body.append(link);
+    fireEvent.click(link);
+
+    expect(confirm).toHaveBeenCalledWith("You have unsaved text changes.");
+    link.remove();
+    window.confirm = original;
+  });
+
   it("shows a retry when the content cannot be loaded", async () => {
     contentMock.mockResolvedValue({ ok: false, error: { code: "INTERNAL" } });
     renderManager();

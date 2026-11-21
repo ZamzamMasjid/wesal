@@ -116,8 +116,30 @@ export function ContentManager() {
       // Browsers decide the wording; returning a value keeps older ones asking.
       event.returnValue = t("unsaved");
     };
+    // In-app links do not fire beforeunload; ask before they navigate too.
+    const intercept = (event: MouseEvent) => {
+      if (event.defaultPrevented) return;
+      const target = event.target;
+      if (!(target instanceof Element)) return;
+      const anchor = target.closest("a[href]");
+      if (!(anchor instanceof HTMLAnchorElement)) return;
+      if (
+        anchor.target === "_blank" ||
+        anchor.origin !== window.location.origin
+      ) {
+        return;
+      }
+      if (!window.confirm(t("unsaved"))) {
+        event.preventDefault();
+        event.stopPropagation();
+      }
+    };
     window.addEventListener("beforeunload", warn);
-    return () => window.removeEventListener("beforeunload", warn);
+    document.addEventListener("click", intercept, true);
+    return () => {
+      window.removeEventListener("beforeunload", warn);
+      document.removeEventListener("click", intercept, true);
+    };
   }, [dirty, t]);
 
   async function reloadLibrary() {

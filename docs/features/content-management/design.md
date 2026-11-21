@@ -2,7 +2,7 @@
 id: content-management
 type: feature-design
 title: Content Management — Design
-last_modified: 2026-11-15
+last_modified: 2026-11-21
 feature: content-management
 ---
 
@@ -28,8 +28,8 @@ Inherits from `docs/design/system.md` at dashboard density. Arabic and English f
 |---|---|
 | Empty | No media: drop zone fills the grid area with "Add photos and videos of the venue" |
 | Loading | Skeleton rows for text fields, skeleton tiles for media |
-| Error | Upload failure shown on the tile with Retry; save failure keeps the form contents and shows the error inline |
+| Error | Upload failure shown on its upload row; choosing the file again retries; save failure keeps the form contents and shows the error inline |
 
 ## Interactions
 
-Text changes are saved explicitly with the save bar; leaving with unsaved changes asks for confirmation. Media uploads, reordering and deletion take effect immediately, each confirmed by a toast; deletion asks first. A "View site" link opens the landing page in a new tab.
+Text changes are saved explicitly with the save bar; leaving with unsaved changes asks for confirmation. Media uploads, reordering and deletion take effect immediately, each confirmed by an inline notice; deletion asks first. A "View site" link opens the landing page in a new tab.
