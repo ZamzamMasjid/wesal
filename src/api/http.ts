@@ -1,6 +1,8 @@
 import { runtime } from "@/lib/runtime";
 import { createReadStream } from "node:fs";
+import { stat } from "node:fs/promises";
 import { Readable } from "node:stream";
+import { contentRange, parseRange, unsatisfiedRange } from "@/lib/http-range";
 import { resolveCaller } from "./caller";
 import { createCallContext } from "./context";
 import { ApiError, statusForCode, type ApiResult } from "./errors";
@@ -215,9 +217,8 @@ export function fileRoute<Output extends FileAnswer>(
  * Wraps a media operation as a Next.js route handler that streams the file from
  * the volume instead of buffering it. A media file never changes once written, so
  * its answer is public and immutable; the name is random and the row is the only
- * way to find it. Range handling arrives with the landing-page serving item; until
- * then the whole file is sent and the `accept-ranges` header is honest only once
- * that item lands.
+ * way to find it. Single byte ranges are honoured, which is what lets a phone
+ * start a video without downloading it first.
  */
 export function mediaRoute<Output extends MediaSource>(
   operation: Operation<Output>,
@@ -238,22 +239,61 @@ export function mediaRoute<Output extends MediaSource>(
       if (!result.ok) return respond(result, requestId);
 
       const media = result.data;
-      const headers: Record<string, string> = {
+      // A missing file is a missing asset, not a broken 200 with an empty body.
+      await stat(media.filePath);
+      const baseHeaders: Record<string, string> = {
         "content-type": media.contentType,
-        "content-length": String(media.byteSize),
         "cache-control":
           media.cacheControl ?? "public, max-age=31536000, immutable",
         etag: media.etag,
+        "accept-ranges": "bytes",
         "x-content-type-options": "nosniff",
         "x-request-id": requestId,
       };
       if (request.headers.get("if-none-match") === media.etag) {
-        return new Response(null, { status: 304, headers });
+        return new Response(null, { status: 304, headers: baseHeaders });
+      }
+
+      const range = parseRange(request.headers.get("range"), media.byteSize);
+      if (range.type === "unsatisfiable") {
+        return new Response(null, {
+          status: 416,
+          headers: {
+            ...baseHeaders,
+            "content-range": unsatisfiedRange(media.byteSize),
+          },
+        });
+      }
+
+      if (range.type === "partial") {
+        const stream = createReadStream(media.filePath, {
+          start: range.start,
+          end: range.end,
+        });
+        const body = Readable.toWeb(stream) as ReadableStream<Uint8Array>;
+        return new Response(body, {
+          status: 206,
+          headers: {
+            ...baseHeaders,
+            "content-length": String(range.end - range.start + 1),
+            "content-range": contentRange(
+              range.start,
+              range.end,
+              media.byteSize,
+            ),
+          },
+        });
       }
 
       const stream = createReadStream(media.filePath);
       const body = Readable.toWeb(stream) as ReadableStream<Uint8Array>;
-      return new Response(body, { status: 200, headers });
+      return new Response(body, {
+        status: 200,
+        headers: {
+          ...baseHeaders,
+          "content-length": String(media.byteSize),
+        },
+      });
     } catch (error) {
       if (
         typeof error === "object" &&
@@ -283,7 +323,8 @@ export function mediaRoute<Output extends MediaSource>(
   };
 }
 
-/** The envelope answer for a path under /api/v1 that no route handles. */ export function apiNotFound(): Response {
+/** The envelope answer for a path under /api/v1 that no route handles. */
+export function apiNotFound(): Response {
   const requestId = crypto.randomUUID();
   return respond(
     failure({ requestId }, "NOT_FOUND", "No such endpoint."),
