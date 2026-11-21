@@ -89,7 +89,7 @@ active:
 | `phase-4-operations` | shipped | v1 | payment-review, staff-notifications, booking-management |
 | `phase-5-public-site` | shipped | v1 | content-management, landing-page |
 | `phase-6-alerts-and-reports` | shipped | later | slot-alerts, booking-reports |
-| `phase-7-mobile-app` | planned | later | customer-mobile-app, push-notifications |
+| `phase-7-mobile-app` | in-progress | later | customer-mobile-app, push-notifications |
 
 ## Section ownership
 

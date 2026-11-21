@@ -2,8 +2,8 @@
 id: phase-7-mobile-app
 type: roadmap-phase
 title: Phase 7 — Mobile App
-status: planned
-last_modified: 2026-11-15
+status: in-progress
+last_modified: 2026-11-21
 milestone: later
 phase_number: 7
 sections: [customer-mobile-app, push-notifications]
@@ -28,7 +28,7 @@ The booking experience as a mobile app over the same JSON API.
 
 - [x] Scaffold Expo app with Arabic/English and RTL, consuming `/api/v1`
 - [x] Implement calendar, booking form, booking page and proof upload screens
-- [ ] Produce Android and iOS store builds
+- [ ] Produce Android and iOS store builds (blocked: Google Play and App Store accounts and signing credentials, see `mobile/README.md`)
 
 ### push-notifications
 

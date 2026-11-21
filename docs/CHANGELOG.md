@@ -227,3 +227,31 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Affected Docs**: booking-management, bookings (view)
 - **Reason**: `axiom:review`, `axiom:integration-check`, `axiom:test` and `axiom:ui-check` on the shipped section; the owner asked for every finding fixed.
 
+## [2026-11-21] — Slot alerts shipped
+
+- **Type**: Feature Change
+- **Summary**: A visitor can ask to be told when a slot awaiting payment or review frees up. They confirm a phone with the same code step as a booking; the subscription is one row per phone and slot, capped per phone, with an unsubscribe link. When the hold expires or the proof is rejected, the outbox queues one bilingual message with a direct booking link; confirming the slot or a new hold ends the watch. The calendar shows Notify me only on slots that can still free up.
+- **Affected Docs**: slot-alerts, calendar (view), slot-alert-signup (view), data-model, flows, phase-6-alerts-and-reports
+- **Reason**: Implementing `phase-6-alerts-and-reports/slot-alerts`; both roadmap items are complete.
+
+## [2026-11-21] — Owner reports shipped
+
+- **Type**: Feature Change
+- **Summary**: The owner picks a month, year or range and reads confirmed bookings, income, deposits recorded, remainders paid and outstanding, bookings by occasion and by month, the online/staff split, cancelled bookings and unfinished attempts. Figures come straight from the bookings table on Africa/Cairo months and keep the price snapshot on each booking. An occasion opens the bookings list filtered to it and the period. The period exports as a UTF-8 CSV download (ADR-032). Reports are owner-only.
+- **Affected Docs**: booking-reports, reports (view), ADR-032, phase-6-alerts-and-reports
+- **Reason**: Implementing `phase-6-alerts-and-reports/booking-reports`; both items complete and phase 6 ships.
+
+## [2026-11-21] — Push notifications for staff alerts
+
+- **Type**: Feature Change
+- **Summary**: Staff register a phone or tablet after login, and each person chooses push, WhatsApp or both. A staff alert is queued once per person as a push row; the sender resolves the person's active devices, counts one accepted ticket as delivered and deactivates tokens the provider reports as unregistered. When the last push attempt fails the alert falls back to the same WhatsApp message, so nothing is dropped. Disabling an account or logging out removes its devices.
+- **Affected Docs**: push-notifications, staff-notifications, data-model, flows, ADR-034, phase-7-mobile-app
+- **Reason**: Implementing `phase-7-mobile-app/push-notifications`; both items complete.
+
+## [2026-11-21] — Customer mobile app scaffolded
+
+- **Type**: Feature Change
+- **Summary**: A new `mobile/` Expo app (ADR-033) consumes the versioned `/api/v1` API: Arabic-first with English, the site's tokens, home with content, gallery and prices, a month calendar, the booking form with phone verification, the private booking page with countdown and screenshot upload, remembered bookings on the device, and a staff login that registers the phone for push. EAS build profiles and app ids are checked in. Store builds are not produced: Google Play and App Store accounts and signing credentials are still needed, so the third roadmap item remains open and phase 7 is not shipped.
+- **Affected Docs**: customer-mobile-app, mobile-home (view), ADR-033, phase-7-mobile-app, `mobile/README.md`
+- **Reason**: Implementing `phase-7-mobile-app/customer-mobile-app`, first two items; the store-build item is blocked on credentials outside the code.
+
