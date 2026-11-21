@@ -2,8 +2,8 @@
 id: staff-access
 type: feature
 title: Staff Access
-status: in-progress
-last_modified: 2026-11-16
+status: shipped
+last_modified: 2026-11-21
 milestone: v1
 pillar: back-office
 depends_on: []
