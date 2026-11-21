@@ -23,6 +23,7 @@ export function dialable(number: string): string {
   return number.replace(/[^\d+]/g, "");
 }
 
-export function whatsappUrl(number: string): string {
-  return `https://wa.me/${dialable(number).replace(/^\+/, "")}`;
+export function whatsappUrl(number: string, text?: string): string {
+  const base = `https://wa.me/${dialable(number).replace(/^\+/, "")}`;
+  return text ? `${base}?text=${encodeURIComponent(text)}` : base;
 }

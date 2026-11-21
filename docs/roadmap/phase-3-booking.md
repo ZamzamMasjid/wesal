@@ -3,7 +3,7 @@ id: phase-3-booking
 type: roadmap-phase
 title: Phase 3 — Booking
 status: in-progress
-last_modified: 2026-11-20
+last_modified: 2026-11-21
 milestone: v1
 phase_number: 3
 sections: [public-calendar, booking-hold, booking-page, payment-proof]
@@ -53,6 +53,7 @@ The private page a customer returns to. Extends `web`; reads `postgres`.
 
 Uploading the transfer screenshot. Extends `web`; files on `upload-volume`.
 
-- [ ] Implement proof upload endpoint: type and size checks, store on volume, stop countdown
-- [ ] Implement upload UI and WhatsApp button prefilled with the booking ID
-- [ ] Implement daily purge of proof files older than one day
+- [x] Implement proof upload endpoint: type and size checks, store on volume, stop countdown
+- [x] Add the staff-only proof file endpoint, served from the volume
+- [x] Implement upload UI and WhatsApp button prefilled with the booking ID
+- [x] Implement daily purge of proof files older than one day

@@ -23,12 +23,16 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllEnvs());
 
 describe("startJobs", () => {
-  it("starts one loop with the outbox and hold-sweep jobs and starts it only once", async () => {
+  it("starts one loop with the outbox, hold-sweep and proof-purge jobs and starts it only once", async () => {
     const { startJobs } = await import("./start");
     const first = startJobs(() => undefined);
     expect(startJobs()).toBe(first);
     expect(created).toHaveLength(1);
-    expect(created[0]!.jobs.map((j) => j.name)).toEqual(["outbox", "holds"]);
+    expect(created[0]!.jobs.map((j) => j.name)).toEqual([
+      "outbox",
+      "holds",
+      "proof-purge",
+    ]);
     expect(start).toHaveBeenCalledOnce();
   });
 

@@ -26,6 +26,7 @@ import { formatTime } from "@/lib/slot-time";
 
 import { CopyButton } from "./copy-button";
 import { clockLabel, countdownWarning, shouldAnnounce } from "./countdown";
+import { ProofUpload } from "./proof-upload";
 
 // The customer's page for one booking (docs/design/views/booking-status.md).
 // The server rendered the first status; this half polls for a change every 30
@@ -287,6 +288,34 @@ export function BookingStatus({
 
         {held && <p className="text-sm text-muted">{t("sharePrivate")}</p>}
       </section>
+
+      {(held || status === "proof_submitted") && (
+        <ProofUpload
+          token={token}
+          bookingId={booking.bookingId}
+          status={held ? "held" : "proof_submitted"}
+          onUploaded={() => {
+            // The server stopped the clock; drop the countdown and the transfer
+            // details in the same paint as the "awaiting review" status.
+            setBooking((current) => ({
+              ...current,
+              status: "proof_submitted",
+              deadlineAt: null,
+              transfer: null,
+            }));
+            setRemaining(0);
+          }}
+          onExpired={() => {
+            setBooking((current) => ({
+              ...current,
+              status: "expired",
+              deadlineAt: null,
+              transfer: null,
+            }));
+            setRemaining(0);
+          }}
+        />
+      )}
 
       <section
         aria-labelledby="booking-summary-heading"

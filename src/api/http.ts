@@ -88,6 +88,14 @@ export function respond<T>(
   });
 }
 
+/** What a file-returning operation answers with. */
+export interface FileAnswer {
+  bytes: Uint8Array;
+  contentType: string;
+  fileName?: string;
+  cacheControl?: string;
+}
+
 /** Wraps an operation as a Next.js route handler. */
 export function route<Output>(
   operation: Operation<Output>,
@@ -122,6 +130,66 @@ export function route<Output>(
         );
       }
       runtime.logger.child({ requestId }).error("unhandled route error", {
+        operation: operation.operationName,
+        err: error,
+      });
+      return respond(
+        failure({ requestId }, "INTERNAL", "Something went wrong."),
+        requestId,
+      );
+    }
+  };
+}
+
+/**
+ * Wraps a file-returning operation as a Next.js route handler. Access is still
+ * decided inside the operation (ADR-020); the wrapper only writes the bytes for
+ * a successful answer and the usual envelope for a failure. Files are never
+ * stored publicly, so an answer is private and cannot be cached (ADR-013).
+ */
+export function fileRoute<Output extends FileAnswer>(
+  operation: Operation<Output>,
+  options: { successStatus?: number } = {},
+) {
+  return async (
+    request: Request,
+    context?: RouteContextLike,
+  ): Promise<Response> => {
+    const requestId = crypto.randomUUID();
+    try {
+      const params = (await context?.params) ?? {};
+      const raw = await defaultInput(request, params);
+      const caller = await resolveCaller(request);
+      const result = await operation(
+        raw,
+        createCallContext(caller, { requestId, ip: clientIp(request) }),
+      );
+      if (!result.ok) return respond(result, requestId);
+
+      const { bytes, contentType, fileName, cacheControl } = result.data;
+      // A fresh ArrayBuffer keeps the DOM types happy and the caller's buffer
+      // (which may be a pooled Node Buffer) out of the response.
+      const body = new Uint8Array(bytes.byteLength);
+      body.set(bytes);
+      return new Response(body.buffer, {
+        status: options.successStatus ?? 200,
+        headers: {
+          "content-type": contentType,
+          "content-length": String(bytes.byteLength),
+          "content-disposition": `inline; filename="${fileName ?? "file"}"`,
+          "cache-control": cacheControl ?? "private, no-store",
+          "x-content-type-options": "nosniff",
+          "x-request-id": requestId,
+        },
+      });
+    } catch (error) {
+      if (error instanceof ApiError) {
+        return respond(
+          failure({ requestId }, error.code, error.message, error.details),
+          requestId,
+        );
+      }
+      runtime.logger.child({ requestId }).error("unhandled file route error", {
         operation: operation.operationName,
         err: error,
       });

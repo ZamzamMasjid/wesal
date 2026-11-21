@@ -248,6 +248,42 @@ export const booking = pgTable(
 );
 
 /**
+ * One piece of evidence that the deposit was transferred
+ * (docs/features/payment-proof). A booking may have several: a second upload
+ * while awaiting review adds another proof, and staff read the newest first.
+ * The file lives on the upload volume; `filePath` is relative to `UPLOAD_DIR`,
+ * and is null for a proof that arrived over WhatsApp. Purging deletes the file
+ * and stamps `purgedAt`; the row stays so the audit trail still shows that a
+ * proof existed (ADR-005, docs/architecture/data-model.md "Retention").
+ */
+export const paymentProof = pgTable(
+  "payment_proof",
+  {
+    id: bigint("id", { mode: "number" })
+      .primaryKey()
+      .generatedAlwaysAsIdentity(),
+    bookingId: integer("booking_id")
+      .notNull()
+      .references(() => booking.id, { onDelete: "cascade" }),
+    /** Example: "proofs/9f2c...-a1b2c3.png". */
+    filePath: text("file_path"),
+    /** A screenshot uploaded here, or one the customer sent by WhatsApp. */
+    receivedVia: text("received_via", {
+      enum: ["upload", "whatsapp"],
+    }).notNull(),
+    uploadedAt: timestamp("uploaded_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    /** When the file was deleted from the volume; null while the file exists. */
+    purgedAt: timestamp("purged_at", { withTimezone: true }),
+  },
+  (t) => [
+    index("payment_proof_booking_uploaded_idx").on(t.bookingId, t.uploadedAt),
+    index("payment_proof_purge_idx").on(t.purgedAt, t.uploadedAt),
+  ],
+);
+
+/**
  * Append-only record of staff actions (auth architecture, "Audit"). A database
  * trigger refuses UPDATE and DELETE, so rows are never edited or removed.
  * `bookingId` has no foreign key yet: the booking table arrives in phase 3,

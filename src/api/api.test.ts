@@ -10,7 +10,7 @@ import { createFakeClock } from "@/test/fake-clock";
 import { authorize, resolveCaller, type Caller } from "./caller";
 import { createCallContext } from "./context";
 import { ApiError, ERROR_STATUS, statusForCode } from "./errors";
-import { apiNotFound, respond, route } from "./http";
+import { apiNotFound, fileRoute, respond, route } from "./http";
 import { defineOperation } from "./operation";
 
 const clock = createFakeClock();
@@ -210,6 +210,43 @@ describe("http route", () => {
     expect(res.status).toBe(404);
     expect((await res.json()).error.code).toBe("NOT_FOUND");
     expect(respond({ ok: true, data: 1 }, "r").status).toBe(200);
+  });
+});
+
+describe("file route", () => {
+  const aFile = defineOperation({
+    name: "test.file",
+    access: "anonymous",
+    input: z.object({ id: z.string() }),
+    handler: async ({ id }) => ({
+      bytes: new Uint8Array([104, 105]),
+      contentType: "text/plain",
+      fileName: `${id}.txt`,
+    }),
+  });
+
+  it("writes the bytes with private, non-sniffable headers", async () => {
+    const res = await fileRoute(aFile)(new Request("http://x/api/v1/t/abc"), {
+      params: Promise.resolve({ id: "abc" }),
+    });
+
+    expect(res.status).toBe(200);
+    expect(res.headers.get("content-type")).toBe("text/plain");
+    expect(res.headers.get("content-length")).toBe("2");
+    expect(res.headers.get("cache-control")).toBe("private, no-store");
+    expect(res.headers.get("x-content-type-options")).toBe("nosniff");
+    expect(res.headers.get("content-disposition")).toBe(
+      'inline; filename="abc.txt"',
+    );
+    expect(new Uint8Array(await res.arrayBuffer())).toEqual(
+      new Uint8Array([104, 105]),
+    );
+  });
+
+  it("answers a denied or failed call with the usual envelope", async () => {
+    const res = await fileRoute(failing)(new Request("http://x/api/v1/t"));
+    expect(res.status).toBe(409);
+    expect((await res.json()).error.code).toBe("SLOT_TAKEN");
   });
 });
 

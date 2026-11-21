@@ -13,6 +13,8 @@
 # production
 /build
 /dist
+# local upload volume (UPLOAD_DIR defaults to db/uploads in development)
+/db/uploads
 
 # misc
 .DS_Store

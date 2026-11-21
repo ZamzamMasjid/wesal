@@ -11,4 +11,9 @@ describe("venue contact links", () => {
   it("builds a wa.me link without the plus sign", () => {
     expect(whatsappUrl("+20 100 123 4567")).toBe("https://wa.me/201001234567");
   });
+  it("prefills the chat with a message, safely encoded", () => {
+    expect(whatsappUrl("+201001234567", "Booking 7K3M9Q")).toBe(
+      "https://wa.me/201001234567?text=Booking%207K3M9Q",
+    );
+  });
 });

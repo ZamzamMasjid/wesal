@@ -2,7 +2,7 @@
 id: booking-status
 type: view
 title: Booking Page
-last_modified: 2026-11-20
+last_modified: 2026-11-21
 feature: booking-page
 mockup: none
 ---
@@ -50,7 +50,7 @@ Rejected/expired/cancelled: what happened, [ Book again ]
 - Status header with badge
 - Countdown
 - Transfer details with copy buttons
-- Upload area and WhatsApp alternative (from `payment-proof`; this feature shows the transfer details and the venue contact until that section ships)
+- Upload area and WhatsApp alternative (from `payment-proof`)
 - Booking summary
 - Confirmation card
 - Contact footer
