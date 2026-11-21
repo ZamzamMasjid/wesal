@@ -3,10 +3,22 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const created: Array<{
-  jobs: { name: string }[];
+  jobs: {
+    name: string;
+    run: (ctx: { jobId: string; log: never }) => Promise<unknown>;
+  }[];
   onStall: (n: number) => void;
 }> = [];
 const start = vi.fn();
+
+const purgeOldProofs = vi.fn(async () => ({ purged: 2, failed: 0 }));
+
+vi.mock("@/ops/booking/purge", () => ({
+  createDailyProofPurge: (_clock: unknown, run: () => Promise<unknown>) => run,
+  purgeOldProofs,
+}));
+
+vi.mock("@/db/client", () => ({ getDb: () => ({}) }));
 
 vi.mock("./loop", () => ({
   createJobLoop: (options: (typeof created)[number]) => {
@@ -19,6 +31,7 @@ beforeEach(() => {
   vi.resetModules();
   created.length = 0;
   start.mockClear();
+  purgeOldProofs.mockClear();
 });
 afterEach(() => vi.unstubAllEnvs());
 
@@ -34,6 +47,25 @@ describe("startJobs", () => {
       "proof-purge",
     ]);
     expect(start).toHaveBeenCalledOnce();
+  });
+
+  it("runs the daily proof purge through the loop and logs what it cleared", async () => {
+    const { startJobs } = await import("./start");
+    startJobs(() => undefined);
+    const job = created[0]!.jobs.find((entry) => entry.name === "proof-purge")!;
+    const info = vi.fn();
+
+    const summary = await job.run({
+      jobId: "job-1",
+      log: { info, child: vi.fn() } as never,
+    });
+
+    expect(purgeOldProofs).toHaveBeenCalledOnce();
+    expect(summary).toEqual({ purged: 2, failed: 0 });
+    expect(info).toHaveBeenCalledWith("old proof files purged", {
+      purged: 2,
+      failed: 0,
+    });
   });
 
   it("hands a stall to the given exit handler", async () => {

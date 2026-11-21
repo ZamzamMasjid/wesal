@@ -7,8 +7,8 @@ generated_by: axiom:reindex
 budgets: {}
 activities: []
 active:
-  phase: phase-3-booking
-  section: null
+  phase: phase-4-operations
+  section: payment-review
 ---
 
 # Project Index
@@ -17,8 +17,8 @@ active:
 
 ## Active work
 
-- **Current phase**: phase-3-booking
-- **Current section**: <none>
+- **Current phase**: phase-4-operations
+- **Current section**: payment-review
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars
@@ -85,7 +85,7 @@ active:
 |---|---|---|---|
 | `phase-1-infrastructure` | shipped | v1 | project-setup, database, testing, deployment |
 | `phase-2-foundations` | shipped | v1 | staff-access, venue-settings, slot-schedule, message-delivery, phone-verification |
-| `phase-3-booking` | in-progress | v1 | public-calendar, booking-hold, booking-page, payment-proof |
+| `phase-3-booking` | shipped | v1 | public-calendar, booking-hold, booking-page, payment-proof |
 | `phase-4-operations` | planned | v1 | payment-review, staff-notifications, booking-management |
 | `phase-5-public-site` | planned | v1 | content-management, landing-page |
 | `phase-6-alerts-and-reports` | planned | later | slot-alerts, booking-reports |

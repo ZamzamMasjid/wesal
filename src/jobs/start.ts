@@ -2,7 +2,7 @@ import { getDb } from "@/db/client";
 import { runtime } from "@/lib/runtime";
 import { getSender } from "@/messaging/config";
 import { processOutbox } from "@/messaging/outbox";
-import { createDailyProofPurge } from "@/ops/booking/purge";
+import { createDailyProofPurge, purgeOldProofs } from "@/ops/booking/purge";
 import { expireOverdueHolds } from "@/ops/booking/sweep";
 import { uploadRoot } from "@/storage/proofs";
 

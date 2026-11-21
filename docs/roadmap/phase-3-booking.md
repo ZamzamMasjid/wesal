@@ -2,7 +2,7 @@
 id: phase-3-booking
 type: roadmap-phase
 title: Phase 3 — Booking
-status: in-progress
+status: shipped
 last_modified: 2026-11-21
 milestone: v1
 phase_number: 3
