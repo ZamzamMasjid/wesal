@@ -184,3 +184,10 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Summary**: The landing page's occasion cards and its primary action lead into the calendar, and the occasion survives the rest of the path: the calendar accepts `?occasion={id}`, carries it into every bookable slot's link, and the booking form starts with that occasion selected, showing its deposit. An occasion that is no longer offered is ignored, so the form still asks for a choice.
 - **Affected Docs**: landing-page, phase-5-public-site
 - **Reason**: Implementing `phase-5-public-site/landing-page`, second item.
+
+## [2026-11-21] — Landing page metadata
+
+- **Type**: Feature Change
+- **Summary**: The home page carries search and share metadata. Arabic is canonical at `/`, English at `/en`, and each language advertises both URLs plus `x-default` through `hreflang` links. The title pairs the venue name with the tagline; the description is the owner's own text in the reader's language (falling back to Arabic, then the tagline); Open Graph and Twitter cards carry the first venue photo as the share image with the owner's alternative text. The origin comes from `PUBLIC_BASE_URL`, then `BETTER_AUTH_URL`, then the development default. The metadata and the page share one content read per request.
+- **Affected Docs**: landing-page, phase-5-public-site
+- **Reason**: Implementing `phase-5-public-site/landing-page`, third item.

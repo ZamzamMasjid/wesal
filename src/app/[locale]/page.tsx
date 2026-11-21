@@ -6,9 +6,11 @@ import {
   Phone,
 } from "lucide-react";
 import Image from "next/image";
+import type { Metadata } from "next";
 import { hasLocale } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 
 import { ANONYMOUS } from "@/api/caller";
 import { createCallContext } from "@/api/context";
@@ -17,6 +19,7 @@ import { SiteHeader } from "@/components/site-header";
 import { getDb } from "@/db/client";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
+import { homeMetadata, publicBaseUrl } from "@/lib/site-metadata";
 import { dialable, whatsappUrl } from "@/lib/venue-contact";
 import {
   formatPrice,
@@ -35,21 +38,13 @@ import { loadSettings } from "@/ops/venue/settings";
 // The public home page (docs/features/landing-page, view home). Everything on it
 // comes from content management and venue settings; nothing is hard-coded. It is
 // rendered on the server through the same operations the API uses (ADR-020), so
-// a slow phone gets the full page in the first response.
+// a slow phone gets the full page in the first response. `generateMetadata` and
+// the page share one read through React's per-request cache.
 
 export const dynamic = "force-dynamic";
 
-const primary =
-  "inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-brand px-8 text-lg font-semibold text-brand-fg transition-colors hover:bg-brand-hover motion-reduce:transition-none";
-const quiet =
-  "inline-flex min-h-(--size-touch) items-center justify-center gap-2 rounded-full bg-fill px-6 font-semibold text-fg transition-colors hover:bg-border motion-reduce:transition-none";
-
-export default async function Home({ params }: PageProps<"/[locale]">) {
-  const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) notFound();
-  setRequestLocale(locale);
-
-  const t = await getTranslations("Home");
+/** The page and its metadata read the same content once per request. */
+const loadLanding = cache(async () => {
   const ctx = createCallContext(ANONYMOUS);
   const [contentResult, occasionsResult, settings] = await Promise.all([
     contentOperations.read({}, ctx),
@@ -63,9 +58,63 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
   if (!occasionsResult.ok) {
     throw new Error(`Occasions failed: ${occasionsResult.error.code}`);
   }
+  return {
+    content: contentResult.data.content,
+    media: contentResult.data.media,
+    occasions: occasionsResult.data.occasions,
+    settings,
+  };
+});
 
-  const { content, media } = contentResult.data;
-  const occasions = occasionsResult.data.occasions;
+export async function generateMetadata({
+  params,
+}: PageProps<"/[locale]">): Promise<Metadata> {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) return {};
+  const t = await getTranslations({ locale, namespace: "Home" });
+
+  try {
+    const { content, media } = await loadLanding();
+    const hero = heroMedia(media);
+    return homeMetadata({
+      locale,
+      venueName: t("venueName"),
+      tagline: t("tagline"),
+      descriptionAr: content.descriptionAr,
+      descriptionEn: content.descriptionEn,
+      hero: hero
+        ? { url: hero.url, altAr: hero.altAr, altEn: hero.altEn }
+        : null,
+      baseUrl: publicBaseUrl(),
+    });
+  } catch {
+    // A database outage must not turn the metadata call into a second failure;
+    // the page's error boundary shows the static notice.
+    return homeMetadata({
+      locale,
+      venueName: t("venueName"),
+      tagline: t("tagline"),
+      descriptionAr: "",
+      descriptionEn: "",
+      hero: null,
+      baseUrl: publicBaseUrl(),
+    });
+  }
+}
+
+const primary =
+  "inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-brand px-8 text-lg font-semibold text-brand-fg transition-colors hover:bg-brand-hover motion-reduce:transition-none";
+const quiet =
+  "inline-flex min-h-(--size-touch) items-center justify-center gap-2 rounded-full bg-fill px-6 font-semibold text-fg transition-colors hover:bg-border motion-reduce:transition-none";
+
+export default async function Home({ params }: PageProps<"/[locale]">) {
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) notFound();
+  setRequestLocale(locale);
+
+  const t = await getTranslations("Home");
+  const { content, media, occasions, settings } = await loadLanding();
+
   const description = venueDescription(
     content.descriptionAr,
     content.descriptionEn,

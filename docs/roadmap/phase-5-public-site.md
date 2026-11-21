@@ -36,7 +36,7 @@ The public home page. Extends `web`.
 
 - [x] Implement home view: hero, gallery, occasion prices, policy, contact
 - [x] Add calendar entry point and booking call to action
-- [ ] Add SEO metadata, Open Graph and hreflang for Arabic and English
+- [x] Add SEO metadata, Open Graph and hreflang for Arabic and English
 - [ ] Serve media with range requests and caching headers
 - [ ] Write e2e test: booking journey from home to uploaded proof in both languages
 - [ ] Run WCAG AA pass on public views and fix findings
