@@ -96,6 +96,8 @@ export interface FileAnswer {
   bytes: Uint8Array;
   contentType: string;
   fileName?: string;
+  /** Offer the file as a download instead of displaying it. */
+  attachment?: boolean;
   cacheControl?: string;
 }
 
@@ -178,7 +180,8 @@ export function fileRoute<Output extends FileAnswer>(
       );
       if (!result.ok) return respond(result, requestId);
 
-      const { bytes, contentType, fileName, cacheControl } = result.data;
+      const { bytes, contentType, fileName, attachment, cacheControl } =
+        result.data;
       // A fresh ArrayBuffer keeps the DOM types happy and the caller's buffer
       // (which may be a pooled Node Buffer) out of the response.
       const body = new Uint8Array(bytes.byteLength);
@@ -188,7 +191,7 @@ export function fileRoute<Output extends FileAnswer>(
         headers: {
           "content-type": contentType,
           "content-length": String(bytes.byteLength),
-          "content-disposition": `inline; filename="${fileName ?? "file"}"`,
+          "content-disposition": `${attachment ? "attachment" : "inline"}; filename="${fileName ?? "file"}"`,
           "cache-control": cacheControl ?? "private, no-store",
           "x-content-type-options": "nosniff",
           "x-request-id": requestId,

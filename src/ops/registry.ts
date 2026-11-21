@@ -14,7 +14,7 @@ import { scheduleOperations } from "./schedule/schedule";
 import { occasionOperations } from "./venue/occasions";
 import { settingsOperations } from "./venue/settings";
 import { verificationOperations } from "./verification/verification";
-
+import { reportOperations } from "./reports/reports";
 import type { Operation } from "@/api/operation";
 
 // Every operation the API exposes. The guard test walks this list, so a new
@@ -36,4 +36,5 @@ export const operations: Operation<unknown>[] = [
   ...Object.values(settingsOperations),
   ...Object.values(scheduleOperations),
   ...Object.values(verificationOperations),
+  ...Object.values(reportOperations),
 ];

@@ -2,13 +2,13 @@
 id: booking-reports
 type: feature
 title: Booking Reports
-status: planned
-last_modified: 2026-11-15
+status: in-progress
+last_modified: 2026-11-21
 milestone: later
 pillar: reporting
 depends_on: [booking-management]
 views: [reports]
-adrs: [ADR-012, ADR-018]
+adrs: [ADR-012, ADR-018, ADR-032]
 roadmap_sections: [phase-6-alerts-and-reports/booking-reports]
 architecture: [data-model, auth, testing]
 components: [web, postgres]
@@ -62,5 +62,4 @@ No new entities. Aggregates bookings by status, occasion, source and month. Inco
 
 ## Open questions
 
-- Which export format does the owner want (Excel or CSV)?
 - Should reports show a Hijri month view, given the venue's occasions follow that calendar's seasons?
