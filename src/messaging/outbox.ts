@@ -1,10 +1,11 @@
 import { and, asc, eq, inArray, lte } from "drizzle-orm";
 
 import type { Database } from "@/db/client";
-import { outboxMessage } from "@/db/schema";
+import { outboxMessage, staffDevice, staffUser } from "@/db/schema";
 import type { Clock } from "@/lib/clock";
 import type { Logger } from "@/lib/logger";
 
+import type { PushProvider } from "./push";
 import type { Channel, MessageSender } from "./sender";
 import {
   renderTemplate,
@@ -40,9 +41,12 @@ const plusSeconds = (date: Date, seconds: number) =>
 /** The database or a transaction, so the row commits with its change. */
 type Executor = Pick<Database, "insert">;
 
+/** Push rows are addressed by staff user, not phone (ADR-034). */
+export type OutboxChannel = Channel | "push";
+
 export interface QueueInput<T extends TemplateName> {
   template: T;
-  /** E.164 phone number. */
+  /** E.164 phone number, or a staff user id for a push row. */
   recipient: string;
   values: TemplateValues<T>;
   locale: Locale;
@@ -50,7 +54,7 @@ export interface QueueInput<T extends TemplateName> {
   /** After this instant the message is dropped instead of sent late. */
   expiresAt?: Date;
   /** First channel; default WhatsApp. */
-  channel?: Channel;
+  channel?: OutboxChannel;
 }
 
 /**
@@ -135,6 +139,7 @@ export async function sendInline<T extends TemplateName>(
 export interface OutboxDeps {
   db: Database;
   sender: MessageSender;
+  push: PushProvider;
   clock: Clock;
   logger: Logger;
 }
@@ -221,6 +226,12 @@ export async function processOutbox(
       continue;
     }
 
+    if (row.channel === "push") {
+      const outcome = await sendPush(deps, row, body, now, log);
+      summary[outcome] += 1;
+      continue;
+    }
+
     try {
       const { providerMessageId } = await deps.sender.send({
         channel: row.channel,
@@ -281,14 +292,172 @@ export async function processOutbox(
   return summary;
 }
 
+type PushOutcome = "sent" | "retried" | "fellBack" | "failed";
+
+function pushTitle(row: OutboxRow): string {
+  const kind = row.values.kind;
+  if (row.locale === "ar") {
+    return kind === "proof" ? "إثبات دفع بانتظار المراجعة" : "حجز عاجل";
+  }
+  return kind === "proof" ? "Payment proof to review" : "Urgent hold";
+}
+
+/**
+ * Sends one staff member's alert to every active device (ADR-034). One accepted
+ * ticket counts as delivered; unregistered tokens are deactivated. When no
+ * device can receive it, the last attempt falls back to WhatsApp instead of
+ * dropping the alert.
+ */
+async function sendPush(
+  deps: OutboxDeps,
+  row: OutboxRow,
+  body: string,
+  now: Date,
+  log: Logger,
+): Promise<PushOutcome> {
+  const tokens = (
+    await deps.db
+      .select({ token: staffDevice.token })
+      .from(staffDevice)
+      .where(
+        and(eq(staffDevice.userId, row.recipient), eq(staffDevice.active, true)),
+      )
+  ).map((device) => device.token);
+
+  if (tokens.length === 0) {
+    const attempts = row.attempts + 1;
+    if (attempts < MAX_ATTEMPTS) {
+      await deps.db
+        .update(outboxMessage)
+        .set({
+          attempts,
+          lastError: "no active device",
+          nextAttemptAt: plusSeconds(now, backoffSeconds(attempts)),
+          updatedAt: now,
+        })
+        .where(eq(outboxMessage.id, row.id));
+      return "retried";
+    }
+    const queued = await fallbackPushToWhatsApp(deps, row, now, "no active device");
+    log.warn("no device accepted the push; the alert fell back to WhatsApp", {
+      recipient: row.recipient,
+    });
+    return queued ? "fellBack" : "failed";
+  }
+
+  try {
+    const link = typeof row.values.link === "string" ? row.values.link : "";
+    const tickets = await deps.push.send(
+      tokens.map((token) => ({
+        to: token,
+        title: pushTitle(row),
+        body,
+        data: link ? { link } : undefined,
+      })),
+    );
+
+    const invalid = tickets.filter((ticket) => ticket.invalid).map((t) => t.token);
+    if (invalid.length > 0) {
+      await deps.db
+        .update(staffDevice)
+        .set({ active: false, updatedAt: now })
+        .where(inArray(staffDevice.token, invalid));
+    }
+
+    if (tickets.some((ticket) => ticket.ok)) {
+      await deps.db
+        .update(outboxMessage)
+        .set({ status: "sent", lastError: null, updatedAt: now })
+        .where(eq(outboxMessage.id, row.id));
+      log.info("push alert sent", {
+        devices: tickets.filter((ticket) => ticket.ok).length,
+      });
+      return "sent";
+    }
+    throw new Error(
+      tickets.find((ticket) => ticket.error)?.error ?? "push rejected",
+    );
+  } catch (err) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    const attempts = row.attempts + 1;
+    const detail = error.message.slice(0, 500);
+    if (attempts < MAX_ATTEMPTS) {
+      await deps.db
+        .update(outboxMessage)
+        .set({
+          attempts,
+          lastError: detail,
+          nextAttemptAt: plusSeconds(now, backoffSeconds(attempts)),
+          updatedAt: now,
+        })
+        .where(eq(outboxMessage.id, row.id));
+      log.warn("push send failed; will retry", { attempts, err: error });
+      return "retried";
+    }
+    const queued = await fallbackPushToWhatsApp(deps, row, now, detail);
+    log.warn("push failed for good; the alert fell back to WhatsApp", {
+      attempts,
+      err: error,
+    });
+    return queued ? "fellBack" : "failed";
+  }
+}
+
+/** Queues the same alert to the person's WhatsApp number; returns whether it could. */
+async function fallbackPushToWhatsApp(
+  deps: OutboxDeps,
+  row: OutboxRow,
+  now: Date,
+  detail: string,
+): Promise<boolean> {
+  const [user] = await deps.db
+    .select({ active: staffUser.active, phone: staffUser.notifyPhone })
+    .from(staffUser)
+    .where(eq(staffUser.id, row.recipient))
+    .limit(1);
+
+  await deps.db
+    .update(outboxMessage)
+    .set({
+      status: "failed",
+      attempts: MAX_ATTEMPTS,
+      lastError: `push: ${detail}`,
+      updatedAt: now,
+    })
+    .where(eq(outboxMessage.id, row.id));
+
+  if (!user?.active || !user.phone) {
+    deps.logger.error("push alert has no WhatsApp fallback", {
+      recipient: row.recipient,
+      detail,
+    });
+    return false;
+  }
+
+  await deps.db.insert(outboxMessage).values({
+    bookingId: row.bookingId,
+    recipient: user.phone,
+    channel: "whatsapp",
+    template: row.template,
+    values: row.values,
+    locale: row.locale,
+    status: "queued",
+    attempts: 0,
+    nextAttemptAt: now,
+    expiresAt: row.expiresAt,
+    createdAt: now,
+    updatedAt: now,
+  });
+  return true;
+}
+
 async function finish(
   deps: OutboxDeps,
   id: number,
   status: "failed",
   lastError: string,
   attempts?: number,
-): Promise<void> {
-  await deps.db
+): Promise<void> {  await deps.db
     .update(outboxMessage)
     .set({
       status,

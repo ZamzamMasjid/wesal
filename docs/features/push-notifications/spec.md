@@ -2,13 +2,13 @@
 id: push-notifications
 type: feature
 title: Push Notifications
-status: planned
-last_modified: 2026-11-15
+status: shipped
+last_modified: 2026-11-21
 milestone: later
 pillar: mobile-app
 depends_on: [customer-mobile-app, staff-notifications]
 views: []
-adrs: [ADR-006, ADR-018]
+adrs: [ADR-006, ADR-018, ADR-034]
 roadmap_sections: [phase-7-mobile-app/push-notifications]
 architecture: [overview, flows, testing]
 components: [web, postgres]

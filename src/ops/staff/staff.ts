@@ -12,7 +12,7 @@ import {
 } from "@/auth/accounts";
 import { getAuth, type Auth } from "@/auth/auth";
 import { getDb, type Database } from "@/db/client";
-import { staffSession, staffUser } from "@/db/schema";
+import { staffDevice, staffSession, staffUser } from "@/db/schema";
 
 // Staff access operations (docs/features/staff-access). Reading your own
 // profile is open to any staff session; managing accounts and reading the audit
@@ -30,6 +30,7 @@ const publicColumns = {
   role: staffUser.role,
   notifyPhone: staffUser.notifyPhone,
   notifyEnabled: staffUser.notifyEnabled,
+  alertChannel: staffUser.alertChannel,
   locale: staffUser.locale,
   active: staffUser.active,
 };
@@ -63,6 +64,7 @@ export function createStaffOperations(resolve: () => StaffDeps) {
     input: z.object({
       notifyPhone: phone,
       notifyEnabled: z.boolean(),
+      alertChannel: z.enum(["push", "whatsapp", "both"]).optional(),
       /** The dashboard language alerts are written in. */
       locale: z.enum(["ar", "en"]).optional(),
     }),
@@ -75,6 +77,7 @@ export function createStaffOperations(resolve: () => StaffDeps) {
             id: staffUser.id,
             notifyPhone: staffUser.notifyPhone,
             notifyEnabled: staffUser.notifyEnabled,
+            alertChannel: staffUser.alertChannel,
             locale: staffUser.locale,
           })
           .from(staffUser)
@@ -93,6 +96,16 @@ export function createStaffOperations(resolve: () => StaffDeps) {
           detail.notifyEnabled = {
             from: target.notifyEnabled,
             to: input.notifyEnabled,
+          };
+        }
+        if (
+          input.alertChannel !== undefined &&
+          input.alertChannel !== target.alertChannel
+        ) {
+          changes.alertChannel = input.alertChannel;
+          detail.alertChannel = {
+            from: target.alertChannel,
+            to: input.alertChannel,
           };
         }
         if (input.locale !== undefined && input.locale !== target.locale) {
@@ -147,6 +160,7 @@ export function createStaffOperations(resolve: () => StaffDeps) {
       role: z.enum(["owner", "staff"]).default("staff"),
       notifyPhone: phone.optional(),
       notifyEnabled: z.boolean().optional(),
+      alertChannel: z.enum(["push", "whatsapp", "both"]).optional(),
     }),
     handler: async (input, ctx) => {
       const { db, auth } = resolve();
@@ -185,6 +199,7 @@ export function createStaffOperations(resolve: () => StaffDeps) {
         active: z.boolean().optional(),
         notifyPhone: phone.optional(),
         notifyEnabled: z.boolean().optional(),
+        alertChannel: z.enum(["push", "whatsapp", "both"]).optional(),
         /** Resets the password; the user's open sessions end. */
         password: password.optional(),
       })
@@ -195,6 +210,7 @@ export function createStaffOperations(resolve: () => StaffDeps) {
           v.active !== undefined ||
           v.notifyPhone !== undefined ||
           v.notifyEnabled !== undefined ||
+          v.alertChannel !== undefined ||
           v.password !== undefined,
         { message: "Nothing to change." },
       ),
@@ -261,6 +277,16 @@ export function createStaffOperations(resolve: () => StaffDeps) {
             to: input.notifyEnabled,
           };
         }
+        if (
+          input.alertChannel !== undefined &&
+          input.alertChannel !== target.alertChannel
+        ) {
+          changes.alertChannel = input.alertChannel;
+          detail.alertChannel = {
+            from: target.alertChannel,
+            to: input.alertChannel,
+          };
+        }
         if (Object.keys(changes).length === 0) return;
 
         await tx
@@ -284,6 +310,8 @@ export function createStaffOperations(resolve: () => StaffDeps) {
           await tx
             .delete(staffSession)
             .where(eq(staffSession.userId, target.id));
+          // A disabled account must stop receiving alerts on its phones too.
+          await tx.delete(staffDevice).where(eq(staffDevice.userId, target.id));
         }
       });
 

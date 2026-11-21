@@ -131,14 +131,16 @@ describe("ReportsView", () => {
 
   it("reloads every figure when the period moves", async () => {
     const fetchMock = vi.fn(
-      async (_input: RequestInfo | URL) =>
-        new Response(
+      async (input: RequestInfo | URL) => {
+        void input;
+        return new Response(
           JSON.stringify({
             ok: true,
             data: { ...initial, from: "2026-12-01", to: "2026-12-31" },
           }),
           { headers: { "content-type": "application/json" } },
-        ),
+        );
+      },
     );
     vi.stubGlobal("fetch", fetchMock);
     renderReports();
@@ -154,10 +156,12 @@ describe("ReportsView", () => {
 
   it("switches to a custom range and a year", async () => {
     const fetchMock = vi.fn(
-      async (_input: RequestInfo | URL) =>
-        new Response(JSON.stringify({ ok: true, data: initial }), {
+      async (input: RequestInfo | URL) => {
+        void input;
+        return new Response(JSON.stringify({ ok: true, data: initial }), {
           headers: { "content-type": "application/json" },
-        }),
+        });
+      },
     );
     vi.stubGlobal("fetch", fetchMock);
     renderReports();

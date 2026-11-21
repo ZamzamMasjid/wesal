@@ -47,7 +47,7 @@ active:
 | `payment-review` | Payment Review | shipped | v1 | back-office | phase-4-operations/payment-review |
 | `phone-verification` | Phone Verification | shipped | v1 | booking | phase-2-foundations/phone-verification |
 | `public-calendar` | Public Calendar | shipped | v1 | availability | phase-3-booking/public-calendar |
-| `push-notifications` | Push Notifications | planned | later | mobile-app | phase-7-mobile-app/push-notifications |
+| `push-notifications` | Push Notifications | shipped | later | mobile-app | phase-7-mobile-app/push-notifications |
 | `slot-alerts` | Slot Alerts | shipped | later | availability | phase-6-alerts-and-reports/slot-alerts |
 | `slot-schedule` | Slot Schedule | shipped | v1 | availability | phase-2-foundations/slot-schedule |
 | `staff-access` | Staff Access | shipped | v1 | back-office | phase-2-foundations/staff-access |
@@ -156,6 +156,8 @@ active:
 | `ADR-030` | Call Twilio over plain HTTP and give each channel five attempts with growing delays | Accepted | phase-2-foundations/message-delivery |
 | `ADR-031` | Use the WhatSend worker as a fee-free WhatsApp provider for now | Accepted | phase-2-foundations/message-delivery |
 | `ADR-032` | Export reports as a UTF-8 CSV file | Accepted | phase-6-alerts-and-reports/booking-reports |
+| `ADR-033` | Build the customer app with Expo and React Native | Accepted | phase-7-mobile-app/customer-mobile-app |
+| `ADR-034` | Send staff push through Expo and fall back to WhatsApp | Accepted | phase-7-mobile-app/push-notifications |
 
 ## Recent changes
 

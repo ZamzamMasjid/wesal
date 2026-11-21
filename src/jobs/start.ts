@@ -2,6 +2,7 @@ import { getDb } from "@/db/client";
 import { runtime } from "@/lib/runtime";
 import { getSender, publicBaseUrl } from "@/messaging/config";
 import { processOutbox } from "@/messaging/outbox";
+import { getPushProvider } from "@/messaging/push";
 import { createDailyProofPurge, purgeOldProofs } from "@/ops/booking/purge";
 import { expireOverdueHolds } from "@/ops/booking/sweep";
 import { uploadRoot } from "@/storage/proofs";
@@ -39,6 +40,7 @@ export function startJobs(
           processOutbox({
             db: getDb(),
             sender: getSender(),
+            push: getPushProvider(),
             clock,
             logger: log,
           }),

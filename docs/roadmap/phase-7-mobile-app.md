@@ -34,5 +34,5 @@ The booking experience as a mobile app over the same JSON API.
 
 Push alerts for owner and staff.
 
-- [ ] Implement device registration endpoint and a push sender behind the messaging adapter
-- [ ] Send push on proof upload and urgent holds to signed-in staff devices
+- [x] Implement device registration endpoint and a push sender behind the messaging adapter
+- [x] Send push on proof upload and urgent holds to signed-in staff devices

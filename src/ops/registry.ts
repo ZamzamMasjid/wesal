@@ -10,6 +10,7 @@ import { mediaOperations } from "./content/media";
 import { getHealth } from "./health";
 import { twilioStatusOperation } from "./messaging/twilio-status";
 import { staffOperations } from "./staff/staff";
+import { deviceOperations } from "./staff/devices";
 import { scheduleOperations } from "./schedule/schedule";
 import { occasionOperations } from "./venue/occasions";
 import { settingsOperations } from "./venue/settings";
@@ -32,6 +33,7 @@ export const operations: Operation<unknown>[] = [
   ...Object.values(contentOperations),
   ...Object.values(mediaOperations),
   ...Object.values(staffOperations),
+  ...Object.values(deviceOperations),
   ...Object.values(occasionOperations),
   ...Object.values(settingsOperations),
   ...Object.values(scheduleOperations),

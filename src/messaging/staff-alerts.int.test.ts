@@ -54,7 +54,13 @@ describe("resolveStaffAlertRecipients", () => {
 
     const recipients = await resolveStaffAlertRecipients(db);
     expect(recipients).toEqual([
-      { id: "on", phone: "+201001111111", locale: "ar" },
+      {
+        id: "on",
+        phone: "+201001111111",
+        locale: "ar",
+        channel: "whatsapp",
+        devices: 0,
+      },
     ]);
   });
 
@@ -76,7 +82,13 @@ describe("resolveStaffAlertRecipients", () => {
 
     const recipients = await resolveStaffAlertRecipients(db);
     expect(recipients).toEqual([
-      { id: "owner", phone: "+201004444444", locale: "ar" },
+      {
+        id: "owner",
+        phone: "+201004444444",
+        locale: "ar",
+        channel: "whatsapp",
+        devices: 0,
+      },
     ]);
   });
 

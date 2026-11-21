@@ -7,6 +7,7 @@ import { outboxMessage } from "@/db/schema";
 import { createLogger } from "@/lib/logger";
 import { openTestDb, resetDatabase } from "@/test/db";
 import { createFakeClock } from "@/test/fake-clock";
+import { createFakePush } from "@/test/fake-push";
 import { createFakeSender } from "@/test/fake-sender";
 
 import {
@@ -23,12 +24,14 @@ const handle = openTestDb();
 const { db } = handle;
 const clock = createFakeClock();
 const sender = createFakeSender();
+const push = createFakePush();
 const logger = createLogger({ clock, write: () => undefined });
-const deps = { db, sender, clock, logger };
+const deps = { db, sender, push, clock, logger };
 
 beforeEach(async () => {
   await resetDatabase(handle);
   sender.reset();
+  push.reset();
   clock.set(new Date("2026-12-24T10:00:00Z"));
 });
 afterAll(() => handle.pool.end());

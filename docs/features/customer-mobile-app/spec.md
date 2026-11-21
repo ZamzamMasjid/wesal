@@ -8,7 +8,7 @@ milestone: later
 pillar: mobile-app
 depends_on: [public-calendar, booking-hold, booking-page, payment-proof]
 views: [mobile-home]
-adrs: [ADR-012, ADR-018]
+adrs: [ADR-012, ADR-018, ADR-033]
 roadmap_sections: [phase-7-mobile-app/customer-mobile-app]
 architecture: [overview, auth, testing]
 components: [web]

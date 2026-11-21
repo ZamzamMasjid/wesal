@@ -16,6 +16,7 @@ export interface StaffProfile {
   role: "owner" | "staff";
   notifyPhone: string | null;
   notifyEnabled: boolean;
+  alertChannel: "push" | "whatsapp" | "both";
   locale: "ar" | "en";
 }
 
@@ -26,6 +27,7 @@ export function MyNotifications({ initial }: { initial: StaffProfile }) {
   const t = useTranslations("Dashboard.notifications");
   const [phone, setPhone] = useState(initial.notifyPhone ?? "");
   const [enabled, setEnabled] = useState(initial.notifyEnabled);
+  const [channel, setChannel] = useState(initial.alertChannel);
   const [locale, setLocale] = useState(initial.locale);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState<{ ok: boolean; text: string } | null>(
@@ -45,6 +47,7 @@ export function MyNotifications({ initial }: { initial: StaffProfile }) {
         body: JSON.stringify({
           notifyPhone: phone.trim() === "" ? null : phone.trim(),
           notifyEnabled: enabled,
+          alertChannel: channel,
           locale,
         }),
       });
@@ -56,6 +59,7 @@ export function MyNotifications({ initial }: { initial: StaffProfile }) {
     if (result.ok && result.data) {
       setPhone(result.data.notifyPhone ?? "");
       setEnabled(result.data.notifyEnabled);
+      setChannel(result.data.alertChannel);
       setLocale(result.data.locale);
       setMessage({ ok: true, text: t("saved") });
     } else {
@@ -106,6 +110,26 @@ export function MyNotifications({ initial }: { initial: StaffProfile }) {
           >
             <option value="ar">{t("languageAr")}</option>
             <option value="en">{t("languageEn")}</option>
+          </select>
+        </label>
+        <label className="space-y-1 text-sm">
+          {t("channel")}
+          <select
+            value={channel}
+            onChange={(event) =>
+              setChannel(
+                event.target.value === "push"
+                  ? "push"
+                  : event.target.value === "both"
+                    ? "both"
+                    : "whatsapp",
+              )
+            }
+            className={inputClass}
+          >
+            <option value="whatsapp">{t("channelWhatsapp")}</option>
+            <option value="push">{t("channelPush")}</option>
+            <option value="both">{t("channelBoth")}</option>
           </select>
         </label>
       </div>

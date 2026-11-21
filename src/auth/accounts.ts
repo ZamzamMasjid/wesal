@@ -11,6 +11,8 @@ export interface NewStaffAccount {
   notifyPhone?: string | null;
   /** Whether staff alerts go to `notifyPhone`. Defaults to on. */
   notifyEnabled?: boolean;
+  /** Push, WhatsApp or both. Defaults to WhatsApp. */
+  alertChannel?: "push" | "whatsapp" | "both";
   /** The dashboard language alerts are written in. Defaults to Arabic. */
   locale?: "ar" | "en";
 }
@@ -59,6 +61,9 @@ export async function createStaffAccount(
       ...(input.notifyEnabled === undefined
         ? {}
         : { notifyEnabled: input.notifyEnabled }),
+      ...(input.alertChannel === undefined
+        ? {}
+        : { alertChannel: input.alertChannel }),
       ...(input.locale === undefined ? {} : { locale: input.locale }),
     },
     { method: "email" },

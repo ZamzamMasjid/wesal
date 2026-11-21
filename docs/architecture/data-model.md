@@ -98,8 +98,16 @@ erDiagram
     string role
     string notify_phone
     bool notify_enabled
+    string alert_channel
     string locale
     bool active
+  }
+  STAFF_DEVICE {
+    string user_id
+    string token
+    string platform
+    bool active
+    timestamptz last_seen_at
   }
   AUDIT_LOG {
     string action
@@ -122,6 +130,7 @@ erDiagram
   BOOKING ||--o{ OUTBOX_MESSAGE : "triggers"
   BOOKING ||--o{ AUDIT_LOG : "recorded in"
   STAFF_USER ||--o{ AUDIT_LOG : "acts in"
+  STAFF_USER ||--o{ STAFF_DEVICE : "pushes to"
 ```
 
 The diagram shows three groups. **Schedule**: the weekly pattern, and date exceptions that either close a date or replace its slots. **Bookings**: a booking with its proofs, the messages it triggers and its audit trail. **Venue**: occasions, the single settings row, site content, media and staff.
@@ -142,6 +151,7 @@ Two points are easy to miss. First, slots are not stored rows: a date's slots ar
 | Slot alert | `web` | `postgres` | Strong; one row per phone and slot |
 | Outbox message | `web` | `postgres` | Strong; delivery is at-least-once |
 | Staff user, session | `web` (Better Auth) | `postgres` | Strong |
+| Staff device (push token) | `web` | `postgres` | Strong; removed on logout or when the provider reports it unregistered |
 | Audit log | `web` | `postgres` | Strong; append-only |
 | Site content, media asset | `web` | Row in `postgres`, file on `upload-volume` | Strong |
 

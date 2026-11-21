@@ -19,6 +19,7 @@ interface StaffUser {
   active: boolean;
   notifyPhone: string | null;
   notifyEnabled: boolean;
+  alertChannel: "push" | "whatsapp" | "both";
 }
 
 interface Envelope<T> {
@@ -308,6 +309,7 @@ function NotificationDialog({
   const ref = useRef<HTMLDialogElement>(null);
   const [phone, setPhone] = useState(user.notifyPhone ?? "");
   const [enabled, setEnabled] = useState(user.notifyEnabled);
+  const [channel, setChannel] = useState(user.alertChannel);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -324,6 +326,7 @@ function NotificationDialog({
     const result = await call(`/api/v1/staff/users/${user.id}`, "PATCH", {
       notifyPhone: phone.trim() === "" ? null : phone.trim(),
       notifyEnabled: enabled,
+      alertChannel: channel,
     });
     setBusy(false);
     if (result.ok) onSaved();
@@ -359,6 +362,26 @@ function NotificationDialog({
             onChange={(event) => setEnabled(event.target.checked)}
           />
           {t("notifyEnabled")}
+        </label>
+        <label className="block space-y-1 text-sm">
+          {t("channel")}
+          <select
+            value={channel}
+            onChange={(event) =>
+              setChannel(
+                event.target.value === "push"
+                  ? "push"
+                  : event.target.value === "both"
+                    ? "both"
+                    : "whatsapp",
+              )
+            }
+            className={inputClass}
+          >
+            <option value="whatsapp">{t("channelWhatsapp")}</option>
+            <option value="push">{t("channelPush")}</option>
+            <option value="both">{t("channelBoth")}</option>
+          </select>
         </label>
         {error && (
           <p

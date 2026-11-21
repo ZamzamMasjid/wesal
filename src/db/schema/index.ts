@@ -47,6 +47,10 @@ export const staffUser = pgTable("staff_user", {
   notifyPhone: text("notify_phone"),
   /** Whether staff alerts go to `notifyPhone`. The owner is the fallback recipient. */
   notifyEnabled: boolean("notify_enabled").notNull().default(true),
+  /** How this person is alerted: push on registered devices, WhatsApp, or both. */
+  alertChannel: text("alert_channel", { enum: ["push", "whatsapp", "both"] })
+    .notNull()
+    .default("whatsapp"),
   /** The dashboard language alerts are written in. */
   locale: text("locale", { enum: ["ar", "en"] })
     .notNull()
@@ -96,6 +100,32 @@ export const staffAccount = pgTable(
     ...timestamps,
   },
   (t) => [index("staff_account_user_id_idx").on(t.userId)],
+);
+
+/**
+ * A phone or tablet registered for staff push notifications
+ * (docs/features/push-notifications). `token` is an Expo push token; the same
+ * device signing in again refreshes its user and `lastSeenAt`. Logout removes
+ * the row, and a token the provider reports as unregistered is deactivated.
+ */
+export const staffDevice = pgTable(
+  "staff_device",
+  {
+    id: bigint("id", { mode: "number" })
+      .primaryKey()
+      .generatedAlwaysAsIdentity(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => staffUser.id, { onDelete: "cascade" }),
+    token: text("token").notNull().unique(),
+    platform: text("platform", { enum: ["android", "ios"] }).notNull(),
+    active: boolean("active").notNull().default(true),
+    lastSeenAt: timestamp("last_seen_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    ...timestamps,
+  },
+  (t) => [index("staff_device_user_idx").on(t.userId, t.active)],
 );
 
 /** Short-lived tokens. Unused while there is no email flow; Better Auth expects it. */
@@ -442,7 +472,11 @@ export const outboxMessage = pgTable(
       .generatedAlwaysAsIdentity(),
     bookingId: integer("booking_id"),
     recipient: text("recipient").notNull(),
-    channel: text("channel", { enum: ["whatsapp", "sms"] }).notNull(),
+    /**
+     * `push` rows are addressed by staff user id; their devices are resolved when
+     * the message is sent (ADR-034).
+     */
+    channel: text("channel", { enum: ["whatsapp", "sms", "push"] }).notNull(),
     template: text("template", {
       enum: [
         "code",

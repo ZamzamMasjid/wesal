@@ -15,6 +15,7 @@ const profile: StaffProfile = {
   role: "staff",
   notifyPhone: "+201001234567",
   notifyEnabled: true,
+  alertChannel: "whatsapp",
   locale: "ar",
 };
 
@@ -50,6 +51,10 @@ describe("MyNotifications", () => {
     expect(screen.getByLabelText("Message language")).toHaveProperty(
       "value",
       "ar",
+    );
+    expect(screen.getByLabelText("How to alert me")).toHaveProperty(
+      "value",
+      "whatsapp",
     );
   });
 
@@ -90,6 +95,7 @@ describe("MyNotifications", () => {
         body: JSON.stringify({
           notifyPhone: "+201009876543",
           notifyEnabled: false,
+          alertChannel: "whatsapp",
           locale: "en",
         }),
       }),
@@ -118,6 +124,7 @@ describe("MyNotifications", () => {
         body: JSON.stringify({
           notifyPhone: null,
           notifyEnabled: true,
+          alertChannel: "whatsapp",
           locale: "ar",
         }),
       }),

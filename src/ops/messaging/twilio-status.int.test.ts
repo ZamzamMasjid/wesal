@@ -8,6 +8,7 @@ import { processOutbox, queueMessage } from "@/messaging/outbox";
 import { twilioSignature } from "@/messaging/twilio";
 import { openTestDb, resetDatabase } from "@/test/db";
 import { createFakeClock } from "@/test/fake-clock";
+import { createFakePush } from "@/test/fake-push";
 import { createFakeSender } from "@/test/fake-sender";
 import { createLogger } from "@/lib/logger";
 
@@ -17,6 +18,7 @@ const handle = openTestDb();
 const { db } = handle;
 const clock = createFakeClock();
 const sender = createFakeSender();
+const push = createFakePush();
 const logger = createLogger({ clock, write: () => undefined });
 
 const TOKEN = "test-auth-token";
@@ -40,6 +42,7 @@ const ctx = () => ({
 beforeEach(async () => {
   await resetDatabase(handle);
   sender.reset();
+  push.reset();
 });
 afterAll(() => handle.pool.end());
 
@@ -58,7 +61,7 @@ async function sendWhatsapp(): Promise<string> {
     },
     locale: "ar",
   });
-  await processOutbox({ db, sender, clock, logger });
+  await processOutbox({ db, sender, push, clock, logger });
   const [row] = await db.select().from(outboxMessage);
   return row!.providerMessageId!;
 }
@@ -112,7 +115,7 @@ describe("webhooks.twilio.status", () => {
       ctx(),
     );
     expect(result).toEqual({ ok: true, data: { outcome: "fell-back" } });
-    await processOutbox({ db, sender, clock, logger });
+    await processOutbox({ db, sender, push, clock, logger });
     expect(sender.sent.map((m) => m.channel)).toEqual(["whatsapp", "sms"]);
   });
 

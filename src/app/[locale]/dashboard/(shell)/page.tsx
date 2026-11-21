@@ -39,6 +39,7 @@ export default async function DashboardHome({
             role: me.data.role,
             notifyPhone: me.data.notifyPhone,
             notifyEnabled: me.data.notifyEnabled,
+            alertChannel: me.data.alertChannel,
             locale: me.data.locale,
           }}
         />
