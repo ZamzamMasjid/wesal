@@ -16,10 +16,15 @@ export default defineConfig({
   },
   projects: [{ name: "chromium", use: { ...devices["Desktop Chrome"] } }],
   webServer: {
-    // Production build: what ships is what is tested.
+    // Production build: what ships is what is tested. The journey needs a
+    // deliverable verification code without a real provider, so it logs instead.
     command: `npm run build && npm run start -- --port ${PORT}`,
     url: `http://localhost:${PORT}`,
     reuseExistingServer: !process.env.CI,
     timeout: 180_000,
+    env: {
+      MESSAGING_PROVIDER: "log",
+      BETTER_AUTH_URL: `http://localhost:${PORT}`,
+    },
   },
 });

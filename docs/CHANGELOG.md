@@ -198,3 +198,10 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Summary**: Venue photos and videos stream from the volume with byte-range support: a single `Range` header returns `206` with `Content-Range` and only that slice, an open-ended or suffix range is clamped to the file, a start past the end returns `416` with `bytes */size`, and several or malformed ranges fall back to the whole file. Every answer advertises `Accept-Ranges: bytes`, carries an `ETag` and `Cache-Control: public, max-age=31536000, immutable`, and answers a matching `If-None-Match` with `304`. A row whose file is gone answers `404` instead of an empty `200`.
 - **Affected Docs**: landing-page, phase-5-public-site
 - **Reason**: Implementing `phase-5-public-site/landing-page`, fourth item.
+
+## [2026-11-21] — End-to-end booking journey from the landing page
+
+- **Type**: Test
+- **Summary**: A Playwright test walks the whole customer path in Arabic and English: open the home page, pick an occasion card, land on the calendar carrying that occasion, open a free day, follow the slot's book link, submit the details, receive the verification code, hold the slot, open the private booking page and upload the transfer screenshot. It asserts the booking reaches `proof_submitted` with its file in the database, seeds its own verification code so it needs no provider, and removes its bookings, codes and files afterwards. The Playwright server now runs the log-only message sender and its own base URL.
+- **Affected Docs**: landing-page, phase-5-public-site
+- **Reason**: Implementing `phase-5-public-site/landing-page`, fifth item.
