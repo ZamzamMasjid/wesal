@@ -297,7 +297,8 @@
       "schedule": "جدول المواعيد",
       "content": "محتوى الموقع",
       "settings": "الإعدادات",
-      "staff": "الموظفون"
+      "staff": "الموظفون",
+      "reports": "التقارير"
     },
     "menu": {
       "role": {
@@ -574,6 +575,8 @@
       "sourceFilter": "المصدر",
       "allStatuses": "كل الحالات",
       "allSources": "كل المصادر",
+      "occasionFilter": "المناسبة",
+      "allOccasions": "كل المناسبات",
       "clearFilters": "مسح المرشحات",
       "loading": "جارٍ التحميل…",
       "loadFailed": "تعذّر تحميل الحجوزات.",
@@ -708,6 +711,40 @@
         "created": "أُضيف الحجز {bookingId}.",
         "failed": "حدث خطأ. حاول مرة أخرى."
       }
+    },
+    "reports": {
+      "title": "التقارير",
+      "previous": "الفترة السابقة",
+      "next": "الفترة التالية",
+      "period": "فترة التقرير",
+      "modeMonth": "شهر",
+      "modeRange": "فترة",
+      "modeYear": "سنة",
+      "month": "الشهر",
+      "year": "السنة",
+      "from": "من",
+      "to": "إلى",
+      "export": "تصدير",
+      "loading": "جارٍ تحميل الأرقام…",
+      "loadFailed": "تعذّر تحميل الأرقام.",
+      "retry": "أعد المحاولة",
+      "ownerOnly": "التقارير للمالك فقط.",
+      "empty": "لا حجوزات في هذه الفترة",
+      "byOccasion": "الحجوزات حسب المناسبة",
+      "byMonth": "الإيراد حسب الشهر",
+      "bookings": "الحجوزات",
+      "income": "الإيراد",
+      "occasion": "المناسبة",
+      "confirmed": "مؤكَّد",
+      "tileBookings": "الحجوزات المؤكَّدة",
+      "tileIncome": "الإيراد",
+      "tileDeposits": "العربون المسجَّل",
+      "tileOutstanding": "متبقٍّ غير مدفوع",
+      "source": "المصدر",
+      "sourceSplit": "عبر الإنترنت {online}، أدخلها الموظفون {staff}",
+      "notCompleted": "لم تكتمل",
+      "notCompletedBody": "{expired} حجزًا منتهيًا، {rejected} إثباتًا مرفوضًا",
+      "cancelled": "{count, plural, zero {لا حجوزات ملغاة} one {حجز واحد ملغى، مستبعد من الإيراد} two {حجزان ملغيان، مستبعدان من الإيراد} few {# حجوزات ملغاة، مستبعدة من الإيراد} other {# حجزًا ملغى، مستبعدًا من الإيراد}}"
     }
   }
 }

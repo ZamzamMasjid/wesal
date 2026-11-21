@@ -297,7 +297,8 @@
       "schedule": "Schedule",
       "content": "Content",
       "settings": "Settings",
-      "staff": "Staff"
+      "staff": "Staff",
+      "reports": "Reports"
     },
     "menu": {
       "role": {
@@ -574,6 +575,8 @@
       "sourceFilter": "Source",
       "allStatuses": "All statuses",
       "allSources": "All sources",
+      "occasionFilter": "Occasion",
+      "allOccasions": "All occasions",
       "clearFilters": "Clear filters",
       "loading": "Loading…",
       "loadFailed": "Could not load bookings.",
@@ -708,6 +711,40 @@
         "created": "Booking {bookingId} added.",
         "failed": "Something went wrong. Try again."
       }
+    },
+    "reports": {
+      "title": "Reports",
+      "previous": "Previous period",
+      "next": "Next period",
+      "period": "Report period",
+      "modeMonth": "Month",
+      "modeRange": "Range",
+      "modeYear": "Year",
+      "month": "Month",
+      "year": "Year",
+      "from": "From",
+      "to": "To",
+      "export": "Export",
+      "loading": "Loading figures…",
+      "loadFailed": "Could not load the figures.",
+      "retry": "Try again",
+      "ownerOnly": "Reports are for the owner only.",
+      "empty": "No bookings in this period",
+      "byOccasion": "Bookings by occasion",
+      "byMonth": "Income by month",
+      "bookings": "Bookings",
+      "income": "Income",
+      "occasion": "Occasion",
+      "confirmed": "confirmed",
+      "tileBookings": "Confirmed bookings",
+      "tileIncome": "Income",
+      "tileDeposits": "Deposits recorded",
+      "tileOutstanding": "Remainders outstanding",
+      "source": "Source",
+      "sourceSplit": "Online {online}, entered by staff {staff}",
+      "notCompleted": "Not completed",
+      "notCompletedBody": "{expired} expired holds, {rejected} rejected proofs",
+      "cancelled": "{count, plural, one {1 cancelled booking, excluded from income} other {# cancelled bookings, excluded from income}}"
     }
   }
 }

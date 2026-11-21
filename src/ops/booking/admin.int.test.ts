@@ -227,6 +227,25 @@ describe("staff.bookings.list", () => {
     ]);
   });
 
+  it("filters by occasion", async () => {
+    const [second] = await db
+      .insert(occasion)
+      .values(anOccasion({ nameAr: "خطوبة", nameEn: "Engagement" }))
+      .returning({ id: occasion.id });
+    await aStoredBooking({ publicId: "OCC001", status: "confirmed" });
+    await aStoredBooking({
+      publicId: "OCC002",
+      status: "confirmed",
+      occasionId: second?.id ?? 2,
+    });
+
+    const result = await ops.list({ occasionId: second?.id ?? 2 }, staff);
+
+    expect(result.ok && result.data.items.map((item) => item.bookingId)).toEqual(
+      ["OCC002"],
+    );
+  });
+
   it("reads a past date range newest first and a future one soonest first", async () => {
     await aStoredBooking({
       publicId: "DEC01X",

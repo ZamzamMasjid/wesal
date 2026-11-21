@@ -111,6 +111,7 @@ const listInput = z
     to: day.optional(),
     status: z.enum(BOOKING_STATUSES).optional(),
     source: z.enum(BOOKING_SOURCES).optional(),
+    occasionId: z.coerce.number().int().positive().optional(),
     q: z.string().trim().max(100).optional(),
     page: z.coerce.number().int().min(1).max(10_000).default(1),
   })
@@ -276,6 +277,9 @@ export function createAdminBookingOperations(resolve: () => AdminBookingDeps) {
         conditions.push(statusCondition(input.status, now));
       }
       if (input.source) conditions.push(eq(booking.source, input.source));
+      if (input.occasionId) {
+        conditions.push(eq(booking.occasionId, input.occasionId));
+      }
       if (input.q) conditions.push(searchCondition(input.q));
 
       const where = conditions.length ? and(...conditions) : undefined;

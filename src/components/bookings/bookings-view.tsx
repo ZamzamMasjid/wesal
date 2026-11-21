@@ -47,6 +47,7 @@ function hasFilters(filters: BookingsFilters): boolean {
     filters.to ||
     filters.status ||
     filters.source ||
+    filters.occasionId ||
     (filters.q && filters.q.trim()),
   );
 }
@@ -80,6 +81,7 @@ export function BookingsView({
     to: useId(),
     status: useId(),
     source: useId(),
+    occasion: useId(),
     filters: useId(),
   };
 
@@ -322,7 +324,7 @@ export function BookingsView({
 
         <div
           id={ids.filters}
-          className={`${filtersOpen ? "grid" : "hidden"} gap-3 rounded-lg bg-surface p-4 shadow-md md:grid md:grid-cols-4 md:items-end md:bg-transparent md:p-0 md:shadow-none`}
+          className={`${filtersOpen ? "grid" : "hidden"} gap-3 rounded-lg bg-surface p-4 shadow-md md:grid md:grid-cols-5 md:items-end md:bg-transparent md:p-0 md:shadow-none`}
         >
           <div className="space-y-1 text-sm">
             <label htmlFor={ids.from} className="font-medium">
@@ -404,6 +406,29 @@ export function BookingsView({
               {BOOKING_SOURCES.map((source) => (
                 <option key={source} value={source}>
                   {t(`source.${source}`)}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div className="space-y-1 text-sm">
+            <label htmlFor={ids.occasion} className="font-medium">
+              {t("occasionFilter")}
+            </label>
+            <select
+              id={ids.occasion}
+              value={filters.occasionId ?? ""}
+              onChange={(event) =>
+                applyFilters({
+                  ...filters,
+                  occasionId: Number(event.target.value) || undefined,
+                })
+              }
+              className="h-(--size-touch-dense) w-full rounded-full border border-border bg-surface px-3 outline-none focus-visible:ring-2 focus-visible:ring-focus"
+            >
+              <option value="">{t("allOccasions")}</option>
+              {occasions.map((occasion) => (
+                <option key={occasion.id} value={occasion.id}>
+                  {locale === "ar" ? occasion.nameAr : occasion.nameEn}
                 </option>
               ))}
             </select>

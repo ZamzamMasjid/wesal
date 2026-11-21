@@ -12,6 +12,7 @@ describe("navFor", () => {
       "bookings",
       "content",
       "schedule",
+      "reports",
       "settings",
       "staff",
     ]);

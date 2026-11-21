@@ -8,7 +8,7 @@ budgets: {}
 activities: []
 active:
   phase: phase-6-alerts-and-reports
-  section: booking-reports
+  section: null
 ---
 
 # Project Index
@@ -18,7 +18,7 @@ active:
 ## Active work
 
 - **Current phase**: phase-6-alerts-and-reports
-- **Current section**: booking-reports
+- **Current section**: <none>
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars
@@ -38,7 +38,7 @@ active:
 | `booking-hold` | Booking Hold | shipped | v1 | booking | phase-3-booking/booking-hold |
 | `booking-management` | Booking Management | shipped | v1 | back-office | phase-4-operations/booking-management |
 | `booking-page` | Booking Page | shipped | v1 | booking | phase-3-booking/booking-page |
-| `booking-reports` | Booking Reports | planned | later | reporting | phase-6-alerts-and-reports/booking-reports |
+| `booking-reports` | Booking Reports | shipped | later | reporting | phase-6-alerts-and-reports/booking-reports |
 | `content-management` | Content Management | shipped | v1 | public-site | phase-5-public-site/content-management |
 | `customer-mobile-app` | Customer Mobile App | planned | later | mobile-app | phase-7-mobile-app/customer-mobile-app |
 | `landing-page` | Landing Page | shipped | v1 | public-site | phase-5-public-site/landing-page |
@@ -155,6 +155,7 @@ active:
 | `ADR-029` | Staff log in with a username; Better Auth's email field holds a placeholder | Accepted | phase-2-foundations/staff-access |
 | `ADR-030` | Call Twilio over plain HTTP and give each channel five attempts with growing delays | Accepted | phase-2-foundations/message-delivery |
 | `ADR-031` | Use the WhatSend worker as a fee-free WhatsApp provider for now | Accepted | phase-2-foundations/message-delivery |
+| `ADR-032` | Export reports as a UTF-8 CSV file | Accepted | phase-6-alerts-and-reports/booking-reports |
 
 ## Recent changes
 

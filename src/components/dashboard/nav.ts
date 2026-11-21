@@ -6,7 +6,8 @@ export type NavItem = {
     | "/dashboard/content"
     | "/dashboard/staff"
     | "/dashboard/settings"
-    | "/dashboard/schedule";
+    | "/dashboard/schedule"
+    | "/dashboard/reports";
   label:
     | "home"
     | "review"
@@ -14,7 +15,8 @@ export type NavItem = {
     | "content"
     | "staff"
     | "settings"
-    | "schedule";
+    | "schedule"
+    | "reports";
   /** Only owners see it; the server enforces the same rule. */
   ownerOnly?: boolean;
 };
@@ -25,6 +27,7 @@ const ALL_ITEMS: NavItem[] = [
   { href: "/dashboard/bookings", label: "bookings" },
   { href: "/dashboard/content", label: "content", ownerOnly: true },
   { href: "/dashboard/schedule", label: "schedule", ownerOnly: true },
+  { href: "/dashboard/reports", label: "reports", ownerOnly: true },
   { href: "/dashboard/settings", label: "settings", ownerOnly: true },
   { href: "/dashboard/staff", label: "staff", ownerOnly: true },
 ];

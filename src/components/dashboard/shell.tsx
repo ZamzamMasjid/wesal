@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  BarChart3,
   CalendarClock,
   CalendarDays,
   Eye,
@@ -29,6 +30,7 @@ const icons = {
   schedule: CalendarClock,
   settings: Settings,
   staff: Users,
+  reports: BarChart3,
 } as const;
 
 interface ShellProps {

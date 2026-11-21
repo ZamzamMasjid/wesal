@@ -31,6 +31,8 @@ export interface BookingsFilters {
   to?: string;
   status?: AdminBookingStatus;
   source?: AdminBookingSource;
+  /** Only bookings of one occasion. */
+  occasionId?: number;
   /** Name, phone or booking ID. */
   q?: string;
   page?: number;
@@ -140,6 +142,7 @@ export function filtersToQuery(filters: BookingsFilters): string {
   if (filters.to) query.set("to", filters.to);
   if (filters.status) query.set("status", filters.status);
   if (filters.source) query.set("source", filters.source);
+  if (filters.occasionId) query.set("occasionId", String(filters.occasionId));
   if (filters.q?.trim()) query.set("q", filters.q.trim());
   if (filters.page && filters.page > 1) query.set("page", String(filters.page));
   const value = query.toString();
@@ -174,6 +177,10 @@ export function parseFilters(
   const source = read("source");
   if ((BOOKING_SOURCES as readonly string[]).includes(source)) {
     filters.source = source as AdminBookingSource;
+  }
+  const occasionId = Number(read("occasionId"));
+  if (Number.isInteger(occasionId) && occasionId > 0) {
+    filters.occasionId = occasionId;
   }
   const q = read("q");
   if (q) filters.q = q.slice(0, 100);

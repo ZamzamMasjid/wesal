@@ -2,7 +2,7 @@
 id: booking-reports
 type: feature
 title: Booking Reports
-status: in-progress
+status: shipped
 last_modified: 2026-11-21
 milestone: later
 pillar: reporting

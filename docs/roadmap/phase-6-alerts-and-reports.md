@@ -34,4 +34,4 @@ The first push (phases 1 to 5) shipped, with real bookings accumulated for repor
 Owner reports on bookings and income.
 
 - [x] Implement reports API: bookings and income by month and occasion
-- [ ] Implement reports view with period filter and export
+- [x] Implement reports view with period filter and export
