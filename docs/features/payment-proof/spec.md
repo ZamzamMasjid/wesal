@@ -3,7 +3,7 @@ id: payment-proof
 type: feature
 title: Payment Proof
 status: planned
-last_modified: 2026-11-15
+last_modified: 2026-11-21
 milestone: v1
 pillar: booking
 depends_on: [booking-page]
@@ -22,9 +22,9 @@ Lets the customer show they have transferred the deposit. The screenshot is the 
 
 ## Behavior
 
-On the booking page, while the booking is held, the customer uploads a screenshot of the transfer. The upload stops the countdown, the booking becomes "awaiting review", and the owner and staff are alerted. Alternatively the customer taps a WhatsApp button that opens a chat with the venue, prefilled with the booking ID, and sends the screenshot there; staff then mark the proof as received in the dashboard, which has the same effect.
+On the booking page, while the booking is held or awaiting review, the customer uploads a screenshot of the transfer. The upload stops the countdown, the booking becomes "awaiting review", and the owner and staff are alerted. A second upload while awaiting review adds another proof, and staff see the newest first. Alternatively the customer taps a WhatsApp button that opens a chat with the venue, prefilled with the booking ID, and sends the screenshot there; staff then mark the proof as received in the dashboard, which has the same effect.
 
-Screenshots are kept for one day. After that the file is deleted; the owner saves any he wants to keep. The record that a proof was provided remains.
+Screenshots are kept for one day, but never deleted while the booking still awaits review. After that the file is deleted; the owner saves any he wants to keep. The record that a proof was provided remains.
 
 ## Data
 
@@ -61,4 +61,4 @@ Files are stored on the app machine's volume and are served only to logged-in st
 
 ## Open questions
 
-- Purge timing. The owner asked to keep screenshots for one day only. A proof uploaded late in the evening and not yet reviewed should not vanish before review; the proposed rule is: purge a day after upload, but never while the booking is still awaiting review. Needs the owner's confirmation.
+None. A file older than a day is purged unless its booking is still awaiting review; such a file is purged on the first daily run after staff decide.

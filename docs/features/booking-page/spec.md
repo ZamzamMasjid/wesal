@@ -3,7 +3,7 @@ id: booking-page
 type: feature
 title: Booking Page
 status: shipped
-last_modified: 2026-11-20
+last_modified: 2026-11-21
 milestone: v1
 pillar: booking
 depends_on: [booking-hold]
@@ -22,7 +22,7 @@ The customer's private page for one booking. It tells them exactly how to pay, h
 
 ## Behavior
 
-The page is reached by the link sent over WhatsApp or SMS, or by typing the booking ID on the site. It shows:
+The page is reached by the link sent over WhatsApp (or SMS when the Twilio provider is configured), or by typing the booking ID on the site. It shows:
 
 - The occasion, date and slot, and the customer's name.
 - While held: the Vodafone Cash number and InstaPay address, the deposit amount, the booking ID, and a countdown to the deadline, with the upload action (see `payment-proof`).

@@ -3,12 +3,12 @@ id: booking-hold
 type: feature
 title: Booking Hold
 status: shipped
-last_modified: 2026-11-20
+last_modified: 2026-11-21
 milestone: v1
 pillar: booking
 depends_on: [public-calendar, phone-verification, venue-settings, message-delivery]
 views: [booking-form]
-adrs: [ADR-002, ADR-003, ADR-009, ADR-010, ADR-012, ADR-015, ADR-018, ADR-021, ADR-022]
+adrs: [ADR-002, ADR-003, ADR-009, ADR-010, ADR-012, ADR-015, ADR-018, ADR-021, ADR-022, ADR-031]
 roadmap_sections: [phase-3-booking/booking-hold]
 architecture: [overview, data-model, flows, testing]
 components: [web, postgres]
@@ -48,7 +48,7 @@ The price is the occasion's price at the time of booking; the deposit is the sit
 1. Customer selects a free slot, chooses the occasion, enters name and phone.
 2. Receives and enters the verification code.
 3. The hold is created; the booking page opens with the countdown.
-4. A message with the booking link arrives by WhatsApp, or SMS if WhatsApp is unavailable.
+4. A message with the booking link arrives by WhatsApp. With the Twilio provider it falls back to SMS; with the WhatSend worker it is WhatsApp only (ADR-031).
 
 **Losing a race.**
 

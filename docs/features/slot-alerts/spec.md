@@ -3,12 +3,12 @@ id: slot-alerts
 type: feature
 title: Slot Alerts
 status: planned
-last_modified: 2026-11-15
+last_modified: 2026-11-21
 milestone: later
 pillar: availability
 depends_on: [public-calendar, phone-verification, message-delivery]
 views: [slot-alert-signup]
-adrs: [ADR-011, ADR-018]
+adrs: [ADR-011, ADR-018, ADR-031]
 roadmap_sections: [phase-6-alerts-and-reports/slot-alerts]
 architecture: [data-model, flows, testing]
 components: [web, postgres]
@@ -24,7 +24,7 @@ Deferred from the initial cut: the calendar already shows provisional slots so p
 
 ## Behavior
 
-On a slot that is awaiting payment or awaiting review, the visitor can tap "Notify me". They enter and verify their phone, and are subscribed to that slot. If the booking on it expires or is rejected, every subscriber receives a WhatsApp or SMS message with a link straight to the booking form for that slot. Being notified reserves nothing: the first subscriber to complete a hold gets the slot.
+On a slot that is awaiting payment or awaiting review, the visitor can tap "Notify me". They enter and verify their phone, and are subscribed to that slot. If the booking on it expires or is rejected, every subscriber receives a WhatsApp message with a link straight to the booking form for that slot (SMS only under the Twilio provider, ADR-031). Being notified reserves nothing: the first subscriber to complete a hold gets the slot.
 
 Subscriptions end when the slot is confirmed, when its start time passes, or after one notification.
 

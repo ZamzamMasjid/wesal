@@ -3,12 +3,12 @@ id: phone-verification
 type: feature
 title: Phone Verification
 status: shipped
-last_modified: 2026-11-17
+last_modified: 2026-11-21
 milestone: v1
 pillar: booking
 depends_on: [message-delivery]
 views: []
-adrs: [ADR-011, ADR-016, ADR-018]
+adrs: [ADR-011, ADR-016, ADR-018, ADR-031]
 roadmap_sections: [phase-2-foundations/phone-verification]
 architecture: [auth, flows, testing]
 components: [web, postgres]
@@ -22,9 +22,9 @@ Proves that a customer controls the phone number they entered before any slot is
 
 ## Behavior
 
-When the customer submits the booking form, a six-digit code is sent to their phone by WhatsApp, or by SMS if WhatsApp cannot deliver. They enter the code; if it matches, the hold is created. The code is valid for five minutes and for five attempts. The customer can ask for a new code after 60 seconds.
+When the customer submits the booking form, a six-digit code is sent to their phone by WhatsApp. With the Twilio provider an SMS is attempted when WhatsApp cannot deliver; with the WhatSend worker there is no SMS channel, so a WhatsApp failure is final (ADR-031). They enter the code; if it matches, the hold is created. The code is valid for five minutes and for five attempts. The customer can ask for a new code after 60 seconds.
 
-If the code cannot be delivered on either channel, no hold is created. The page says codes cannot be sent right now and shows the venue's phone number and WhatsApp so the booking can be made by contacting the owner.
+If the code cannot be delivered on any channel the provider offers, no hold is created. The page says codes cannot be sent right now and shows the venue's phone number and WhatsApp so the booking can be made by contacting the owner.
 
 Verification creates no account and no login; it proves control of the phone once.
 

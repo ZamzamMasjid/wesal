@@ -3,7 +3,7 @@ id: venue-settings
 type: feature
 title: Venue Settings
 status: shipped
-last_modified: 2026-11-16
+last_modified: 2026-11-21
 milestone: v1
 pillar: back-office
 depends_on: [staff-access]
@@ -42,8 +42,9 @@ Changes take effect for new bookings. A booking already made keeps the price and
 - `GET /api/v1/occasions` — public; active occasions with prices.
 - `GET /api/v1/staff/occasions`, `POST`, `PATCH /{id}` — owner only.
 - `GET /api/v1/staff/settings`, `PUT /api/v1/staff/settings` — owner only; PUT takes every field and an empty payment field means "not set".
-- `GET /api/v1/payment-details` — returned only as part of a booking page, never listed publicly on its own.
 - `/dashboard/settings`
+
+Payment details have no public endpoint of their own. They reach a customer only inside the booking-page payload, and only while that booking is held.
 
 ## Workflows
 

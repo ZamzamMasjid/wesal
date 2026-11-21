@@ -2,8 +2,8 @@
 id: auth
 type: architecture
 title: Access and Trust Boundaries
-last_modified: 2026-11-15
-review: draft
+last_modified: 2026-11-21
+review: reviewed
 depends_on: [overview]
 components: []
 ---
@@ -48,7 +48,7 @@ There is one trust boundary, the JSON API in `web`, with four levels of access b
 
 ## Staff authentication
 
-Better Auth with password login; users and sessions are stored in `postgres` (ADR-004). Sessions are HTTP-only, secure, same-site cookies. Roles are a field on the staff user. Only the owner creates, disables or resets staff accounts; there is no self-registration and no public sign-up route. A disabled account's sessions stop working immediately.
+Better Auth with password login; the login identifier is a username, stored with a placeholder email (ADR-029). Users and sessions are stored in `postgres` (ADR-004). Sessions are HTTP-only, secure, same-site cookies. Roles are a field on the staff user. Only the owner creates, disables or resets staff accounts; there is no self-registration and no public sign-up route. A disabled account's sessions stop working immediately.
 
 Every staff endpoint passes through one authorization guard that checks session, active flag and role. Owner-only endpoints declare it in the route definition, so a missing check is visible in code review and coverable by one table-driven integration test.
 
@@ -56,18 +56,18 @@ Every staff endpoint passes through one authorization guard that checks session,
 
 Customers never log in. A booking is reachable two ways:
 
-- **Link token.** A long random token in the booking page URL, sent by WhatsApp or SMS. Holding the link is holding the booking.
+- **Link token.** A long random token in the booking page URL, sent by WhatsApp (or SMS when the Twilio provider is configured). Holding the link is holding the booking.
 - **Booking ID.** A short random code (not sequential, not derived from the date or phone) that the customer can type on the site. Lookup is rate-limited per IP and returns the same "not found" for wrong and nonexistent IDs.
 
 Lookup by phone number does not exist: it would let anyone who knows a family's number see their occasion and date.
 
-What a holder can see is limited to that booking: occasion, slot, status, deposit, transfer details and countdown. What they can do is upload proof while the booking is `held`. They cannot cancel or change it; those happen offline through the owner.
+What a holder can see is limited to that booking: occasion, slot, status, deposit, transfer details and countdown. What they can do is upload proof while the booking is `held` or awaiting review; a second upload while awaiting review adds another proof, and staff see the newest first. Once staff decide, the holder can only read. They cannot cancel or change the booking; that happens offline through the owner.
 
 ## Phone verification
 
 A hold requires a phone that received a code in the last few minutes. The code is stored hashed, expires quickly, allows a small number of attempts, and requests are rate-limited per phone and per IP. A successful check returns a short-lived verified-phone token bound to that phone; the create-hold endpoint requires it and rejects a token for a different phone. Verification proves control of the phone once; it creates no session and no account.
 
-If the code cannot be delivered on either channel, no hold is created (ADR-016).
+If the code cannot be delivered on any channel the provider offers, no hold is created (ADR-016).
 
 ## Screenshots
 
@@ -75,7 +75,7 @@ Payment screenshots are served only through a staff endpoint behind the guard. T
 
 ## Webhooks
 
-The Twilio status webhook is the one endpoint called by a machine. It is authenticated by Twilio's request signature and accepts only delivery-status updates for messages Wesal sent.
+The Twilio status webhook is the one endpoint called by a machine. It exists only while the Twilio provider is selected, is authenticated by Twilio's request signature, and accepts only delivery-status updates for messages Wesal sent. The WhatSend worker sends no callbacks, so in that mode a message's delivery is unconfirmed and nothing arrives on that route (ADR-031).
 
 ## Audit
 
@@ -86,7 +86,8 @@ Every staff action that changes a booking or a setting writes an append-only row
 | Dependency | If unavailable | Degrades or stops |
 |---|---|---|
 | `postgres` | No session can be checked | Stops; staff endpoints refuse rather than allow |
-| Twilio | No codes | Degrades; no new online holds, staff login unaffected |
+| Twilio (Twilio mode) | No codes | Degrades; no new online holds, staff login unaffected |
+| WhatSend worker down or unlinked (WhatSend mode) | No codes, and no SMS fallback exists | Degrades; no new online holds, staff login unaffected; `/health` reports the session state when the worker still answers |
 
 ## Constraints
 
@@ -106,3 +107,5 @@ Every staff action that changes a booking or a setting writes an append-only row
 - ADR-012 — JSON API from day one, used by the web UI
 - ADR-013 — Staff alert carries a link, not the image
 - ADR-016 — A failed verification stops the booking
+- ADR-029 — Username login with a placeholder email
+- ADR-031 — The WhatSend worker as a fee-free WhatsApp provider for now

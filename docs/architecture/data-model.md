@@ -2,8 +2,8 @@
 id: data-model
 type: architecture
 title: Data Model
-last_modified: 2026-11-16
-review: draft
+last_modified: 2026-11-21
+review: reviewed
 depends_on: [overview]
 components: []
 ---
@@ -112,10 +112,11 @@ erDiagram
   BOOKING ||--o{ OUTBOX_MESSAGE : "triggers"
   BOOKING ||--o{ AUDIT_LOG : "recorded in"
   STAFF_USER ||--o{ AUDIT_LOG : "acts in"
-  STAFF_USER ||--o{ BOOKING : "enters (staff source)"
 ```
 
 The diagram shows three groups. **Schedule**: the weekly pattern, and date exceptions that either close a date or replace its slots. **Bookings**: a booking with its proofs, the messages it triggers and its audit trail. **Venue**: occasions, the single settings row, site content, media and staff.
+
+Better Auth's session, account and verification tables belong to `web` (ADR-004) and are omitted from the domain ER; `booking.source` records whether staff entered the booking, and the audit row names the staff user who did.
 
 Two points are easy to miss. First, slots are not stored rows: a date's slots are computed from the pattern and exceptions. A booking stores its own start and end timestamps, so later schedule edits never alter an existing booking. Second, a booking snapshots the occasion's price and the deposit at creation, so later price changes never alter what a customer was quoted.
 
@@ -163,7 +164,7 @@ Public slot states map from this: free (no active booking), awaiting payment (`h
 
 ## Retention
 
-- Payment screenshots are kept for one day. A daily job deletes the file and stamps `purged_at`; the row stays so the audit trail still shows that a proof existed.
+- Payment screenshots are kept for one day, but a file is never deleted while its booking is still awaiting review. The daily job purges files older than a day whose booking has left `proof_submitted`, and stamps `purged_at`; a proof that has awaited review for days is purged on the first daily run after staff decide. The row stays so the audit trail still shows that a proof existed.
 - Booking records and the audit log are kept; nothing else has a stated retention rule.
 - Phone verification rows and sent outbox rows may be pruned by the sweep once they are no longer needed.
 

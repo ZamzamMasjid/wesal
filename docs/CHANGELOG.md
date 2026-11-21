@@ -108,3 +108,9 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Affected Docs**: booking-page, booking-status (view), phase-3-booking
 - **Reason**: Implementing `phase-3-booking/booking-page`.
 
+## [2026-11-21] — Architecture review: the WhatSend provider and four review findings
+
+- **Type**: Design Change
+- **Summary**: The architecture now describes both messaging providers. The overview's context and component diagrams, contracts table, secrets, deployment section and failure table include the WhatSend worker as an external Fly app with its own volume (`ADR-031`); Twilio remains the only provider with an SMS fallback and delivery callbacks. `flows` and `auth` carry the same provider split in their failure tables, and flow 5 shows the no-SMS branch. The health endpoint reports the worker's session state in WhatSend mode without failing the check. Channel capability is now stated as the provider's, so no spec promises an SMS fallback under a WhatsApp-only provider. Proof upload is allowed while held or awaiting review, and the one-day purge skips files whose booking still awaits review (`ADR-005`). The booking page joins the calendar in the 30-second polling window, and `ADR-031` gains its alternatives table.
+- **Affected Docs**: overview, auth, flows, data-model, ADR-005, ADR-031, message-delivery, phone-verification, staff-notifications, payment-proof, booking-hold, booking-page, slot-alerts, venue-settings
+- **Reason**: `axiom:architect --review` found the provider decision and the failure plan out of step with the shipped WhatSend adapter, plus a stale proof-upload rule, a phantom payment-details endpoint and an unrecorded purge rule. The owner settled re-upload and purge in review.

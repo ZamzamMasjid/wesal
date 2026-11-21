@@ -3,12 +3,12 @@ id: staff-notifications
 type: feature
 title: Staff Notifications
 status: planned
-last_modified: 2026-11-15
+last_modified: 2026-11-21
 milestone: v1
 pillar: messaging
 depends_on: [message-delivery, staff-access, payment-proof]
 views: []
-adrs: [ADR-011, ADR-013, ADR-018]
+adrs: [ADR-011, ADR-013, ADR-018, ADR-031]
 roadmap_sections: [phase-4-operations/staff-notifications]
 architecture: [flows, auth, testing]
 components: [web, postgres]
@@ -22,7 +22,7 @@ Tells the owner and staff that something needs them, so nobody has to keep the d
 
 ## Behavior
 
-Two events send an alert by WhatsApp, with SMS as fallback:
+Two events send an alert by WhatsApp. With the Twilio provider an SMS is attempted when WhatsApp cannot deliver; with the WhatSend worker there is no SMS fallback, so an undelivered alert is lost (ADR-031). The events are:
 
 - **A payment proof was uploaded.** The message gives the occasion, date, slot, customer name and deposit amount, and a link that opens that booking's review page.
 - **An urgent hold was created**, for a slot starting soon. The message says the slot is close and to watch for the proof.

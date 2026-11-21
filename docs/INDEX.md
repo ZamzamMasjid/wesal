@@ -2,7 +2,7 @@
 id: index
 type: index
 title: Project Index
-last_modified: 2026-11-20
+last_modified: 2026-11-21
 generated_by: axiom:reindex
 budgets: {}
 activities: []
