@@ -103,6 +103,17 @@ describe("ProofUpload", () => {
     expect(screen.queryByRole("link", { name: /WhatsApp/ })).toBeNull();
   });
 
+  it("keeps the file input out of the tab order and the accessibility tree", () => {
+    renderUpload();
+
+    const input = document.querySelector(
+      'input[type="file"]',
+    ) as HTMLInputElement;
+    // The visible button is the only upload control; a keyboard or screen-reader
+    // user must not meet a second, invisible one.
+    expect(input.hidden).toBe(true);
+  });
+
   it("refuses a file that is not an accepted image before sending", () => {
     renderUpload();
 

@@ -147,8 +147,7 @@ export function ProofUpload({
         ref={inputRef}
         type="file"
         accept={PROOF_ACCEPT}
-        className="sr-only"
-        aria-label={status === "held" ? t("action") : t("actionAnother")}
+        hidden
         onChange={onChosen}
       />
 
