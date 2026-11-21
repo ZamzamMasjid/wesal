@@ -1,8 +1,8 @@
-"use client";
+﻿"use client";
 
 import { Inbox, Plus, Search } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useEffect, useId, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 
 import { AddBookingDialog } from "@/components/bookings/add-booking-dialog";
 import { BookingDetailPanel } from "@/components/bookings/booking-detail-panel";
@@ -58,6 +58,8 @@ interface Props {
   occasions: BookingOccasionOption[];
   /** Today in the venue's time zone, the earliest date a manual entry offers. */
   today: string;
+  /** The server could not read the list; the view still renders its filters. */
+  initialError?: boolean;
 }
 
 export function BookingsView({
@@ -66,6 +68,7 @@ export function BookingsView({
   initialDetail,
   occasions,
   today,
+  initialError = false,
 }: Props) {
   const t = useTranslations("Dashboard.bookings");
   const statusLabels = useTranslations("Dashboard.bookings.status");
@@ -84,7 +87,7 @@ export function BookingsView({
   const [searchText, setSearchText] = useState(initialFilters.q ?? "");
   const [data, setData] = useState(initial);
   const [loading, setLoading] = useState(false);
-  const [offline, setOffline] = useState(false);
+  const [offline, setOffline] = useState(initialError);
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [addOpen, setAddOpen] = useState(false);
   const [detail, setDetail] = useState(initialDetail);
@@ -93,22 +96,77 @@ export function BookingsView({
   const [notice, setNotice] = useState<string | null>(null);
 
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const restoreId = useRef<string | null>(null);
+  const asideRef = useRef<HTMLElement>(null);
+  const restoreId = useRef<string | null>(initialDetail?.bookingId ?? null);
 
-  // Opening moves focus into the panel; closing returns it to the row that was
-  // opened, as the view doc requires.
-  useEffect(() => {
-    if (detail) {
-      headingRef.current?.focus();
-      return;
-    }
+  // A range the server refuses (From after To) is a form problem, not a load
+  // failure: the filters stay usable and nothing is fetched until it is fixed.
+  const rangeInvalid = Boolean(
+    filters.from && filters.to && filters.from > filters.to,
+  );
+
+  const closeDetail = useCallback(() => {
+    // The list is still rendered behind the panel, so the row can take focus
+    // before the panel goes away; waiting for the effect races the route update.
     if (restoreId.current) {
-      document
-        .querySelector<HTMLElement>(`[data-booking-row="${restoreId.current}"]`)
-        ?.focus();
+      const candidates = Array.from(
+        document.querySelectorAll<HTMLElement>(
+          `[data-booking-row="${restoreId.current}"]`,
+        ),
+      );
+      const target =
+        candidates.find((element) => element.offsetWidth > 0) ?? candidates[0];
+      target?.focus();
       restoreId.current = null;
     }
+    setDetail(null);
+    setDetailError(false);
+    const params = new URLSearchParams(filtersToQuery(filters).slice(1));
+    const query = params.toString();
+    router.replace(`/dashboard/bookings${query ? `?${query}` : ""}`, {
+      scroll: false,
+    });
+  }, [filters, router]);
+
+  // Opening moves focus into the panel.
+  useEffect(() => {
+    if (detail) headingRef.current?.focus();
   }, [detail]);
+
+  // Below `xl` the detail covers the page, so it behaves as a modal: Tab stays
+  // inside it and Escape closes it. At `xl` it sits beside the list and neither
+  // applies.
+  useEffect(() => {
+    if (!detail) return;
+    function onKeyDown(event: KeyboardEvent) {
+      // A dialog owns Escape while it is open (Radix closes it itself).
+      if (document.querySelector('[role="dialog"]')) return;
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeDetail();
+        return;
+      }
+      if (event.key !== "Tab" || !asideRef.current) return;
+      if (window.matchMedia("(min-width: 80rem)").matches) return;
+      const focusable = Array.from(
+        asideRef.current.querySelectorAll<HTMLElement>(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+        ),
+      ).filter((element) => element.getClientRects().length > 0);
+      if (focusable.length === 0) return;
+      const first = focusable[0]!;
+      const last = focusable[focusable.length - 1]!;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    }
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [detail, closeDetail]);
 
   function syncUrl(next: BookingsFilters, bookingId?: string | null) {
     const params = new URLSearchParams(filtersToQuery(next).slice(1));
@@ -120,6 +178,12 @@ export function BookingsView({
   }
 
   async function load(next: BookingsFilters, bookingId?: string | null) {
+    if (next.from && next.to && next.from > next.to) {
+      // The server would refuse this range; keep it in the URL and let the form
+      // explain it instead of replacing the page with a load error.
+      syncUrl(next, bookingId);
+      return;
+    }
     setLoading(true);
     const result = await fetchBookings(next);
     setLoading(false);
@@ -160,12 +224,6 @@ export function BookingsView({
     } else {
       setDetailError(true);
     }
-  }
-
-  function closeDetail() {
-    setDetail(null);
-    setDetailError(false);
-    syncUrl(filters);
   }
 
   async function refreshCurrent() {
@@ -351,6 +409,15 @@ export function BookingsView({
             </select>
           </div>
         </div>
+
+        {rangeInvalid && (
+          <p
+            role="alert"
+            className="rounded-lg bg-danger-soft p-3 text-sm text-danger"
+          >
+            {t("invalidRange")}
+          </p>
+        )}
       </div>
 
       {notice && (
@@ -365,16 +432,19 @@ export function BookingsView({
       <div
         className={
           panelOpen
-            ? "grid gap-6 lg:grid-cols-[minmax(0,1fr)_24rem] lg:items-start"
+            ? "grid gap-6 xl:grid-cols-[minmax(0,1fr)_20rem] xl:items-start"
             : ""
         }
       >
-        <div className="min-w-0 space-y-3">
+        <div
+          className={`min-w-0 space-y-3 ${loading ? "opacity-70 transition-opacity" : ""}`}
+          aria-busy={loading}
+        >
           <p role="status" className="text-sm text-muted">
             {t("count", { count: data.total })}
           </p>
 
-          {offline && (
+          {offline && !rangeInvalid && (
             <div
               role="alert"
               className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-warning-soft px-4 py-3 text-sm text-warning"
@@ -391,7 +461,7 @@ export function BookingsView({
             </div>
           )}
 
-          {loading && data.items.length === 0 ? (
+          {rangeInvalid ? null : loading && data.items.length === 0 ? (
             <div className="space-y-2" aria-hidden>
               {Array.from({ length: 5 }, (_, index) => (
                 <div
@@ -429,94 +499,116 @@ export function BookingsView({
             </div>
           ) : (
             <>
-              <table className="hidden w-full overflow-hidden rounded-lg bg-surface text-sm shadow-md md:table">
-                <caption className="sr-only">{t("title")}</caption>
-                <thead>
-                  <tr className="border-b border-border text-start text-xs text-muted">
-                    <th scope="col" className="p-3 text-start font-medium">
-                      {t("columns.when")}
-                    </th>
-                    <th scope="col" className="p-3 text-start font-medium">
-                      {t("columns.occasion")}
-                    </th>
-                    <th scope="col" className="p-3 text-start font-medium">
-                      {t("columns.customer")}
-                    </th>
-                    <th scope="col" className="p-3 text-start font-medium">
-                      {t("columns.status")}
-                    </th>
-                    <th scope="col" className="p-3 text-start font-medium">
-                      {t("columns.source")}
-                    </th>
-                    <th scope="col" className="p-3 text-start font-medium">
-                      {t("columns.remainder")}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.items.map((item) => (
-                    <tr
-                      key={item.id}
-                      className="border-b border-border last:border-0 hover:bg-fill/60"
-                    >
-                      <td className="p-1">
-                        <button
-                          type="button"
-                          data-booking-row={item.bookingId}
-                          aria-label={t("open", { bookingId: item.bookingId })}
-                          onClick={() => void openDetail(item)}
-                          className="w-full rounded-md p-2 text-start focus-visible:ring-2 focus-visible:ring-focus"
-                        >
-                          <span className="block">
-                            {longDayLabel(item.day, locale)}
-                          </span>
-                          <span className="block text-xs text-muted">
-                            <bdi className="font-mono tabular-nums">
-                              {formatTime(item.start, locale)}
-                            </bdi>
-                            <span aria-hidden="true"> – </span>
-                            <bdi className="font-mono tabular-nums">
-                              {formatTime(item.end, locale)}
-                            </bdi>
-                          </span>
-                        </button>
-                      </td>
-                      <td className="p-3">
-                        {locale === "ar"
-                          ? item.occasion.nameAr
-                          : item.occasion.nameEn}
-                      </td>
-                      <td className="p-3">
-                        <span className="block">{item.customerName}</span>
-                        <bdi
-                          dir="ltr"
-                          className="block font-mono text-xs text-muted"
-                        >
-                          {item.customerPhone}
-                        </bdi>
-                      </td>
-                      <td className="p-3">
-                        <BookingStatusBadge status={item.status} />
-                      </td>
-                      <td className="p-3 text-xs text-muted">
-                        {t(`source.${item.source}`)}
-                      </td>
-                      <td className="p-3">
-                        <span className="block font-mono tabular-nums">
-                          {money(locale, item.remainderEgp)}
-                        </span>
-                        <span className="block text-xs text-muted">
-                          {item.remainderPaid
-                            ? t("remainder.paid")
-                            : t("remainder.unpaid")}
-                        </span>
-                      </td>
+              <div className="hidden overflow-x-auto rounded-lg bg-surface shadow-md lg:block">
+                <table className="w-full text-sm">
+                  <caption className="sr-only">{t("title")}</caption>
+                  <thead>
+                    <tr className="border-b border-border text-start text-xs text-muted">
+                      <th
+                        scope="col"
+                        className="px-1.5 py-2 text-start font-medium"
+                      >
+                        {t("columns.when")}
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-1.5 py-2 text-start font-medium"
+                      >
+                        {t("columns.occasion")}
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-1.5 py-2 text-start font-medium"
+                      >
+                        {t("columns.customer")}
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-1.5 py-2 text-start font-medium"
+                      >
+                        {t("columns.status")}
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-1.5 py-2 text-start font-medium"
+                      >
+                        {t("columns.source")}
+                      </th>
+                      <th
+                        scope="col"
+                        className="px-1.5 py-2 text-start font-medium"
+                      >
+                        {t("columns.remainder")}
+                      </th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {data.items.map((item) => (
+                      <tr
+                        key={item.id}
+                        className="border-b border-border last:border-0 hover:bg-fill/60"
+                      >
+                        <td className="p-1">
+                          <button
+                            type="button"
+                            data-booking-row={item.bookingId}
+                            aria-label={t("open", {
+                              bookingId: item.bookingId,
+                            })}
+                            onClick={() => void openDetail(item)}
+                            className="w-full rounded-md p-2 text-start focus-visible:ring-2 focus-visible:ring-focus"
+                          >
+                            <span className="block whitespace-nowrap">
+                              {longDayLabel(item.day, locale)}
+                            </span>
+                            <span className="block whitespace-nowrap text-xs text-muted">
+                              <bdi className="font-mono tabular-nums">
+                                {formatTime(item.start, locale)}
+                              </bdi>
+                              <span aria-hidden="true"> â€“ </span>
+                              <bdi className="font-mono tabular-nums">
+                                {formatTime(item.end, locale)}
+                              </bdi>
+                            </span>
+                          </button>
+                        </td>
+                        <td className="px-1.5 py-2">
+                          {locale === "ar"
+                            ? item.occasion.nameAr
+                            : item.occasion.nameEn}
+                        </td>
+                        <td className="px-1.5 py-2">
+                          <span className="block">{item.customerName}</span>
+                          <bdi
+                            dir="ltr"
+                            className="block font-mono text-xs text-muted"
+                          >
+                            {item.customerPhone}
+                          </bdi>
+                        </td>
+                        <td className="px-1.5 py-2">
+                          <BookingStatusBadge status={item.status} />
+                        </td>
+                        <td className="px-1.5 py-2 text-xs text-muted">
+                          {t(`source.${item.source}`)}
+                        </td>
+                        <td className="px-1.5 py-2">
+                          <span className="block whitespace-nowrap font-mono tabular-nums">
+                            {money(locale, item.remainderEgp)}
+                          </span>
+                          <span className="block text-xs whitespace-nowrap text-muted">
+                            {item.remainderPaid
+                              ? t("remainder.paid")
+                              : t("remainder.unpaid")}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-              <ul className="space-y-2 md:hidden">
+              <ul className="space-y-2 lg:hidden">
                 {data.items.map((item) => (
                   <li key={item.id}>
                     <button
@@ -536,11 +628,11 @@ export function BookingsView({
                       </div>
                       <p className="text-sm text-muted">
                         {longDayLabel(item.day, locale)}
-                        <span aria-hidden="true"> · </span>
+                        <span aria-hidden="true"> Â· </span>
                         <bdi className="font-mono tabular-nums">
                           {formatTime(item.start, locale)}
                         </bdi>
-                        <span aria-hidden="true"> – </span>
+                        <span aria-hidden="true"> â€“ </span>
                         <bdi className="font-mono tabular-nums">
                           {formatTime(item.end, locale)}
                         </bdi>
@@ -597,13 +689,14 @@ export function BookingsView({
           <>
             <div
               aria-hidden
-              className="fixed inset-0 z-20 bg-overlay lg:hidden"
+              className="fixed inset-0 z-20 bg-overlay xl:hidden"
               onClick={closeDetail}
             />
             <aside
+              ref={asideRef}
               role="region"
-              aria-label={t("title")}
-              className="fixed inset-0 z-30 overflow-y-auto bg-bg p-4 md:inset-4 md:rounded-lg md:bg-surface md:shadow-lg lg:sticky lg:inset-auto lg:z-auto lg:max-h-[calc(100dvh-2rem)] lg:overflow-y-auto lg:rounded-lg lg:bg-surface lg:p-4 lg:shadow-md"
+              aria-label={t("detailRegion")}
+              className="fixed inset-0 z-30 overflow-y-auto bg-bg p-4 md:inset-4 md:rounded-lg md:bg-surface md:shadow-lg xl:sticky xl:inset-auto xl:z-auto xl:max-h-[calc(100dvh-2rem)] xl:overflow-y-auto xl:rounded-lg xl:bg-surface xl:p-4 xl:shadow-md"
             >
               {detail ? (
                 <BookingDetailPanel

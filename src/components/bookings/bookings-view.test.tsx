@@ -112,6 +112,7 @@ interface Responses {
   create?: unknown;
   cancel?: unknown;
   paid?: unknown;
+  proofReceived?: unknown;
 }
 
 function stubFetch(responses: Responses = {}) {
@@ -185,6 +186,18 @@ function stubFetch(responses: Responses = {}) {
               bookingId: "ABC234",
               status: "confirmed",
               remainderPaid: true,
+            },
+          },
+        );
+      }
+      if (url.endsWith("/proof-received")) {
+        return jsonResponse(
+          responses.proofReceived ?? {
+            ok: true,
+            data: {
+              bookingId: "ABC234",
+              status: "proof_submitted",
+              proofId: 9,
             },
           },
         );
@@ -266,6 +279,22 @@ describe("BookingsView list", () => {
     );
   });
 
+  it("explains an inverted date range instead of replacing the page", () => {
+    const fetchMock = stubFetch();
+    renderView({ filters: { to: "2026-12-20" } });
+
+    fireEvent.change(screen.getByLabelText("From"), {
+      target: { value: "2026-12-25" },
+    });
+
+    expect(
+      screen.getByText("The end date must not be before the start date."),
+    ).toBeTruthy();
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(screen.getByLabelText("To")).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Add booking" })).toBeTruthy();
+  });
+
   it("uses calm empty states for no bookings and for filters that match nothing", () => {
     stubFetch();
     renderView({ page: aPage({ items: [], total: 0 }) });
@@ -282,7 +311,7 @@ describe("BookingsView list", () => {
 });
 
 describe("BookingsView detail", () => {
-  it("marks the remainder paid after a confirmation", async () => {
+  it("closes the confirmation and shows the notice once the remainder is paid", async () => {
     const fetchMock = stubFetch();
     renderView({ detail: aDetail() });
 
@@ -293,8 +322,52 @@ describe("BookingsView detail", () => {
     fireEvent.click(within(dialog).getByRole("button", { name: "Mark paid" }));
 
     expect(await screen.findByText("Remainder marked paid.")).toBeTruthy();
+    expect(screen.queryByRole("dialog")).toBeNull();
     expect(fetchMock).toHaveBeenCalledWith(
       "/api/v1/staff/bookings/ABC234/remainder-paid",
+      expect.objectContaining({ method: "POST" }),
+    );
+  });
+
+  it("shows a failed remainder mark inside the still-open confirmation", async () => {
+    stubFetch({
+      paid: {
+        ok: false,
+        error: { code: "INTERNAL", message: "boom" },
+      },
+    });
+    renderView({ detail: aDetail() });
+
+    fireEvent.click(
+      screen.getByRole("button", { name: "Mark remainder paid" }),
+    );
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.click(within(dialog).getByRole("button", { name: "Mark paid" }));
+
+    expect(
+      await within(dialog).findByText("Something went wrong. Try again."),
+    ).toBeTruthy();
+    expect(screen.queryByRole("dialog")).toBeTruthy();
+  });
+
+  it("marks a WhatsApp proof received on a held booking", async () => {
+    const fetchMock = stubFetch({
+      proofReceived: {
+        ok: true,
+        data: {
+          bookingId: "ABC234",
+          status: "proof_submitted",
+          proofId: 9,
+        },
+      },
+    });
+    renderView({ detail: aDetail({ status: "held" }) });
+
+    fireEvent.click(screen.getByRole("button", { name: "Mark received" }));
+
+    expect(await screen.findByText("Proof marked received.")).toBeTruthy();
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/v1/staff/bookings/ABC234/proof-received",
       expect.objectContaining({ method: "POST" }),
     );
   });
@@ -401,5 +474,46 @@ describe("AddBookingDialog", () => {
       "/api/v1/staff/bookings",
       expect.objectContaining({ method: "POST" }),
     );
+  });
+
+  it("sends the customer's chosen message language", async () => {
+    const fetchMock = stubFetch();
+    renderView();
+
+    fireEvent.click(screen.getByRole("button", { name: "Add booking" }));
+    const dialog = await screen.findByRole("dialog");
+    fireEvent.click(
+      await screen.findByRole("button", {
+        name: "12:00 PM – 2:00 PM, Free",
+      }),
+    );
+    fireEvent.change(within(dialog).getByLabelText("Occasion"), {
+      target: { value: "1" },
+    });
+    fireEvent.change(within(dialog).getByLabelText("Message language"), {
+      target: { value: "en" },
+    });
+    fireEvent.change(within(dialog).getByLabelText("Name"), {
+      target: { value: "Mona" },
+    });
+    fireEvent.change(within(dialog).getByLabelText("Phone"), {
+      target: { value: "01001234567" },
+    });
+    fireEvent.click(
+      within(dialog).getByRole("button", { name: "Add booking" }),
+    );
+
+    await waitFor(() => {
+      const post = fetchMock.mock.calls.find(
+        ([input, init]) =>
+          String(input) === "/api/v1/staff/bookings" &&
+          (init as RequestInit | undefined)?.method === "POST",
+      );
+      expect(post).toBeTruthy();
+      const body = JSON.parse(
+        String((post?.[1] as RequestInit | undefined)?.body),
+      ) as { locale?: string };
+      expect(body.locale).toBe("en");
+    });
   });
 });

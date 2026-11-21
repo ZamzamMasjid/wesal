@@ -65,10 +65,11 @@ export function AddBookingDialog({
 }: Props) {
   const t = useTranslations("Dashboard.bookings.addDialog");
   const slotStates = useTranslations("Calendar.states");
-  const locale = useLocale() === "ar" ? "ar" : "en";
+  const uiLocale = useLocale() === "ar" ? "ar" : "en";
   const ids = {
     date: useId(),
     occasion: useId(),
+    language: useId(),
     name: useId(),
     phone: useId(),
     note: useId(),
@@ -78,6 +79,7 @@ export function AddBookingDialog({
   const [slots, setSlots] = useState<SlotsState>({ kind: "loading" });
   const [selected, setSelected] = useState<AvailabilitySlot | null>(null);
   const [occasionId, setOccasionId] = useState("");
+  const [messageLocale, setMessageLocale] = useState<"ar" | "en">(uiLocale);
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [note, setNote] = useState("");
@@ -112,6 +114,7 @@ export function AddBookingDialog({
     setDay(today);
     setSelected(null);
     setOccasionId("");
+    setMessageLocale(uiLocale);
     setName("");
     setPhone("");
     setNote("");
@@ -147,6 +150,7 @@ export function AddBookingDialog({
       occasionId: Number(occasionId),
       name: name.trim(),
       phone: phone.trim(),
+      locale: messageLocale,
       note: note.trim() ? note.trim() : undefined,
     });
     setPending(false);
@@ -182,9 +186,13 @@ export function AddBookingDialog({
 
   function holderText(entry: Holder): string {
     const who = entry.customerName ?? "";
+    if (!who) return t("slotTakenUnknown");
     if (entry.deadlineAt) {
       const time = cairoParts(new Date(entry.deadlineAt)).time;
-      return t("slotHeldBy", { name: who, time: formatTime(time, locale) });
+      return t("slotHeldBy", {
+        name: who,
+        time: formatTime(time, uiLocale),
+      });
     }
     return t("slotConfirmedBy", { name: who });
   }
@@ -223,12 +231,20 @@ export function AddBookingDialog({
                 {t("slotsLoading")}
               </p>
             ) : slots.kind === "error" ? (
-              <p
+              <div
                 role="alert"
-                className="rounded-lg bg-danger-soft p-3 text-sm text-danger"
+                className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-danger-soft p-3 text-sm text-danger"
               >
-                {t("slotsFailed")}
-              </p>
+                <span>{t("slotsFailed")}</span>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="rounded-full"
+                  onClick={() => void loadSlots(day)}
+                >
+                  {t("slotsRetry")}
+                </Button>
+              </div>
             ) : slots.closed ? (
               <p className="flex items-center gap-2 rounded-lg bg-fill p-3 text-sm">
                 <CalendarX className="size-5 text-muted" aria-hidden />
@@ -249,9 +265,9 @@ export function AddBookingDialog({
                       <button
                         type="button"
                         aria-pressed={isSelected}
-                        aria-label={`${formatTime(slot.start, locale)} – ${formatTime(
+                        aria-label={`${formatTime(slot.start, uiLocale)} – ${formatTime(
                           slot.end,
-                          locale,
+                          uiLocale,
                         )}, ${slotStates(slot.state)}`}
                         disabled={unavailable}
                         onClick={() => {
@@ -268,8 +284,8 @@ export function AddBookingDialog({
                       >
                         <span className="block font-mono font-semibold tabular-nums">
                           <bdi>
-                            {formatTime(slot.start, locale)} –{" "}
-                            {formatTime(slot.end, locale)}
+                            {formatTime(slot.start, uiLocale)} –{" "}
+                            {formatTime(slot.end, uiLocale)}
                           </bdi>
                         </span>
                         <span className="block text-xs">
@@ -296,9 +312,26 @@ export function AddBookingDialog({
               <option value="">{t("chooseOccasion")}</option>
               {occasions.map((occasion) => (
                 <option key={occasion.id} value={occasion.id}>
-                  {locale === "ar" ? occasion.nameAr : occasion.nameEn}
+                  {uiLocale === "ar" ? occasion.nameAr : occasion.nameEn}
                 </option>
               ))}
+            </select>
+          </div>
+
+          <div className="space-y-1 text-sm">
+            <label htmlFor={ids.language} className="font-medium">
+              {t("messageLanguage")}
+            </label>
+            <select
+              id={ids.language}
+              value={messageLocale}
+              onChange={(event) =>
+                setMessageLocale(event.target.value === "en" ? "en" : "ar")
+              }
+              className={inputClass}
+            >
+              <option value="ar">{t("languageAr")}</option>
+              <option value="en">{t("languageEn")}</option>
             </select>
           </div>
 

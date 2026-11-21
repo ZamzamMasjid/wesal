@@ -130,6 +130,8 @@ const createInput = z
     occasionId: z.coerce.number().int().positive(),
     name: z.string().trim().min(1).max(120),
     phone: z.string().trim().min(1).max(30),
+    /** The language of the customer's booking-confirmed message. */
+    locale: z.enum(["ar", "en"]).default("ar"),
     note: z
       .string()
       .trim()
@@ -514,7 +516,7 @@ export function createAdminBookingOperations(resolve: () => AdminBookingDeps) {
         );
       }
 
-      const locale: BookingLocale = "ar";
+      const locale: BookingLocale = input.locale;
 
       for (let attempt = 0; attempt < ID_ATTEMPTS; attempt++) {
         const publicId = generatePublicId();

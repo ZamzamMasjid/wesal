@@ -2,7 +2,7 @@
 id: bookings
 type: view
 title: Bookings
-last_modified: 2026-11-15
+last_modified: 2026-11-21
 feature: booking-management
 mockup: none
 ---
@@ -72,21 +72,22 @@ Booking detail (side panel on desktop, page on phones)
 ## Interactions
 
 - Selecting a row opens the detail.
-- "Add booking" opens the dialog: date, slot (taken slots visible, not selectable), occasion, name, phone, note; saving creates a confirmed booking.
+- "Add booking" opens the dialog: date, slot (taken slots visible, not selectable), occasion, the customer's message language, name, phone, note; saving creates a confirmed booking.
 - "Cancel booking" asks for a reason and frees the slot.
 - "Mark remainder paid" toggles the flag after a confirmation.
 - A held booking's detail offers "Mark proof received".
-- Filters and search update the URL.
+- Filters and search update the URL. A date range whose end is before its start is shown as a field error and is not sent to the server.
 
 ## Responsive behavior
 
 - Below `md`: cards instead of a table; filters collapse behind a Filters button; detail is a full page.
-- `md` to `lg`: table with the detail as an overlay panel.
-- `lg` and up: table with the detail panel beside it.
+- `md` to `lg`: cards; detail is an overlay panel.
+- `lg` to `xl`: compact table with the detail as an overlay panel.
+- `xl` and up: table with the detail panel beside it.
 
 ## Accessibility
 
 - The table has a caption and column headers; rows are reachable by keyboard and open with Enter.
 - Status is text in every row, not only a colored badge.
-- The detail panel is a labelled region; opening it moves focus to its heading and closing returns focus to the row.
+- The detail panel is a labelled region; opening it moves focus to its heading and closing returns focus to the visible row. Below `xl` it traps focus and Escape closes it.
 - History is an ordered list with times in the dashboard language.

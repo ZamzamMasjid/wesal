@@ -1,5 +1,5 @@
 import { hasLocale } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { createCallContext } from "@/api/context";
@@ -27,7 +27,6 @@ export default async function BookingsPage({
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
 
-  const t = await getTranslations("Dashboard.bookings");
   const search = await searchParams;
   const filters = parseFilters(search);
   const bookingId =
@@ -44,12 +43,20 @@ export default async function BookingsPage({
 
   if (!list.ok) {
     return (
-      <section className="space-y-4">
-        <h1 className="text-3xl font-bold">{t("title")}</h1>
-        <p role="alert" className="rounded-lg bg-danger-soft p-3 text-danger">
-          {t("loadFailed")}
-        </p>
-      </section>
+      <BookingsView
+        initial={{
+          items: [],
+          total: 0,
+          page: 1,
+          pageSize: 25,
+          refreshedAt: ctx.clock.now().toISOString(),
+        }}
+        initialFilters={filters}
+        initialDetail={null}
+        occasions={occasions.ok ? occasions.data.occasions : []}
+        today={cairoDay(ctx.clock.now())}
+        initialError
+      />
     );
   }
 

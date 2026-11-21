@@ -118,6 +118,8 @@ export interface CreateStaffBookingInput {
   occasionId: number;
   name: string;
   phone: string;
+  /** The language of the customer's booking-confirmed message. */
+  locale?: "ar" | "en";
   /** Free text, e.g. that a deposit was taken offline. */
   note?: string;
 }

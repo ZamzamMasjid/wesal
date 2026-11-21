@@ -23,7 +23,7 @@ import {
 } from "@/lib/booking-admin-api";
 import { cairoParts } from "@/lib/cairo-time";
 import { longDayLabel } from "@/lib/calendar-grid";
-import { proofFileHref, reviewHref } from "@/lib/review-api";
+import { markProofReceived, proofFileHref, reviewHref } from "@/lib/review-api";
 import { formatTime } from "@/lib/slot-time";
 
 // One booking's detail (docs/design/views/bookings.md): summary, proofs and the
@@ -61,12 +61,16 @@ export function BookingDetailPanel({
   const historyLabels = useTranslations("Dashboard.bookings.history");
   const locale = useLocale() === "ar" ? "ar" : "en";
 
-  const [busy, setBusy] = useState<"cancel" | "paid" | null>(null);
+  const [busy, setBusy] = useState<"cancel" | "paid" | "received" | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [paidOpen, setPaidOpen] = useState(false);
+  const [paidError, setPaidError] = useState<string | null>(null);
   const [cancelOpen, setCancelOpen] = useState(false);
+  const [cancelError, setCancelError] = useState<string | null>(null);
   const [reason, setReason] = useState("");
   const [reasonMissing, setReasonMissing] = useState(false);
+  const [confirmNow, setConfirmNow] = useState(false);
 
   const occasion =
     locale === "ar" ? detail.occasion.nameAr : detail.occasion.nameEn;
@@ -90,14 +94,17 @@ export function BookingDetailPanel({
   async function onMarkPaid() {
     if (busy) return;
     setBusy("paid");
-    setError(null);
+    setPaidError(null);
     setNotice(null);
     const result = await markRemainderPaid(detail.bookingId);
     setBusy(null);
     if (!result.ok) {
-      setError(problemText(result.error?.code, result.error?.details));
+      // The dialog stays open so the failure is where the staff member is
+      // looking, not behind its overlay.
+      setPaidError(problemText(result.error?.code, result.error?.details));
       return;
     }
+    setPaidOpen(false);
     setNotice(t("markedPaid"));
     onMutated();
   }
@@ -109,16 +116,33 @@ export function BookingDetailPanel({
       return;
     }
     setBusy("cancel");
-    setError(null);
+    setCancelError(null);
     setNotice(null);
     const result = await cancelBooking(detail.bookingId, reason.trim());
+    setBusy(null);
+    if (!result.ok) {
+      setCancelError(problemText(result.error?.code, result.error?.details));
+      return;
+    }
+    setCancelOpen(false);
+    setReason("");
+    setNotice(t("cancelled"));
+    onMutated();
+  }
+
+  async function onProofReceived() {
+    if (busy) return;
+    setBusy("received");
+    setError(null);
+    setNotice(null);
+    const result = await markProofReceived(detail.bookingId, confirmNow);
     setBusy(null);
     if (!result.ok) {
       setError(problemText(result.error?.code, result.error?.details));
       return;
     }
-    setCancelOpen(false);
-    setNotice(t("cancelled"));
+    setConfirmNow(false);
+    setNotice(t("proofReceivedDone"));
     onMutated();
   }
 
@@ -325,9 +349,35 @@ export function BookingDetailPanel({
         )}
       </section>
 
+      {detail.status === "held" && (
+        <section className="space-y-3 rounded-lg bg-surface p-4 shadow-md">
+          <h3 className="text-sm font-semibold">{t("proofReceived")}</h3>
+          <p className="text-sm text-muted">{t("proofReceivedHint")}</p>
+          <label className="flex min-h-(--size-touch-dense) items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={confirmNow}
+              onChange={(event) => setConfirmNow(event.target.checked)}
+              className="size-4 accent-brand"
+            />
+            {t("proofReceivedAlsoConfirm")}
+          </label>
+          <Button
+            type="button"
+            onClick={() => void onProofReceived()}
+            disabled={busy !== null}
+            className="h-(--size-touch) w-full rounded-full bg-brand text-brand-fg hover:bg-brand-hover"
+          >
+            {busy === "received"
+              ? t("proofReceiving")
+              : t("proofReceivedAction")}
+          </Button>
+        </section>
+      )}
+
       {cancellable ? (
         <div className="flex flex-wrap gap-2">
-          <Dialog>
+          <Dialog open={paidOpen} onOpenChange={setPaidOpen}>
             <DialogTrigger asChild>
               <Button
                 type="button"
@@ -345,6 +395,14 @@ export function BookingDetailPanel({
             <DialogContent closeLabel={t("closeDialog")}>
               <DialogTitle>{t("markPaidTitle")}</DialogTitle>
               <DialogDescription>{t("markPaidBody")}</DialogDescription>
+              {paidError && (
+                <p
+                  role="alert"
+                  className="mt-3 rounded-lg bg-danger-soft p-3 text-sm text-danger"
+                >
+                  {paidError}
+                </p>
+              )}
               <div className="mt-4 flex flex-wrap justify-end gap-2">
                 <DialogClose asChild>
                   <Button
@@ -372,6 +430,7 @@ export function BookingDetailPanel({
             open={cancelOpen}
             onOpenChange={(next) => {
               setCancelOpen(next);
+              setCancelError(null);
               setReasonMissing(false);
             }}
           >
@@ -409,6 +468,14 @@ export function BookingDetailPanel({
               <p id="cancel-reason-hint" className="mt-1 text-xs text-muted">
                 {reasonMissing ? t("cancelNeedsReason") : t("cancelReasonHint")}
               </p>
+              {cancelError && (
+                <p
+                  role="alert"
+                  className="mt-3 rounded-lg bg-danger-soft p-3 text-sm text-danger"
+                >
+                  {cancelError}
+                </p>
+              )}
               <div className="mt-4 flex flex-wrap justify-end gap-2">
                 <DialogClose asChild>
                   <Button

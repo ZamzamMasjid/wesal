@@ -448,6 +448,20 @@ describe("staff.bookings.create", () => {
     });
   });
 
+  it("writes the booking and its message in the language staff chose", async () => {
+    const result = await ops.create(manualInput({ locale: "en" }), staff);
+
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    const [row] = await db
+      .select()
+      .from(booking)
+      .where(eq(booking.publicId, result.data.bookingId));
+    expect(row?.locale).toBe("en");
+    const [message] = await db.select().from(outboxMessage);
+    expect(message?.locale).toBe("en");
+  });
+
   it("refuses a slot an online hold owns and says who holds it until when", async () => {
     const deadline = new Date(NOW.getTime() + 12 * 60_000);
     await aStoredBooking({

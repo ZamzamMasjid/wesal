@@ -26,7 +26,7 @@ Staff see all bookings in a list they can filter by date, status and source (onl
 
 From here staff can:
 
-- **Enter a booking** for a caller or walk-in: pick date, slot and occasion, enter name and phone. It starts confirmed, with no hold and no deposit step in the system, and the customer is sent their booking page link.
+- **Enter a booking** for a caller or walk-in: pick date, slot and occasion, enter name and phone, and choose the language of the customer's message. It starts confirmed, with no hold and no deposit step in the system, and the customer is sent their booking page link.
 - **Cancel** a confirmed booking, with a reason. The slot becomes free.
 - **Mark the remainder paid** when the customer settles at the venue.
 
@@ -49,9 +49,9 @@ No new entities. Booking fields used here: source and remainder-paid flag. The e
 
 **A caller books by phone.**
 
-1. Staff open Add booking, choose the date and slot, the occasion, and enter the caller's name and phone.
+1. Staff open Add booking, choose the date and slot, the occasion, and enter the caller's name and phone, choosing the language of the message.
 2. The booking is saved as confirmed and the public calendar shows the slot as confirmed.
-3. The customer receives their booking page link by message.
+3. The customer receives their booking page link by message, in the chosen language.
 
 **The slot is held online at that moment.**
 

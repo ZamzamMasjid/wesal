@@ -147,7 +147,7 @@ export function DashboardShell({ user, children }: ShellProps) {
             role="group"
             aria-label={t("menu.account")}
           >
-            <span className="px-3 text-sm">
+            <span className="hidden px-3 text-sm sm:block">
               {user.name}
               <span className="ms-2 text-muted">
                 {t(`menu.role.${user.role}`)}

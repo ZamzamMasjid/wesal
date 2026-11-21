@@ -219,3 +219,11 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Summary**: Phase 5 ships: the owner maintains bilingual site text and ordered photos and videos from `/dashboard/content`, and the public home page presents them with prices, policy, contact, a gallery lightbox, SEO/Open Graph metadata, range-served media and WCAG AA in both languages and both themes. The landing page's occasion cards carry the choice into the calendar and booking form. Content Management and Landing Page are complete; the roadmap advances to phase 6.
 - **Affected Docs**: content-management, landing-page, home (view), phase-5-public-site
 - **Reason**: Completing `phase-5-public-site`; the home mockup is archived now that the live page is the visual truth.
+
+## [2026-11-21] - Booking management verification fixes
+
+- **Type**: Bug Fix / Design Change
+- **Summary**: The bookings view now holds its documented layout at every breakpoint: cards below `lg`, a compact table from `lg` (with the detail as an overlay), and the side-by-side panel at `xl`, with the table contained instead of covering or scrolling the page. An inverted date range shows a field error and keeps the filters and Add booking instead of replacing the page with a load error; a server-side list failure now renders the view with its filters and an inline Retry. The mark-paid confirmation closes on success and shows its failure inside the dialog; the cancel dialog shows its failure there too. Closing the detail returns focus to the visible row (table or card) and, below `xl`, the panel traps focus, closes on Escape and is labelled as the booking detail. A held booking's detail gains Mark proof received (optionally confirming in one step), matching the view doc. Staff choose the language of the customer's manual-entry message, the add dialog offers a retry when slots fail to load, an unknown slot holder no longer renders an empty name, and the dashboard header no longer overflows at 320px. The e2e spec no longer presses Escape after mark-paid, since the dialog now closes itself.
+- **Affected Docs**: booking-management, bookings (view)
+- **Reason**: `axiom:review`, `axiom:integration-check`, `axiom:test` and `axiom:ui-check` on the shipped section; the owner asked for every finding fixed.
+
