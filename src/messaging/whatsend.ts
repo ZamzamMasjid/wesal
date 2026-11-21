@@ -20,6 +20,43 @@ export interface WhatSendConfig {
 }
 
 const DEFAULT_TIMEOUT_MS = 10_000;
+const STATUS_TIMEOUT_MS = 2_000;
+
+/** What the worker says about its WhatsApp link, reduced to what health needs. */
+export type WhatSendSessionStatus = "linked" | "unlinked" | "unknown";
+
+/**
+ * Asks the worker whether its WhatsApp session is linked. Never throws: the
+ * health check reports an unreachable or confused worker as "unknown" instead
+ * of failing the whole endpoint. States: the worker reports `connected` when
+ * the QR link is live; `qr_required`, `disconnected`, `connecting`,
+ * `reconnecting` and `failed` all count as not linked.
+ */
+export async function probeWhatSendSession(
+  config: WhatSendConfig,
+): Promise<WhatSendSessionStatus> {
+  const doFetch = config.fetch ?? fetch;
+  const url = `${config.workerUrl.replace(/\/+$/, "")}/api/v1/sessions/${encodeURIComponent(
+    config.sessionId,
+  )}/status`;
+
+  let response: Response;
+  try {
+    response = await doFetch(url, {
+      headers: { authorization: `Bearer ${config.secret}` },
+      signal: AbortSignal.timeout(config.timeoutMs ?? STATUS_TIMEOUT_MS),
+    });
+  } catch {
+    return "unknown";
+  }
+
+  const payload = (await response.json().catch(() => null)) as {
+    data?: { state?: string };
+  } | null;
+  const state = payload?.data?.state;
+  if (!response.ok || !state) return "unknown";
+  return state === "connected" ? "linked" : "unlinked";
+}
 
 export function createWhatSendSender(config: WhatSendConfig): MessageSender {
   const doFetch = config.fetch ?? fetch;

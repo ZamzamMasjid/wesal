@@ -109,7 +109,7 @@ It asks for the password at a hidden prompt (minimum 8 characters); the password
 curl -s https://<app-url>/api/v1/health
 ```
 
-Returns `{"ok":true,"data":{"web":"up","database":"up","jobs":{"lastTickAgeSeconds":...}}}`. A `503` with `SERVICE_UNAVAILABLE` means Postgres does not answer. `lastTickAgeSeconds` is `null` until the job loop (message-delivery) ships. Fly's own check uses `?probe=web` so a database outage still shows visitors the fallback notice.
+Returns `{"ok":true,"data":{"web":"up","database":"up","jobs":{"lastTickAgeSeconds":...},"messaging":{...}}}`. A `503` with `SERVICE_UNAVAILABLE` means Postgres does not answer. `lastTickAgeSeconds` is `null` until the loop records its first tick. With `MESSAGING_PROVIDER=whatsend`, `messaging` is `{"provider":"whatsend","session":"linked"|"unlinked"|"unknown"}`; `unlinked` means the worker is up but the QR link is gone, and `unknown` means the worker could not be reached or is misconfigured. Both are warnings, not a failed health check, so Fly does not restart a healthy app. Fly's own check uses `?probe=web` so a database outage still shows visitors the fallback notice and the deploy check never waits on the worker.
 
 Logs are the only observability (ADR-017):
 
