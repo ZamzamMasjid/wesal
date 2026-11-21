@@ -2,9 +2,9 @@
 id: home
 type: view
 title: Landing
-last_modified: 2026-11-15
+last_modified: 2026-11-21
 feature: landing-page
-mockup: approved
+mockup: archived
 ---
 
 # Landing

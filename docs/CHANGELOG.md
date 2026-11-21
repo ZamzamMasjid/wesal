@@ -212,3 +212,10 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Summary**: The public views are audited with axe-core against the WCAG 2.0/2.1/2.2 A and AA tags in a Playwright test: home in Arabic, English and dark mode, the calendar in light and dark, the booking form, find-booking and a private booking page. Each scan must report zero violations, and the home and calendar must not scroll sideways at 360px. The audit found one real defect: a selected calendar day carried `text-fg` as well as `text-brand-fg`, so the day number rendered dark on the oxblood pill at 1.47:1; the unselected colours are now applied only when unselected. The phones-only contact bar became a labelled navigation landmark.
 - **Affected Docs**: landing-page, home (view), calendar (view), phase-5-public-site
 - **Reason**: Implementing `phase-5-public-site/landing-page`, sixth item.
+
+## [2026-11-21] — Public site shipped
+
+- **Type**: Feature Change
+- **Summary**: Phase 5 ships: the owner maintains bilingual site text and ordered photos and videos from `/dashboard/content`, and the public home page presents them with prices, policy, contact, a gallery lightbox, SEO/Open Graph metadata, range-served media and WCAG AA in both languages and both themes. The landing page's occasion cards carry the choice into the calendar and booking form. Content Management and Landing Page are complete; the roadmap advances to phase 6.
+- **Affected Docs**: content-management, landing-page, home (view), phase-5-public-site
+- **Reason**: Completing `phase-5-public-site`; the home mockup is archived now that the live page is the visual truth.

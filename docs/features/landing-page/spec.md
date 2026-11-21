@@ -2,7 +2,7 @@
 id: landing-page
 type: feature
 title: Landing Page
-status: in-progress
+status: shipped
 last_modified: 2026-11-21
 milestone: v1
 pillar: public-site

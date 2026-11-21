@@ -2,7 +2,7 @@
 id: phase-5-public-site
 type: roadmap-phase
 title: Phase 5 — Public Site
-status: in-progress
+status: shipped
 last_modified: 2026-11-21
 milestone: v1
 phase_number: 5

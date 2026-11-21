@@ -2,21 +2,42 @@
 // ROADMAP: phase-2-foundations / venue-settings / settings screen (axiom:ui-check distillation)
 // Needs the dev seed (`npm run db:seed`): owner login with SEED_OWNER_PASSWORD or the default.
 // These tests never save a change: every action is cancelled or rejected.
-import { expect, test, type Page } from "@playwright/test";
+// One login is shared by every test through the session cookies, so the login
+// rate limit does not turn a full run red.
+import { expect, test, type BrowserContext, type Page } from "@playwright/test";
 
 const OWNER = "owner";
 const PASSWORD = process.env.SEED_OWNER_PASSWORD ?? "owner-password";
 
-async function loginToSettings(page: Page, locale: "ar" | "en") {
-  const prefix = locale === "en" ? "/en" : "";
-  await page.goto(`${prefix}/dashboard/settings`);
-  // The login page is Arabic or English following the requested locale.
+let cookies: Awaited<ReturnType<BrowserContext["storageState"]>>["cookies"] =
+  [];
+
+test.beforeAll(async ({ browser }) => {
+  const context = await browser.newContext({
+    baseURL: process.env.PLAYWRIGHT_BASE_URL ?? "http://localhost:3100",
+  });
+  const page = await context.newPage();
+  await page.goto("/dashboard/login");
   await page
     .locator('input[type="text"], input:not([type])')
     .first()
     .fill(OWNER);
   await page.locator('input[type="password"]').fill(PASSWORD);
   await page.locator("form button[type=submit]").click();
+  await expect(page).toHaveURL(/\/dashboard$/, { timeout: 15_000 });
+  await expect(page.locator("main h1")).toBeVisible();
+  cookies = (await context.storageState()).cookies;
+  expect(cookies.length).toBeGreaterThan(0);
+  await context.close();
+});
+
+test.beforeEach(async ({ context }) => {
+  await context.addCookies(cookies);
+});
+
+async function loginToSettings(page: Page, locale: "ar" | "en") {
+  const prefix = locale === "en" ? "/en" : "";
+  await page.goto(`${prefix}/dashboard/settings`);
   await expect(page.locator("main h1")).toBeVisible();
   await expect(page.locator("main ul li").first()).toBeVisible();
 }

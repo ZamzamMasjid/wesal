@@ -7,8 +7,8 @@ generated_by: axiom:reindex
 budgets: {}
 activities: []
 active:
-  phase: phase-5-public-site
-  section: null
+  phase: phase-6-alerts-and-reports
+  section: slot-alerts
 ---
 
 # Project Index
@@ -17,8 +17,8 @@ active:
 
 ## Active work
 
-- **Current phase**: phase-5-public-site
-- **Current section**: <none>
+- **Current phase**: phase-6-alerts-and-reports
+- **Current section**: slot-alerts
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars
@@ -39,9 +39,9 @@ active:
 | `booking-management` | Booking Management | shipped | v1 | back-office | phase-4-operations/booking-management |
 | `booking-page` | Booking Page | shipped | v1 | booking | phase-3-booking/booking-page |
 | `booking-reports` | Booking Reports | planned | later | reporting | phase-6-alerts-and-reports/booking-reports |
-| `content-management` | Content Management | in-progress | v1 | public-site | phase-5-public-site/content-management |
+| `content-management` | Content Management | shipped | v1 | public-site | phase-5-public-site/content-management |
 | `customer-mobile-app` | Customer Mobile App | planned | later | mobile-app | phase-7-mobile-app/customer-mobile-app |
-| `landing-page` | Landing Page | in-progress | v1 | public-site | phase-5-public-site/landing-page |
+| `landing-page` | Landing Page | shipped | v1 | public-site | phase-5-public-site/landing-page |
 | `message-delivery` | Message Delivery | shipped | v1 | messaging | phase-2-foundations/message-delivery |
 | `payment-proof` | Payment Proof | shipped | v1 | booking | phase-3-booking/payment-proof |
 | `payment-review` | Payment Review | shipped | v1 | back-office | phase-4-operations/payment-review |
@@ -72,7 +72,7 @@ active:
 | `booking-status` | Booking Page | booking-page | none |
 | `bookings` | Bookings | booking-management | none |
 | `calendar` | Availability Calendar | public-calendar | approved |
-| `home` | Landing | landing-page | approved |
+| `home` | Landing | landing-page | archived |
 | `mobile-home` | Mobile Home | customer-mobile-app | none |
 | `reports` | Reports | booking-reports | none |
 | `review-queue` | Payment Review | payment-review | none |
@@ -87,7 +87,7 @@ active:
 | `phase-2-foundations` | shipped | v1 | staff-access, venue-settings, slot-schedule, message-delivery, phone-verification |
 | `phase-3-booking` | shipped | v1 | public-calendar, booking-hold, booking-page, payment-proof |
 | `phase-4-operations` | shipped | v1 | payment-review, staff-notifications, booking-management |
-| `phase-5-public-site` | in-progress | v1 | content-management, landing-page |
+| `phase-5-public-site` | shipped | v1 | content-management, landing-page |
 | `phase-6-alerts-and-reports` | planned | later | slot-alerts, booking-reports |
 | `phase-7-mobile-app` | planned | later | customer-mobile-app, push-notifications |
 

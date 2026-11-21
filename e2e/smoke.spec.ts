@@ -15,5 +15,7 @@ test("home page loads in English, left-to-right, at /en", async ({ page }) => {
   expect(response?.status()).toBe(200);
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await expect(page.locator("html")).toHaveAttribute("dir", "ltr");
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("Wesal");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveText(
+    "Wesal Mosque and Event Hall",
+  );
 });
