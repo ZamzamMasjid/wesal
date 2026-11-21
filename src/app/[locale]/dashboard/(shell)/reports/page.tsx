@@ -39,9 +39,7 @@ export default async function ReportsPage({
       <section className="space-y-4">
         <h1 className="text-3xl font-bold">{t("title")}</h1>
         <p role="alert" className="rounded-lg bg-danger-soft p-3 text-danger">
-          {result.error.code === "FORBIDDEN"
-            ? t("ownerOnly")
-            : t("loadFailed")}
+          {result.error.code === "FORBIDDEN" ? t("ownerOnly") : t("loadFailed")}
         </p>
       </section>
     );

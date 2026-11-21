@@ -47,7 +47,11 @@ describe("report periods", () => {
   });
 
   it("slides a custom range by its own length", () => {
-    const range = { kind: "range" as const, from: "2026-03-01", to: "2026-03-10" };
+    const range = {
+      kind: "range" as const,
+      from: "2026-03-01",
+      to: "2026-03-10",
+    };
     expect(shiftPeriod(range, 1)).toEqual({
       kind: "range",
       from: "2026-03-11",

@@ -35,22 +35,20 @@ async function messages() {
 
 describe("resolveStaffAlertRecipients", () => {
   it("keeps active, opted-in accounts that have a phone", async () => {
-    await db
-      .insert(staffUser)
-      .values([
-        aStaffUser({ id: "on", notifyPhone: "+201001111111", locale: "ar" }),
-        aStaffUser({
-          id: "off",
-          notifyPhone: "+201002222222",
-          notifyEnabled: false,
-        }),
-        aStaffUser({ id: "nophone" }),
-        aStaffUser({
-          id: "disabled",
-          notifyPhone: "+201003333333",
-          active: false,
-        }),
-      ]);
+    await db.insert(staffUser).values([
+      aStaffUser({ id: "on", notifyPhone: "+201001111111", locale: "ar" }),
+      aStaffUser({
+        id: "off",
+        notifyPhone: "+201002222222",
+        notifyEnabled: false,
+      }),
+      aStaffUser({ id: "nophone" }),
+      aStaffUser({
+        id: "disabled",
+        notifyPhone: "+201003333333",
+        active: false,
+      }),
+    ]);
 
     const recipients = await resolveStaffAlertRecipients(db);
     expect(recipients).toEqual([
@@ -93,16 +91,14 @@ describe("resolveStaffAlertRecipients", () => {
   });
 
   it("returns nobody when no active account has a phone", async () => {
-    await db
-      .insert(staffUser)
-      .values([
-        aStaffUser({ id: "nophone" }),
-        aStaffUser({
-          id: "disabled",
-          notifyPhone: "+201006666666",
-          active: false,
-        }),
-      ]);
+    await db.insert(staffUser).values([
+      aStaffUser({ id: "nophone" }),
+      aStaffUser({
+        id: "disabled",
+        notifyPhone: "+201006666666",
+        active: false,
+      }),
+    ]);
     expect(await resolveStaffAlertRecipients(db)).toEqual([]);
   });
 });

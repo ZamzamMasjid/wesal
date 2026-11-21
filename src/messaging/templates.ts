@@ -8,11 +8,7 @@ import { VENUE_TIME_ZONE } from "@/lib/clock";
 
 export type Locale = "ar" | "en";
 export type TemplateName =
-  | "code"
-  | "booking-link"
-  | "booking-confirmed"
-  | "staff-alert"
-  | "slot-alert";
+  "code" | "booking-link" | "booking-confirmed" | "staff-alert" | "slot-alert";
 
 const text = z.string().min(1).max(500);
 const instant = z.iso.datetime({ offset: true });

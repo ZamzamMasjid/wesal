@@ -1,10 +1,6 @@
 // Push is never sent in tests. The fake records each batch and can refuse every
 // device, report a token as unregistered, or throw when the provider is down.
-import type {
-  PushMessage,
-  PushProvider,
-  PushTicket,
-} from "@/messaging/push";
+import type { PushMessage, PushProvider, PushTicket } from "@/messaging/push";
 
 export interface FakePushProvider extends PushProvider {
   readonly sent: PushMessage[][];
@@ -25,22 +21,18 @@ export function createFakePush(): FakePushProvider {
       sent.push(messages);
       if (failure) throw failure;
       if (rejection) {
-        return messages.map(
-          (message): PushTicket => ({
-            token: message.to,
-            ok: false,
-            invalid: rejection?.invalid,
-            error: rejection?.error,
-          }),
-        );
-      }
-      return messages.map(
-        (message, index): PushTicket => ({
+        return messages.map((message): PushTicket => ({
           token: message.to,
-          ok: true,
-          providerMessageId: `fake-push-${sent.length}-${index}`,
-        }),
-      );
+          ok: false,
+          invalid: rejection?.invalid,
+          error: rejection?.error,
+        }));
+      }
+      return messages.map((message, index): PushTicket => ({
+        token: message.to,
+        ok: true,
+        providerMessageId: `fake-push-${sent.length}-${index}`,
+      }));
     },
     fail(error = new Error("push provider unavailable")) {
       failure = error;

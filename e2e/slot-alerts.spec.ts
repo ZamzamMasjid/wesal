@@ -92,7 +92,13 @@ test.beforeAll(async () => {
         customer_name, customer_phone, locale, price_egp, deposit_egp, hold_expires_at)
      values ($1, $2, $3, $4, $5, 'held', 'online',
         'Alert E2E', '+201000008888', 'ar', 15000, 7500, now() + interval '1 day')`,
-    [publicId, `token-${publicId}`, occasionId, `${day}T16:00:00Z`, `${day}T20:00:00Z`],
+    [
+      publicId,
+      `token-${publicId}`,
+      occasionId,
+      `${day}T16:00:00Z`,
+      `${day}T20:00:00Z`,
+    ],
   );
 });
 
@@ -147,9 +153,9 @@ test("a visitor subscribes to a taken slot after the code check", async ({
     page.getByRole("dialog").getByText("You will be notified", { exact: true }),
   ).toBeVisible({ timeout: 15_000 });
   await expect(
-    page.getByRole("dialog").getByText(
-      `We will message ${phone} if this slot frees up.`,
-    ),
+    page
+      .getByRole("dialog")
+      .getByText(`We will message ${phone} if this slot frees up.`),
   ).toBeVisible();
 
   const stored = await client.query(
@@ -160,5 +166,7 @@ test("a visitor subscribes to a taken slot after the code check", async ({
   expect(stored.rows[0].notified_at).toBeNull();
 
   await page.getByRole("button", { name: "Back to calendar" }).click();
-  await expect(page.getByText("You will be notified", { exact: true })).toBeVisible();
+  await expect(
+    page.getByText("You will be notified", { exact: true }),
+  ).toBeVisible();
 });

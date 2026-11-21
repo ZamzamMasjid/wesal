@@ -320,7 +320,10 @@ async function sendPush(
       .select({ token: staffDevice.token })
       .from(staffDevice)
       .where(
-        and(eq(staffDevice.userId, row.recipient), eq(staffDevice.active, true)),
+        and(
+          eq(staffDevice.userId, row.recipient),
+          eq(staffDevice.active, true),
+        ),
       )
   ).map((device) => device.token);
 
@@ -338,7 +341,12 @@ async function sendPush(
         .where(eq(outboxMessage.id, row.id));
       return "retried";
     }
-    const queued = await fallbackPushToWhatsApp(deps, row, now, "no active device");
+    const queued = await fallbackPushToWhatsApp(
+      deps,
+      row,
+      now,
+      "no active device",
+    );
     log.warn("no device accepted the push; the alert fell back to WhatsApp", {
       recipient: row.recipient,
     });
@@ -356,7 +364,9 @@ async function sendPush(
       })),
     );
 
-    const invalid = tickets.filter((ticket) => ticket.invalid).map((t) => t.token);
+    const invalid = tickets
+      .filter((ticket) => ticket.invalid)
+      .map((t) => t.token);
     if (invalid.length > 0) {
       await deps.db
         .update(staffDevice)
@@ -457,7 +467,8 @@ async function finish(
   status: "failed",
   lastError: string,
   attempts?: number,
-): Promise<void> {  await deps.db
+): Promise<void> {
+  await deps.db
     .update(outboxMessage)
     .set({
       status,

@@ -286,9 +286,7 @@ describe("staff.reports.export", () => {
       result.data.bytes,
     );
     expect(text.startsWith("\uFEFF")).toBe(true);
-    expect(text).toContain(
-      "Confirmed bookings,3",
-    );
+    expect(text).toContain("Confirmed bookings,3");
     expect(text).toContain("Income (EGP),6000");
     expect(text).toContain("Occasion,زواج / Wedding,2,4000");
     expect(text).toContain("Month,2026-12,1,3000");

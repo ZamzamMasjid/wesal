@@ -157,7 +157,11 @@ export function ReportsView({
               download
               className="inline-flex h-(--size-touch-dense) items-center gap-2 rounded-full bg-brand px-4 text-sm font-semibold text-brand-fg hover:bg-brand-hover"
             >
-              <Download aria-hidden="true" className="size-4" strokeWidth={1.75} />
+              <Download
+                aria-hidden="true"
+                className="size-4"
+                strokeWidth={1.75}
+              />
               {t("export")}
             </a>
           </div>
@@ -344,7 +348,11 @@ function Tiles({
 }) {
   const t = useTranslations("Dashboard.reports");
   const tiles = [
-    { label: t("tileBookings"), value: number.format(data.bookings), unit: t("confirmed") },
+    {
+      label: t("tileBookings"),
+      value: number.format(data.bookings),
+      unit: t("confirmed"),
+    },
     { label: t("tileIncome"), value: money.format(data.incomeEgp) },
     { label: t("tileDeposits"), value: money.format(data.depositEgp) },
     {
@@ -356,10 +364,7 @@ function Tiles({
   return (
     <ul className="grid grid-cols-2 gap-3 md:grid-cols-4">
       {tiles.map((tile) => (
-        <li
-          key={tile.label}
-          className="rounded-lg bg-surface p-4 shadow-md"
-        >
+        <li key={tile.label} className="rounded-lg bg-surface p-4 shadow-md">
           <span className="block text-sm text-muted">{tile.label}</span>
           <span className="mt-1 block font-mono text-2xl font-bold tabular-nums">
             {tile.value}

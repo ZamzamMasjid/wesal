@@ -78,7 +78,10 @@ describe("staff.devices.register", () => {
       active: false,
     });
 
-    await ops.register({ token: EXPO_TOKEN, platform: "android" }, asUser("sara"));
+    await ops.register(
+      { token: EXPO_TOKEN, platform: "android" },
+      asUser("sara"),
+    );
 
     const [row] = await db.select().from(staffDevice);
     expect(row?.active).toBe(true);
@@ -97,7 +100,10 @@ describe("staff.devices.register", () => {
 
 describe("staff.devices.unregister", () => {
   it("removes the caller's device", async () => {
-    await ops.register({ token: EXPO_TOKEN, platform: "android" }, asUser("sara"));
+    await ops.register(
+      { token: EXPO_TOKEN, platform: "android" },
+      asUser("sara"),
+    );
     const [row] = await db.select().from(staffDevice);
 
     const result = await ops.unregister({ id: row!.id }, asUser("sara"));
@@ -107,7 +113,10 @@ describe("staff.devices.unregister", () => {
   });
 
   it("does not remove another person's device", async () => {
-    await ops.register({ token: EXPO_TOKEN, platform: "android" }, asUser("sara"));
+    await ops.register(
+      { token: EXPO_TOKEN, platform: "android" },
+      asUser("sara"),
+    );
     const [row] = await db.select().from(staffDevice);
 
     const result = await ops.unregister({ id: row!.id }, asUser("mona"));

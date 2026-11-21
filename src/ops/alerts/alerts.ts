@@ -27,7 +27,9 @@ const time = z
   .string()
   .regex(/^([01]\d|2[0-3]):[0-5]\d$/, "Use a time written HH:MM.");
 
-const day = z.string().refine(isValidDay, "Use a real date written YYYY-MM-DD.");
+const day = z
+  .string()
+  .refine(isValidDay, "Use a real date written YYYY-MM-DD.");
 
 export const createAlertInput = z
   .object({

@@ -3,12 +3,7 @@
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createCallContext } from "@/api/context";
-import {
-  booking,
-  occasion,
-  slotAlert,
-  slotPattern,
-} from "@/db/schema";
+import { booking, occasion, slotAlert, slotPattern } from "@/db/schema";
 import type { Clock } from "@/lib/clock";
 import {
   issueVerifiedPhoneToken,
@@ -17,10 +12,7 @@ import {
 import { aBooking, anOccasion, aSlotPattern } from "@/test/factories";
 import { openTestDb, resetDatabase } from "@/test/db";
 
-import {
-  createAlertOperations,
-  MAX_ACTIVE_ALERTS_PER_PHONE,
-} from "./alerts";
+import { createAlertOperations, MAX_ACTIVE_ALERTS_PER_PHONE } from "./alerts";
 
 const handle = openTestDb();
 const { db } = handle;

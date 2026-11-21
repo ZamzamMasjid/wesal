@@ -3,7 +3,13 @@
 import { afterAll, beforeEach, describe, expect, it } from "vitest";
 
 import { createCallContext } from "@/api/context";
-import { booking, occasion, outboxMessage, slotAlert, staffUser } from "@/db/schema";
+import {
+  booking,
+  occasion,
+  outboxMessage,
+  slotAlert,
+  staffUser,
+} from "@/db/schema";
 import type { Clock } from "@/lib/clock";
 import { expireOverdueHolds } from "@/ops/booking/sweep";
 import { createReviewOperations } from "@/ops/booking/review";
@@ -91,9 +97,9 @@ describe("slot alerts when a slot frees", () => {
     expect(messages[1]?.values.link).toContain(`${BASE_URL}/en/book?`);
 
     const alerts = await db.select().from(slotAlert);
-    expect(alerts.every((row) => row.notifiedAt?.getTime() === NOW.getTime())).toBe(
-      true,
-    );
+    expect(
+      alerts.every((row) => row.notifiedAt?.getTime() === NOW.getTime()),
+    ).toBe(true);
   });
 
   it("does not tell the same subscriber twice when the sweep runs again", async () => {

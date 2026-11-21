@@ -304,12 +304,7 @@ export function createReviewOperations(resolve: () => ReviewDeps) {
         .set({ status: "expired", updatedAt: now })
         .where(eq(booking.id, row.id));
       // The stored expiry frees the slot, so tell anyone watching it.
-      await notifySlotAlerts(
-        tx,
-        { now: () => now },
-        row,
-        resolve().baseUrl,
-      );
+      await notifySlotAlerts(tx, { now: () => now }, row, resolve().baseUrl);
     }
     if (status !== "proof_submitted") {
       return { ok: false, error: statusChanged(status) };

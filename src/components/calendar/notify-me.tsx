@@ -1,6 +1,7 @@
 "use client";
 
-import { BellRing } from "lucide-react";import { useLocale, useTranslations } from "next-intl";
+import { BellRing } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
 import { CodeStep } from "@/components/booking/code-step";

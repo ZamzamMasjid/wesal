@@ -241,9 +241,9 @@ describe("staff.bookings.list", () => {
 
     const result = await ops.list({ occasionId: second?.id ?? 2 }, staff);
 
-    expect(result.ok && result.data.items.map((item) => item.bookingId)).toEqual(
-      ["OCC002"],
-    );
+    expect(
+      result.ok && result.data.items.map((item) => item.bookingId),
+    ).toEqual(["OCC002"]);
   });
 
   it("reads a past date range newest first and a future one soonest first", async () => {

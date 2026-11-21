@@ -1,5 +1,10 @@
 import { addDays, isValidDay } from "./cairo-time";
-import { addMonths, firstDayOfMonth, lastDayOfMonth, monthOf } from "./calendar-grid";
+import {
+  addMonths,
+  firstDayOfMonth,
+  lastDayOfMonth,
+  monthOf,
+} from "./calendar-grid";
 
 // Period arithmetic for the reports view (docs/features/booking-reports): a
 // month, a year or a custom range of Africa/Cairo calendar days. Pure so the
@@ -75,7 +80,11 @@ export function periodFromRange(
  */
 export function isValidPeriod(period: ReportPeriod): boolean {
   if (period.kind === "range") {
-    return isValidDay(period.from) && isValidDay(period.to) && period.from <= period.to;
+    return (
+      isValidDay(period.from) &&
+      isValidDay(period.to) &&
+      period.from <= period.to
+    );
   }
   if (period.kind === "month") {
     return /^\d{4}-(0[1-9]|1[0-2])$/.test(period.month);

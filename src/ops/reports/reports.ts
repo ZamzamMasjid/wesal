@@ -4,12 +4,14 @@ import { z } from "zod";
 import { defineOperation } from "@/api/operation";
 import { getDb, type Database } from "@/db/client";
 import { booking, occasion } from "@/db/schema";
-import { addDays, cairoInstant, cairoParts, isValidDay } from "@/lib/cairo-time";
+import {
+  addDays,
+  cairoInstant,
+  cairoParts,
+  isValidDay,
+} from "@/lib/cairo-time";
 import { addMonths, monthOf } from "@/lib/calendar-grid";
-import type {
-  ReportOccasionLine,
-  ReportsSummary,
-} from "@/lib/reports-api";
+import type { ReportOccasionLine, ReportsSummary } from "@/lib/reports-api";
 
 // Owner reports (docs/features/booking-reports): figures for a period of
 // Africa/Cairo calendar days, straight from the bookings table. Income uses the
@@ -21,7 +23,9 @@ import type {
 /** A generous ceiling: three years, enough for any comparison the owner needs. */
 export const MAX_REPORT_DAYS = 1100;
 
-const day = z.string().refine(isValidDay, "Use a real date written YYYY-MM-DD.");
+const day = z
+  .string()
+  .refine(isValidDay, "Use a real date written YYYY-MM-DD.");
 
 export const reportInput = z
   .object({ from: day, to: day })
@@ -47,7 +51,13 @@ export interface ReportDeps {
 }
 
 interface Row {
-  status: "held" | "proof_submitted" | "confirmed" | "expired" | "rejected" | "cancelled";
+  status:
+    | "held"
+    | "proof_submitted"
+    | "confirmed"
+    | "expired"
+    | "rejected"
+    | "cancelled";
   source: "online" | "staff";
   occasionId: number;
   startsAt: Date;

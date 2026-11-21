@@ -45,9 +45,7 @@ export interface StaffAlertRecipient {
 }
 
 /** A device count per staff member. */
-async function deviceCounts(
-  executor: Executor,
-): Promise<Map<string, number>> {
+async function deviceCounts(executor: Executor): Promise<Map<string, number>> {
   const rows = await executor
     .select({ userId: staffDevice.userId, total: count() })
     .from(staffDevice)

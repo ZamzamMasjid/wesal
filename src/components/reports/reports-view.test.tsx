@@ -88,9 +88,7 @@ describe("ReportsView", () => {
       screen.getByRole("heading", { level: 2, name: "Bookings by occasion" }),
     ).toBeTruthy();
     expect(screen.getByText("Online 9, entered by staff 5")).toBeTruthy();
-    expect(
-      screen.getByText("7 expired holds, 1 rejected proofs"),
-    ).toBeTruthy();
+    expect(screen.getByText("7 expired holds, 1 rejected proofs")).toBeTruthy();
     expect(screen.getByText(/2 cancelled bookings/)).toBeTruthy();
 
     const wedding = screen.getByRole("link", { name: "Wedding" });
@@ -104,9 +102,7 @@ describe("ReportsView", () => {
 
     expect(
       screen.getByRole("link", { name: /Export/ }).getAttribute("href"),
-    ).toBe(
-      "/api/v1/staff/reports/export?from=2026-11-01&to=2026-11-30",
-    );
+    ).toBe("/api/v1/staff/reports/export?from=2026-11-01&to=2026-11-30");
   });
 
   it("replaces the charts with a message when the period has no bookings", () => {
@@ -130,18 +126,16 @@ describe("ReportsView", () => {
   });
 
   it("reloads every figure when the period moves", async () => {
-    const fetchMock = vi.fn(
-      async (input: RequestInfo | URL) => {
-        void input;
-        return new Response(
-          JSON.stringify({
-            ok: true,
-            data: { ...initial, from: "2026-12-01", to: "2026-12-31" },
-          }),
-          { headers: { "content-type": "application/json" } },
-        );
-      },
-    );
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      void input;
+      return new Response(
+        JSON.stringify({
+          ok: true,
+          data: { ...initial, from: "2026-12-01", to: "2026-12-31" },
+        }),
+        { headers: { "content-type": "application/json" } },
+      );
+    });
     vi.stubGlobal("fetch", fetchMock);
     renderReports();
 
@@ -155,14 +149,12 @@ describe("ReportsView", () => {
   });
 
   it("switches to a custom range and a year", async () => {
-    const fetchMock = vi.fn(
-      async (input: RequestInfo | URL) => {
-        void input;
-        return new Response(JSON.stringify({ ok: true, data: initial }), {
-          headers: { "content-type": "application/json" },
-        });
-      },
-    );
+    const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+      void input;
+      return new Response(JSON.stringify({ ok: true, data: initial }), {
+        headers: { "content-type": "application/json" },
+      });
+    });
     vi.stubGlobal("fetch", fetchMock);
     renderReports();
 
