@@ -10,3 +10,5 @@ docs
 drizzle
 playwright-report
 test-results
+# Browser-agent output (screenshots and page snapshots), not source.
+.playwright-mcp
