@@ -235,6 +235,111 @@ describe("staff.me and staff.users.list", () => {
   });
 });
 
+describe("staff.me.notifications", () => {
+  it("lets a staff member set their own phone, opt-in and alert language", async () => {
+    const owner = await makeOwner();
+    const created = await ops.createUser(
+      { name: "Sara", username: "sara", password: "initial-pass" },
+      ctx(owner.caller),
+    );
+    if (!created.ok) throw new Error("setup failed");
+    const staffCaller: Caller = {
+      kind: "staff",
+      userId: created.data.id,
+      role: "staff",
+    };
+
+    const result = await ops.updateNotifications(
+      {
+        notifyPhone: "+201001111111",
+        notifyEnabled: false,
+        locale: "en",
+      },
+      ctx(staffCaller),
+    );
+    expect(result.ok && result.data).toMatchObject({
+      id: created.data.id,
+      notifyPhone: "+201001111111",
+      notifyEnabled: false,
+      locale: "en",
+    });
+
+    const audit = await ops.audit({}, ctx(owner.caller));
+    expect(audit.ok && audit.data.entries[0]).toMatchObject({
+      action: "staff.notify_update",
+      actorId: created.data.id,
+      detail: {
+        notifyPhone: "changed",
+        notifyEnabled: { from: true, to: false },
+        locale: { from: "ar", to: "en" },
+      },
+    });
+  });
+
+  it("clears the phone and rejects a malformed one", async () => {
+    const owner = await makeOwner();
+    const cleared = await ops.updateNotifications(
+      { notifyPhone: null, notifyEnabled: true },
+      ctx(owner.caller),
+    );
+    expect(cleared.ok && cleared.data.notifyPhone).toBeNull();
+
+    const bad = await ops.updateNotifications(
+      { notifyPhone: "12", notifyEnabled: true },
+      ctx(owner.caller),
+    );
+    expect(!bad.ok && bad.error.code).toBe("VALIDATION_FAILED");
+  });
+});
+
+describe("staff.users.update notification settings", () => {
+  it("lets the owner set a staff member's alert phone and opt-in", async () => {
+    const owner = await makeOwner();
+    const created = await ops.createUser(
+      { name: "Sara", username: "sara", password: "initial-pass" },
+      ctx(owner.caller),
+    );
+    if (!created.ok) throw new Error("setup failed");
+
+    const result = await ops.updateUser(
+      {
+        id: created.data.id,
+        notifyPhone: "+201002222222",
+        notifyEnabled: false,
+      },
+      ctx(owner.caller),
+    );
+    expect(result.ok && result.data).toMatchObject({
+      notifyPhone: "+201002222222",
+      notifyEnabled: false,
+      locale: "ar",
+    });
+
+    const audit = await ops.audit({}, ctx(owner.caller));
+    expect(audit.ok && audit.data.entries[0]).toMatchObject({
+      action: "staff.update",
+      detail: {
+        notifyPhone: "changed",
+        notifyEnabled: { from: true, to: false },
+      },
+    });
+  });
+
+  it("creates a staff account with alerts off when asked", async () => {
+    const owner = await makeOwner();
+    const created = await ops.createUser(
+      {
+        name: "Sara",
+        username: "sara",
+        password: "initial-pass",
+        notifyEnabled: false,
+      },
+      ctx(owner.caller),
+    );
+    expect(created.ok && created.data.notifyEnabled).toBe(false);
+  });
+});
+
 describe("audit log", () => {
   it("records time from the injected clock and filters by booking", async () => {
     const owner = await makeOwner();

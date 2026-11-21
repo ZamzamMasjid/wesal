@@ -2,7 +2,7 @@
 id: staff-notifications
 type: feature
 title: Staff Notifications
-status: planned
+status: shipped
 last_modified: 2026-11-21
 milestone: v1
 pillar: messaging
@@ -33,12 +33,12 @@ Each staff member has a notification phone and can turn alerts on or off for the
 
 ## Data
 
-No new entities. Uses the staff user's notification phone and opt-in flag, and queues outbox messages.
+No new entities. Uses the staff user's notification phone, opt-in flag and alert language, and queues outbox messages.
 
 ## Surface
 
 - Internal: queue alerts when a booking enters `proof_submitted`, and when an urgent hold is created.
-- `PATCH /api/v1/staff/me/notifications` — phone and opt-in for the current user.
+- `PATCH /api/v1/staff/me/notifications` — phone, opt-in and alert language for the current user.
 - `PATCH /api/v1/staff/users/{id}` — owner sets these for any staff member.
 
 ## Workflows

@@ -89,6 +89,8 @@ erDiagram
     string username
     string role
     string notify_phone
+    bool notify_enabled
+    string locale
     bool active
   }
   AUDIT_LOG {

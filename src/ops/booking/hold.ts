@@ -12,6 +12,7 @@ import { cairoInstant, isValidDay } from "@/lib/cairo-time";
 import { verificationSecret } from "@/lib/verification-secret";
 import { publicBaseUrl } from "@/messaging/config";
 import { queueMessage } from "@/messaging/outbox";
+import { queueStaffAlert } from "@/messaging/staff-alerts";
 import { resolveSlots, sameSlot } from "@/ops/schedule/resolver";
 import { depositFor, loadSettings } from "@/ops/venue/settings";
 import { isE164, normalizePhone } from "@/ops/verification/phone";
@@ -203,6 +204,8 @@ export function createBookingOperations(resolve: () => HoldDeps) {
       const [chosen] = await deps.db
         .select({
           id: occasion.id,
+          nameAr: occasion.nameAr,
+          nameEn: occasion.nameEn,
           priceEgp: occasion.priceEgp,
         })
         .from(occasion)
@@ -317,6 +320,25 @@ export function createBookingOperations(resolve: () => HoldDeps) {
               // be misleading, so the outbox drops it instead of sending late.
               expiresAt: deadline,
             });
+
+            // A hold on a slot starting soon is announced the moment it is
+            // created, so staff know to watch for the proof (staff-notifications).
+            if (urgent) {
+              await queueStaffAlert(tx, ctx.clock, {
+                kind: "urgent",
+                booking: {
+                  id: row.id,
+                  publicId,
+                  customerName: input.name,
+                  occasionNameAr: chosen.nameAr,
+                  occasionNameEn: chosen.nameEn,
+                  startsAt,
+                  depositEgp,
+                },
+                baseUrl: deps.baseUrl,
+                logger: ctx.log,
+              });
+            }
           });
 
           return {

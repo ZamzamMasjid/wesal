@@ -4,12 +4,14 @@ import { z } from "zod";
 import { ApiError } from "@/api/errors";
 import { defineOperation } from "@/api/operation";
 import { getDb, type Database } from "@/db/client";
-import { booking, paymentProof } from "@/db/schema";
+import { booking, occasion, paymentProof } from "@/db/schema";
 import {
   MAX_PROOF_BYTES,
   PROOF_MIME_TYPES,
   type ProofMime,
 } from "@/lib/proof-api";
+import { publicBaseUrl } from "@/messaging/config";
+import { queueStaffAlert } from "@/messaging/staff-alerts";
 import {
   deleteProof,
   readProof,
@@ -110,6 +112,8 @@ export interface ProofDeps {
   db: Database;
   /** The upload volume root (`UPLOAD_DIR`), or a temporary directory in tests. */
   uploadDir: string;
+  /** Public origin, for the review link in the staff alert. */
+  baseUrl: string;
 }
 
 function extensionOf(filePath: string): string {
@@ -226,10 +230,17 @@ export function createProofOperations(resolve: () => ProofDeps) {
           const [current] = await tx
             .select({
               id: booking.id,
+              publicId: booking.publicId,
               status: booking.status,
               holdExpiresAt: booking.holdExpiresAt,
+              customerName: booking.customerName,
+              startsAt: booking.startsAt,
+              depositEgp: booking.depositEgp,
+              occasionNameAr: occasion.nameAr,
+              occasionNameEn: occasion.nameEn,
             })
             .from(booking)
+            .innerJoin(occasion, eq(booking.occasionId, occasion.id))
             .where(eq(booking.id, found.id))
             .for("update");
           if (!current) {
@@ -279,6 +290,23 @@ export function createProofOperations(resolve: () => ProofDeps) {
               })
               .where(eq(booking.id, current.id));
           }
+
+          // The alert belongs to the proof, not to the first status change: a
+          // second screenshot while awaiting review is worth telling staff about.
+          await queueStaffAlert(tx, ctx.clock, {
+            kind: "proof",
+            booking: {
+              id: current.id,
+              publicId: current.publicId,
+              customerName: current.customerName,
+              occasionNameAr: current.occasionNameAr,
+              occasionNameEn: current.occasionNameEn,
+              startsAt: current.startsAt,
+              depositEgp: current.depositEgp,
+            },
+            baseUrl: deps.baseUrl,
+            logger: ctx.log,
+          });
 
           return {
             status: "proof_submitted",
@@ -350,4 +378,5 @@ export function createProofOperations(resolve: () => ProofDeps) {
 export const proofOperations = createProofOperations(() => ({
   db: getDb(),
   uploadDir: uploadRoot(),
+  baseUrl: publicBaseUrl(),
 }));

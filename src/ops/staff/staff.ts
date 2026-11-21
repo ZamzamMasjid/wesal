@@ -29,6 +29,8 @@ const publicColumns = {
   username: staffUser.username,
   role: staffUser.role,
   notifyPhone: staffUser.notifyPhone,
+  notifyEnabled: staffUser.notifyEnabled,
+  locale: staffUser.locale,
   active: staffUser.active,
 };
 
@@ -50,6 +52,71 @@ export function createStaffOperations(resolve: () => StaffDeps) {
         .db.select(publicColumns)
         .from(staffUser)
         .where(eq(staffUser.id, actorId(ctx.caller)));
+      if (!user) throw new ApiError("UNAUTHENTICATED");
+      return user;
+    },
+  });
+
+  const updateNotifications = defineOperation({
+    name: "staff.me.notifications",
+    access: "staff",
+    input: z.object({
+      notifyPhone: phone,
+      notifyEnabled: z.boolean(),
+      /** The dashboard language alerts are written in. */
+      locale: z.enum(["ar", "en"]).optional(),
+    }),
+    handler: async (input, ctx) => {
+      const { db } = resolve();
+      const actor = actorId(ctx.caller);
+      await db.transaction(async (tx) => {
+        const [target] = await tx
+          .select({
+            id: staffUser.id,
+            notifyPhone: staffUser.notifyPhone,
+            notifyEnabled: staffUser.notifyEnabled,
+            locale: staffUser.locale,
+          })
+          .from(staffUser)
+          .where(eq(staffUser.id, actor))
+          .for("update");
+        if (!target) throw new ApiError("UNAUTHENTICATED");
+
+        const changes: Partial<typeof staffUser.$inferInsert> = {};
+        const detail: Record<string, unknown> = {};
+        if (input.notifyPhone !== target.notifyPhone) {
+          changes.notifyPhone = input.notifyPhone;
+          detail.notifyPhone = "changed";
+        }
+        if (input.notifyEnabled !== target.notifyEnabled) {
+          changes.notifyEnabled = input.notifyEnabled;
+          detail.notifyEnabled = {
+            from: target.notifyEnabled,
+            to: input.notifyEnabled,
+          };
+        }
+        if (input.locale !== undefined && input.locale !== target.locale) {
+          changes.locale = input.locale;
+          detail.locale = { from: target.locale, to: input.locale };
+        }
+        if (Object.keys(changes).length === 0) return;
+
+        await tx
+          .update(staffUser)
+          .set({ ...changes, updatedAt: ctx.clock.now() })
+          .where(eq(staffUser.id, target.id));
+        await recordAudit(tx, ctx.clock, {
+          actorId: actor,
+          action: "staff.notify_update",
+          target: `staff_user:${target.id}`,
+          detail,
+        });
+      });
+
+      const [user] = await db
+        .select(publicColumns)
+        .from(staffUser)
+        .where(eq(staffUser.id, actor));
       if (!user) throw new ApiError("UNAUTHENTICATED");
       return user;
     },
@@ -79,6 +146,7 @@ export function createStaffOperations(resolve: () => StaffDeps) {
       password,
       role: z.enum(["owner", "staff"]).default("staff"),
       notifyPhone: phone.optional(),
+      notifyEnabled: z.boolean().optional(),
     }),
     handler: async (input, ctx) => {
       const { db, auth } = resolve();
@@ -116,6 +184,7 @@ export function createStaffOperations(resolve: () => StaffDeps) {
         role: z.enum(["owner", "staff"]).optional(),
         active: z.boolean().optional(),
         notifyPhone: phone.optional(),
+        notifyEnabled: z.boolean().optional(),
         /** Resets the password; the user's open sessions end. */
         password: password.optional(),
       })
@@ -125,6 +194,7 @@ export function createStaffOperations(resolve: () => StaffDeps) {
           v.role !== undefined ||
           v.active !== undefined ||
           v.notifyPhone !== undefined ||
+          v.notifyEnabled !== undefined ||
           v.password !== undefined,
         { message: "Nothing to change." },
       ),
@@ -180,6 +250,16 @@ export function createStaffOperations(resolve: () => StaffDeps) {
         ) {
           changes.notifyPhone = input.notifyPhone;
           detail.notifyPhone = "changed";
+        }
+        if (
+          input.notifyEnabled !== undefined &&
+          input.notifyEnabled !== target.notifyEnabled
+        ) {
+          changes.notifyEnabled = input.notifyEnabled;
+          detail.notifyEnabled = {
+            from: target.notifyEnabled,
+            to: input.notifyEnabled,
+          };
         }
         if (Object.keys(changes).length === 0) return;
 
@@ -243,7 +323,7 @@ export function createStaffOperations(resolve: () => StaffDeps) {
     }),
   });
 
-  return { me, listUsers, createUser, updateUser, audit };
+  return { me, updateNotifications, listUsers, createUser, updateUser, audit };
 }
 
 export const staffOperations = createStaffOperations(() => ({

@@ -44,6 +44,12 @@ export const staffUser = pgTable("staff_user", {
     .notNull()
     .default("staff"),
   notifyPhone: text("notify_phone"),
+  /** Whether staff alerts go to `notifyPhone`. The owner is the fallback recipient. */
+  notifyEnabled: boolean("notify_enabled").notNull().default(true),
+  /** The dashboard language alerts are written in. */
+  locale: text("locale", { enum: ["ar", "en"] })
+    .notNull()
+    .default("ar"),
   active: boolean("active").notNull().default(true),
   ...timestamps,
 });

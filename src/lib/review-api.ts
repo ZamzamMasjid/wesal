@@ -92,6 +92,21 @@ export function reviewHref(bookingId: string): string {
   return `/dashboard/review/${encodeURIComponent(bookingId)}`;
 }
 
+/** The review page, in the language a staff alert is written in. */
+export function reviewPath(locale: "ar" | "en", bookingId: string): string {
+  const prefix = locale === "ar" ? "" : `/${locale}`;
+  return `${prefix}${reviewHref(bookingId)}`;
+}
+
+/** The absolute review link that goes in a staff WhatsApp/SMS alert. */
+export function absoluteReviewLink(
+  baseUrl: string,
+  locale: "ar" | "en",
+  bookingId: string,
+): string {
+  return `${baseUrl.replace(/\/+$/, "")}${reviewPath(locale, bookingId)}`;
+}
+
 /** The staff-only screenshot endpoint (ADR-013: never a public URL). */
 export function proofFileHref(proofId: number): string {
   return `/api/v1/staff/proofs/${proofId}/file`;

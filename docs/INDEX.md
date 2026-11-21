@@ -8,7 +8,7 @@ budgets: {}
 activities: []
 active:
   phase: phase-4-operations
-  section: staff-notifications
+  section: booking-management
 ---
 
 # Project Index
@@ -18,7 +18,7 @@ active:
 ## Active work
 
 - **Current phase**: phase-4-operations
-- **Current section**: staff-notifications
+- **Current section**: booking-management
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars
@@ -51,7 +51,7 @@ active:
 | `slot-alerts` | Slot Alerts | planned | later | availability | phase-6-alerts-and-reports/slot-alerts |
 | `slot-schedule` | Slot Schedule | shipped | v1 | availability | phase-2-foundations/slot-schedule |
 | `staff-access` | Staff Access | in-progress | v1 | back-office | phase-2-foundations/staff-access |
-| `staff-notifications` | Staff Notifications | planned | v1 | messaging | phase-4-operations/staff-notifications |
+| `staff-notifications` | Staff Notifications | shipped | v1 | messaging | phase-4-operations/staff-notifications |
 | `venue-settings` | Venue Settings | shipped | v1 | back-office | phase-2-foundations/venue-settings |
 
 ## Architecture

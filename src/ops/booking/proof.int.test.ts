@@ -7,11 +7,17 @@ import { eq } from "drizzle-orm";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
 
 import { createCallContext } from "@/api/context";
-import { booking, occasion, paymentProof } from "@/db/schema";
+import {
+  booking,
+  occasion,
+  outboxMessage,
+  paymentProof,
+  staffUser,
+} from "@/db/schema";
 import type { Clock } from "@/lib/clock";
 import { MAX_PROOF_BYTES } from "@/lib/proof-api";
 import { openTestDb, resetDatabase } from "@/test/db";
-import { aBooking, anOccasion } from "@/test/factories";
+import { aBooking, anOccasion, aStaffUser } from "@/test/factories";
 import { resolveProofPath } from "@/storage/proofs";
 
 import { createProofOperations, sniffProofImage } from "./proof";
@@ -19,6 +25,7 @@ import { createProofOperations, sniffProofImage } from "./proof";
 const handle = openTestDb();
 const { db } = handle;
 
+const BASE_URL = "https://wesal.example";
 const NOW = new Date("2026-12-20T08:00:00Z");
 const DEADLINE = new Date(NOW.getTime() + 20 * 60_000);
 let now = NOW;
@@ -32,7 +39,11 @@ const staff = {
   ...createCallContext({ kind: "staff", userId: "staff-1", role: "staff" }),
   clock,
 };
-const ops = createProofOperations(() => ({ db, uploadDir: root }));
+const ops = createProofOperations(() => ({
+  db,
+  uploadDir: root,
+  baseUrl: BASE_URL,
+}));
 
 const PNG = Buffer.from([
   0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 1, 2,
@@ -86,7 +97,13 @@ async function storedBooking() {
 beforeEach(async () => {
   now = NOW;
   await resetDatabase(handle);
-  await db.insert(occasion).values(anOccasion({ priceEgp: 1000 }));
+  await db.insert(occasion).values(
+    anOccasion({
+      nameAr: "زفاف",
+      nameEn: "Wedding",
+      priceEgp: 1000,
+    }),
+  );
   root = await mkdtemp(path.join(tmpdir(), "wesal-proof-ops-"));
 });
 
@@ -139,6 +156,63 @@ describe("bookings.proof", () => {
     expect(row.status).toBe("proof_submitted");
     expect(row.holdExpiresAt).toBeNull();
     expect(row.updatedAt).toEqual(NOW);
+  });
+
+  it("queues a staff alert with a review link for every opted-in staff member", async () => {
+    await db.insert(staffUser).values([
+      aStaffUser({
+        id: "staff-ar",
+        name: "Sara",
+        notifyPhone: "+201001111111",
+        locale: "ar",
+      }),
+      aStaffUser({
+        id: "staff-en",
+        name: "Mona",
+        notifyPhone: "+201002222222",
+        locale: "en",
+      }),
+      aStaffUser({
+        id: "staff-off",
+        name: "Nour",
+        notifyPhone: "+201003333333",
+        notifyEnabled: false,
+      }),
+    ]);
+    await seedHeld({
+      publicId: "PROOF1",
+      customerName: "Hassan",
+      depositEgp: 500,
+    });
+
+    const result = await ops.upload(
+      { token: "token-held", file: aFile(PNG, "receipt.png", "image/png") },
+      holder,
+    );
+    expect(result.ok).toBe(true);
+
+    const messages = await db.select().from(outboxMessage);
+    expect(messages).toHaveLength(2);
+    const byLocale = new Map(
+      messages.map((message) => [message.locale, message]),
+    );
+    expect(byLocale.get("ar")).toMatchObject({
+      template: "staff-alert",
+      recipient: "+201001111111",
+      channel: "whatsapp",
+    });
+    expect(byLocale.get("ar")?.values).toMatchObject({
+      kind: "proof",
+      link: `${BASE_URL}/dashboard/review/PROOF1`,
+      occasion: "زفاف",
+      customerName: "Hassan",
+      depositEgp: "500",
+    });
+    expect(byLocale.get("en")?.values).toMatchObject({
+      kind: "proof",
+      link: `${BASE_URL}/en/dashboard/review/PROOF1`,
+      occasion: "Wedding",
+    });
   });
 
   it("trusts the content, not the file name or the browser's type", async () => {

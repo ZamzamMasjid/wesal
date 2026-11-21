@@ -9,6 +9,10 @@ export interface NewStaffAccount {
   password: string;
   role: StaffRole;
   notifyPhone?: string | null;
+  /** Whether staff alerts go to `notifyPhone`. Defaults to on. */
+  notifyEnabled?: boolean;
+  /** The dashboard language alerts are written in. Defaults to Arabic. */
+  locale?: "ar" | "en";
 }
 
 export const MIN_PASSWORD_LENGTH = 8;
@@ -52,6 +56,10 @@ export async function createStaffAccount(
       role: input.role,
       active: true,
       notifyPhone: input.notifyPhone ?? null,
+      ...(input.notifyEnabled === undefined
+        ? {}
+        : { notifyEnabled: input.notifyEnabled }),
+      ...(input.locale === undefined ? {} : { locale: input.locale }),
     },
     { method: "email" },
   );

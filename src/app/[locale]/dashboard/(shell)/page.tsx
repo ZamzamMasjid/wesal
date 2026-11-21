@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { createCallContext } from "@/api/context";
+import { MyNotifications } from "@/components/dashboard/notifications";
 import { routing } from "@/i18n/routing";
 import { staffOperations } from "@/ops/staff/staff";
 
@@ -23,11 +24,25 @@ export default async function DashboardHome({
     createCallContext(await currentCaller()),
   );
   return (
-    <section className="space-y-2">
-      <h1 className="text-3xl font-bold">
-        {t("welcome", { name: me.ok ? me.data.name : "" })}
-      </h1>
-      <p className="text-muted">{t("welcomeHint")}</p>
+    <section className="space-y-6">
+      <div className="space-y-2">
+        <h1 className="text-3xl font-bold">
+          {t("welcome", { name: me.ok ? me.data.name : "" })}
+        </h1>
+        <p className="text-muted">{t("welcomeHint")}</p>
+      </div>
+      {me.ok && (
+        <MyNotifications
+          initial={{
+            id: me.data.id,
+            name: me.data.name,
+            role: me.data.role,
+            notifyPhone: me.data.notifyPhone,
+            notifyEnabled: me.data.notifyEnabled,
+            locale: me.data.locale,
+          }}
+        />
+      )}
     </section>
   );
 }

@@ -56,6 +56,18 @@ export function createAuth(db: Database, config: AuthConfig) {
           input: false,
         },
         notifyPhone: { type: "string", required: false, input: false },
+        notifyEnabled: {
+          type: "boolean",
+          required: true,
+          defaultValue: true,
+          input: false,
+        },
+        locale: {
+          type: "string",
+          required: true,
+          defaultValue: "ar",
+          input: false,
+        },
       },
     },
     session: {

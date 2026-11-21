@@ -9,13 +9,19 @@ import {
   occasion,
   outboxMessage,
   slotPattern,
+  staffUser,
 } from "@/db/schema";
 import type { Clock } from "@/lib/clock";
 import {
   issueVerifiedPhoneToken,
   VERIFIED_PHONE_TOKEN_MINUTES,
 } from "@/ops/verification/token";
-import { aBooking, anOccasion, aSlotPattern } from "@/test/factories";
+import {
+  aBooking,
+  anOccasion,
+  aSlotPattern,
+  aStaffUser,
+} from "@/test/factories";
 import { openTestDb, resetDatabase } from "@/test/db";
 
 import { createBookingOperations } from "./hold";
@@ -212,6 +218,59 @@ describe("bookings.create", () => {
     expect(result.data.deadlineAt).toBe(
       new Date("2026-12-25T00:20:00Z").toISOString(),
     );
+  });
+
+  it("queues an urgent staff alert when the hold is on a soon slot", async () => {
+    await db.insert(staffUser).values(
+      aStaffUser({
+        id: "staff-en",
+        name: "Mona",
+        notifyPhone: "+201002222222",
+        locale: "en",
+      }),
+    );
+    now = new Date("2026-12-25T00:00:00Z");
+    const result = await ops.create(input({ token: tokenFor() }), ctx);
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+
+    const messages = await db
+      .select()
+      .from(outboxMessage)
+      .orderBy(outboxMessage.id);
+    expect(messages.map((message) => message.template)).toEqual([
+      "booking-link",
+      "staff-alert",
+    ]);
+    const alert = messages.find(
+      (message) => message.template === "staff-alert",
+    );
+    expect(alert).toMatchObject({
+      recipient: "+201002222222",
+      locale: "en",
+      channel: "whatsapp",
+      expiresAt: new Date("2026-12-25T16:00:00Z"),
+    });
+    expect(alert?.values).toMatchObject({
+      kind: "urgent",
+      link: `${BASE_URL}/en/dashboard/review/${result.data.bookingId}`,
+      customerName: "Mona Hassan",
+      slotStartAt: "2026-12-25T16:00:00.000Z",
+    });
+    expect(typeof alert?.values.occasion).toBe("string");
+  });
+
+  it("does not alert staff for a hold outside the urgent threshold", async () => {
+    await db
+      .insert(staffUser)
+      .values(aStaffUser({ id: "staff-ar", notifyPhone: "+201001111111" }));
+    const result = await ops.create(input(), ctx);
+    expect(result.ok).toBe(true);
+
+    const messages = await db.select().from(outboxMessage);
+    expect(messages.map((message) => message.template)).toEqual([
+      "booking-link",
+    ]);
   });
 
   it("lets exactly one of two customers hold the slot", async () => {

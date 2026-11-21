@@ -1,7 +1,13 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 
 import { Button } from "@/components/ui/button";
 
@@ -11,6 +17,8 @@ interface StaffUser {
   username: string;
   role: "owner" | "staff";
   active: boolean;
+  notifyPhone: string | null;
+  notifyEnabled: boolean;
 }
 
 interface Envelope<T> {
@@ -48,6 +56,7 @@ export function StaffManager() {
   );
   const [loadFailed, setLoadFailed] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [notifyFor, setNotifyFor] = useState<StaffUser | null>(null);
 
   const load = useCallback(async () => {
     const result = await call<{ users: StaffUser[] }>(
@@ -161,6 +170,7 @@ export function StaffManager() {
                 <th className="p-3 text-start">{t("name")}</th>
                 <th className="p-3 text-start">{t("login")}</th>
                 <th className="p-3 text-start">{t("status")}</th>
+                <th className="p-3 text-start">{t("alerts")}</th>
                 <th className="p-3 text-start">{t("actions")}</th>
               </tr>
             </thead>
@@ -174,7 +184,27 @@ export function StaffManager() {
                   <td className="p-3">
                     {user.active ? t("active") : t("disabled")}
                   </td>
+                  <td className="p-3">
+                    {user.notifyPhone ? (
+                      <span className="flex flex-col">
+                        <span dir="ltr">{user.notifyPhone}</span>
+                        <span className="text-xs text-muted">
+                          {user.notifyEnabled ? t("notifyOn") : t("notifyOff")}
+                        </span>
+                      </span>
+                    ) : (
+                      <span className="text-muted">{t("noPhone")}</span>
+                    )}
+                  </td>
                   <td className="flex flex-wrap gap-2 p-3">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setNotifyFor(user)}
+                    >
+                      {t("editAlerts")}
+                    </Button>
                     <Button
                       type="button"
                       variant="outline"
@@ -249,6 +279,104 @@ export function StaffManager() {
           {creating ? t("creating") : t("create")}
         </Button>
       </form>
+
+      {notifyFor && (
+        <NotificationDialog
+          user={notifyFor}
+          onClose={() => setNotifyFor(null)}
+          onSaved={() => {
+            setNotifyFor(null);
+            void load();
+          }}
+        />
+      )}
     </div>
+  );
+}
+
+/** The owner sets a staff member's alert phone and whether alerts are sent. */
+function NotificationDialog({
+  user,
+  onClose,
+  onSaved,
+}: {
+  user: StaffUser;
+  onClose: () => void;
+  onSaved: () => void;
+}) {
+  const t = useTranslations("Dashboard.staff");
+  const ref = useRef<HTMLDialogElement>(null);
+  const [phone, setPhone] = useState(user.notifyPhone ?? "");
+  const [enabled, setEnabled] = useState(user.notifyEnabled);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const dialog = ref.current;
+    if (dialog && !dialog.open) dialog.showModal();
+  }, []);
+
+  async function save(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (busy) return;
+    setBusy(true);
+    setError(null);
+    const result = await call(`/api/v1/staff/users/${user.id}`, "PATCH", {
+      notifyPhone: phone.trim() === "" ? null : phone.trim(),
+      notifyEnabled: enabled,
+    });
+    setBusy(false);
+    if (result.ok) onSaved();
+    else if (result.error?.code === "VALIDATION_FAILED") setError(t("invalid"));
+    else setError(t("failed"));
+  }
+
+  return (
+    <dialog
+      ref={ref}
+      aria-labelledby="notify-title"
+      onClose={onClose}
+      className="m-auto w-[min(28rem,calc(100vw-2rem))] rounded-lg bg-surface p-5 text-foreground shadow-md backdrop:bg-black/50"
+    >
+      <form onSubmit={save} className="space-y-4">
+        <h2 id="notify-title" className="text-xl font-bold">
+          {t("notifyTitle", { name: user.name })}
+        </h2>
+        <label className="block space-y-1 text-sm">
+          {t("notifyPhone")}
+          <input
+            type="tel"
+            dir="ltr"
+            value={phone}
+            onChange={(event) => setPhone(event.target.value)}
+            className={inputClass}
+          />
+        </label>
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={enabled}
+            onChange={(event) => setEnabled(event.target.checked)}
+          />
+          {t("notifyEnabled")}
+        </label>
+        {error && (
+          <p
+            role="alert"
+            className="rounded-sm bg-danger-soft p-3 text-sm text-danger"
+          >
+            {error}
+          </p>
+        )}
+        <div className="flex justify-end gap-2">
+          <Button type="button" variant="ghost" onClick={onClose}>
+            {t("cancel")}
+          </Button>
+          <Button type="submit" disabled={busy}>
+            {busy ? t("saving") : t("save")}
+          </Button>
+        </div>
+      </form>
+    </dialog>
   );
 }

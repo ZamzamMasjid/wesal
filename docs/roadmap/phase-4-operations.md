@@ -36,9 +36,9 @@ Staff confirm or reject uploaded proofs. Extends `web`; reads `upload-volume`.
 
 Alerts to owner and staff through the outbox in `web`.
 
-- [ ] Queue staff alert on proof upload with a link to the review page
-- [ ] Queue urgent alert for holds on slots starting soon
-- [ ] Implement per-staff notification phone and opt-in setting
+- [x] Queue staff alert on proof upload with a link to the review page
+- [x] Queue urgent alert for holds on slots starting soon
+- [x] Implement per-staff notification phone and opt-in setting
 
 ### booking-management
 
