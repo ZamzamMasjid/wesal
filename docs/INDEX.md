@@ -7,8 +7,8 @@ generated_by: axiom:reindex
 budgets: {}
 activities: []
 active:
-  phase: phase-6-alerts-and-reports
-  section: null
+  phase: phase-7-mobile-app
+  section: customer-mobile-app
 ---
 
 # Project Index
@@ -17,8 +17,8 @@ active:
 
 ## Active work
 
-- **Current phase**: phase-6-alerts-and-reports
-- **Current section**: <none>
+- **Current phase**: phase-7-mobile-app
+- **Current section**: customer-mobile-app
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars
@@ -88,7 +88,7 @@ active:
 | `phase-3-booking` | shipped | v1 | public-calendar, booking-hold, booking-page, payment-proof |
 | `phase-4-operations` | shipped | v1 | payment-review, staff-notifications, booking-management |
 | `phase-5-public-site` | shipped | v1 | content-management, landing-page |
-| `phase-6-alerts-and-reports` | planned | later | slot-alerts, booking-reports |
+| `phase-6-alerts-and-reports` | shipped | later | slot-alerts, booking-reports |
 | `phase-7-mobile-app` | planned | later | customer-mobile-app, push-notifications |
 
 ## Section ownership

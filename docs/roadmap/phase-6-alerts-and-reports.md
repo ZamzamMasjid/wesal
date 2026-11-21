@@ -2,8 +2,8 @@
 id: phase-6-alerts-and-reports
 type: roadmap-phase
 title: Phase 6 — Alerts and Reports
-status: planned
-last_modified: 2026-11-15
+status: shipped
+last_modified: 2026-11-21
 milestone: later
 phase_number: 6
 sections: [slot-alerts, booking-reports]
