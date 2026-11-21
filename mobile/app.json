@@ -1,0 +1,44 @@
+{
+  "expo": {
+    "name": "وصال",
+    "slug": "wesal",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "wesal",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.wesal.app",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "اختر صورة إثبات التحويل من معرض الصور.",
+        "NSCameraUsageDescription": "التقط صورة إثبات التحويل."
+      }
+    },
+    "android": {
+      "package": "com.wesal.app",
+      "permissions": ["POST_NOTIFICATIONS", "READ_MEDIA_IMAGES"]
+    },
+    "plugins": [
+      "expo-localization",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "اختر صورة إثبات التحويل من معرض الصور."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "color": "#6B2737"
+        }
+      ]
+    ],
+    "extra": {
+      "apiUrl": "https://wesal.example",
+      "eas": {
+        "projectId": "00000000-0000-0000-0000-000000000000"
+      }
+    }
+  }
+}

@@ -40,7 +40,7 @@ active:
 | `booking-page` | Booking Page | shipped | v1 | booking | phase-3-booking/booking-page |
 | `booking-reports` | Booking Reports | shipped | later | reporting | phase-6-alerts-and-reports/booking-reports |
 | `content-management` | Content Management | shipped | v1 | public-site | phase-5-public-site/content-management |
-| `customer-mobile-app` | Customer Mobile App | planned | later | mobile-app | phase-7-mobile-app/customer-mobile-app |
+| `customer-mobile-app` | Customer Mobile App | in-progress | later | mobile-app | phase-7-mobile-app/customer-mobile-app |
 | `landing-page` | Landing Page | shipped | v1 | public-site | phase-5-public-site/landing-page |
 | `message-delivery` | Message Delivery | shipped | v1 | messaging | phase-2-foundations/message-delivery |
 | `payment-proof` | Payment Proof | shipped | v1 | booking | phase-3-booking/payment-proof |

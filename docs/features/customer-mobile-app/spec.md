@@ -2,8 +2,8 @@
 id: customer-mobile-app
 type: feature
 title: Customer Mobile App
-status: planned
-last_modified: 2026-11-15
+status: in-progress
+last_modified: 2026-11-21
 milestone: later
 pillar: mobile-app
 depends_on: [public-calendar, booking-hold, booking-page, payment-proof]
@@ -61,5 +61,4 @@ No new server entities. On the device: the link tokens of bookings made there.
 
 ## Open questions
 
-- Expo and React Native are the assumed stack (matching the owner's other project); this is to be decided when the phase starts.
-- Is the owner and staff side part of the same app, or a separate one?
+- Store developer accounts and signing credentials (Google Play, App Store) are setup work outside the code; no store build can be produced until they exist.

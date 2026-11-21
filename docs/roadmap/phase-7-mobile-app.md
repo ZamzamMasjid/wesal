@@ -26,8 +26,8 @@ The first push shipped and its JSON API stable. Developer accounts for Google Pl
 
 The booking experience as a mobile app over the same JSON API.
 
-- [ ] Scaffold Expo app with Arabic/English and RTL, consuming `/api/v1`
-- [ ] Implement calendar, booking form, booking page and proof upload screens
+- [x] Scaffold Expo app with Arabic/English and RTL, consuming `/api/v1`
+- [x] Implement calendar, booking form, booking page and proof upload screens
 - [ ] Produce Android and iOS store builds
 
 ### push-notifications
