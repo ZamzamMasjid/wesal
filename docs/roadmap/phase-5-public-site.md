@@ -34,7 +34,7 @@ Owner-editable content and media. Extends `web`; files on `upload-volume`.
 
 The public home page. Extends `web`.
 
-- [ ] Implement home view: hero, gallery, occasion prices, policy, contact
+- [x] Implement home view: hero, gallery, occasion prices, policy, contact
 - [ ] Add calendar entry point and booking call to action
 - [ ] Add SEO metadata, Open Graph and hreflang for Arabic and English
 - [ ] Serve media with range requests and caching headers

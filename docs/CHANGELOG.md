@@ -170,3 +170,10 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Summary**: The owner edits the site at `/dashboard/content`, reached from a new owner-only Content item in the dashboard navigation. The screen pairs Arabic and English description and policy fields (with a same-as-Arabic hint), the two contact numbers, and a sticky save bar that appears only when text is dirty; leaving the page with unsaved text asks first. Below it, a media manager uploads several photos or videos at once with per-file progress, checks type and the settings limit before sending, shows the free volume space, keeps the first photo as the hero, reorders by drag or move buttons, edits alternative text in both languages, and deletes with a confirmation. A "View site" link opens the landing page in a new tab.
 - **Affected Docs**: content-management (design), phase-5-public-site
 - **Reason**: Implementing `phase-5-public-site/content-management`, third item.
+
+## [2026-11-21] — Landing page
+
+- **Type**: Feature Change
+- **Summary**: The public home page is live at `/` (Arabic) and `/en`. It is server-rendered from content management and venue settings: the first photo is the hero, the description is set as paragraphs beside the venue name, and the remaining photos and videos fill a gallery whose first tile is double width. The gallery opens a focus-trapping lightbox with arrow-key and button navigation, and videos play only on tap, muted. Occasion cards show the localized name and price with the deposit percentage beside them, the policy text is a collapsible numbered list (one rule per line), and the contact block carries the phone and WhatsApp actions with a sticky bar on phones. Empty occasions become a contact prompt; no media omits the hero and gallery. The header gains "Find my booking" on the landing page, and the language switch stays on the same page.
+- **Affected Docs**: landing-page, content-management, home (view), phase-5-public-site
+- **Reason**: Implementing `phase-5-public-site/landing-page`, first item.
