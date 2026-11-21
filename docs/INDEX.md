@@ -8,7 +8,7 @@ budgets: {}
 activities: []
 active:
   phase: phase-5-public-site
-  section: content-management
+  section: landing-page
 ---
 
 # Project Index
@@ -18,7 +18,7 @@ active:
 ## Active work
 
 - **Current phase**: phase-5-public-site
-- **Current section**: content-management
+- **Current section**: landing-page
 - **Initial cut**: 14 feature(s) / 5 phase(s) · **later**: 4 feature(s) / 2 phase(s)
 
 ## Pillars

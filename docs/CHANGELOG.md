@@ -163,3 +163,10 @@ Implementation details (refactors, dependency bumps, internal cleanups) belong i
 - **Summary**: The owner can upload, order, describe and remove venue photos and videos. `media_asset` stores the kind, file path, MIME type, byte size, position and Arabic/English alternative text; files are streamed to random names under `media/` on the upload volume and are never purged. `POST /api/v1/staff/media` takes a multipart upload and checks the type and the size limit before writing, `PATCH` and `DELETE /api/v1/staff/media/{id}` change the text/order and remove the row with its file, and `GET /api/v1/staff/media` returns the ordered list with the limits and free disk space. `GET /api/v1/media/{id}` streams a file anonymously with an immutable cache header. The public content answer now carries the ordered media list. Venue settings gain `maxPhotoMb` (20 default) and `maxVideoMb` (200 default), editable on the settings screen. A full volume refuses the upload with `STORAGE_FULL`.
 - **Affected Docs**: content-management, venue-settings, data-model, phase-5-public-site
 - **Reason**: Implementing `phase-5-public-site/content-management`, second item.
+
+## [2026-11-21] — Content editor screens
+
+- **Type**: Feature Change
+- **Summary**: The owner edits the site at `/dashboard/content`, reached from a new owner-only Content item in the dashboard navigation. The screen pairs Arabic and English description and policy fields (with a same-as-Arabic hint), the two contact numbers, and a sticky save bar that appears only when text is dirty; leaving the page with unsaved text asks first. Below it, a media manager uploads several photos or videos at once with per-file progress, checks type and the settings limit before sending, shows the free volume space, keeps the first photo as the hero, reorders by drag or move buttons, edits alternative text in both languages, and deletes with a confirmation. A "View site" link opens the landing page in a new tab.
+- **Affected Docs**: content-management (design), phase-5-public-site
+- **Reason**: Implementing `phase-5-public-site/content-management`, third item.

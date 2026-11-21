@@ -28,7 +28,7 @@ Owner-editable content and media. Extends `web`; files on `upload-volume`.
 
 - [x] Implement site content API: description, policy, contact in Arabic and English
 - [x] Implement media upload and ordering for photos and videos on the volume
-- [ ] Implement owner-only content editor screens
+- [x] Implement owner-only content editor screens
 
 ### landing-page
 

@@ -5,11 +5,12 @@ import { describe, expect, it } from "vitest";
 import { navFor } from "./nav";
 
 describe("navFor", () => {
-  it("shows review and bookings to everyone and settings, schedule and staff to owners only", () => {
+  it("shows review and bookings to everyone and content, settings, schedule and staff to owners only", () => {
     expect(navFor("owner").map((i) => i.label)).toEqual([
       "home",
       "review",
       "bookings",
+      "content",
       "schedule",
       "settings",
       "staff",
