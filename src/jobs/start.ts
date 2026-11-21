@@ -1,6 +1,6 @@
 import { getDb } from "@/db/client";
 import { runtime } from "@/lib/runtime";
-import { getSender } from "@/messaging/config";
+import { getSender, publicBaseUrl } from "@/messaging/config";
 import { processOutbox } from "@/messaging/outbox";
 import { createDailyProofPurge, purgeOldProofs } from "@/ops/booking/purge";
 import { expireOverdueHolds } from "@/ops/booking/sweep";
@@ -46,7 +46,11 @@ export function startJobs(
       {
         name: "holds",
         run: async ({ log }) => {
-          const summary = await expireOverdueHolds({ db: getDb(), clock });
+          const summary = await expireOverdueHolds({
+            db: getDb(),
+            clock,
+            baseUrl: publicBaseUrl(),
+          });
           if (summary.expired > 0) {
             log.info("overdue holds expired", { expired: summary.expired });
           }

@@ -444,7 +444,13 @@ export const outboxMessage = pgTable(
     recipient: text("recipient").notNull(),
     channel: text("channel", { enum: ["whatsapp", "sms"] }).notNull(),
     template: text("template", {
-      enum: ["code", "booking-link", "booking-confirmed", "staff-alert"],
+      enum: [
+        "code",
+        "booking-link",
+        "booking-confirmed",
+        "staff-alert",
+        "slot-alert",
+      ],
     }).notNull(),
     values: jsonb("values").$type<Record<string, string>>().notNull(),
     locale: text("locale", { enum: ["ar", "en"] }).notNull(),

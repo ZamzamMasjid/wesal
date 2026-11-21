@@ -13,6 +13,7 @@ const handle = openTestDb();
 const { db } = handle;
 const NOW = new Date("2026-12-20T08:00:00Z");
 const clock: Clock = { now: () => NOW };
+const BASE_URL = "https://wesal.example";
 
 beforeEach(async () => {
   await resetDatabase(handle);
@@ -43,7 +44,10 @@ describe("expireOverdueHolds", () => {
       }),
     ]);
 
-    expect(await expireOverdueHolds({ db, clock })).toEqual({ expired: 2 });
+    expect(await expireOverdueHolds({ db, clock, baseUrl: BASE_URL })).toEqual({
+      expired: 2,
+      notified: 0,
+    });
 
     const stored = await db.select().from(booking);
     expect(stored.map((row) => row.status)).toEqual(["expired", "expired"]);
@@ -92,7 +96,10 @@ describe("expireOverdueHolds", () => {
       }),
     ]);
 
-    expect(await expireOverdueHolds({ db, clock })).toEqual({ expired: 0 });
+    expect(await expireOverdueHolds({ db, clock, baseUrl: BASE_URL })).toEqual({
+      expired: 0,
+      notified: 0,
+    });
 
     const stored = await db.select().from(booking);
     expect(stored.map((row) => row.status)).toEqual([
@@ -116,7 +123,13 @@ describe("expireOverdueHolds", () => {
       }),
     );
 
-    expect(await expireOverdueHolds({ db, clock })).toEqual({ expired: 1 });
-    expect(await expireOverdueHolds({ db, clock })).toEqual({ expired: 0 });
+    expect(await expireOverdueHolds({ db, clock, baseUrl: BASE_URL })).toEqual({
+      expired: 1,
+      notified: 0,
+    });
+    expect(await expireOverdueHolds({ db, clock, baseUrl: BASE_URL })).toEqual({
+      expired: 0,
+      notified: 0,
+    });
   });
 });

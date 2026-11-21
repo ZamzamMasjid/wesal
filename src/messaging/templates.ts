@@ -8,7 +8,11 @@ import { VENUE_TIME_ZONE } from "@/lib/clock";
 
 export type Locale = "ar" | "en";
 export type TemplateName =
-  "code" | "booking-link" | "booking-confirmed" | "staff-alert";
+  | "code"
+  | "booking-link"
+  | "booking-confirmed"
+  | "staff-alert"
+  | "slot-alert";
 
 const text = z.string().min(1).max(500);
 const instant = z.iso.datetime({ offset: true });
@@ -35,6 +39,15 @@ export const TEMPLATE_VALUES = {
     slotStartAt: instant,
     customerName: text,
     depositEgp: z.string().optional(),
+  }),
+  /**
+   * A watched slot just freed up. `link` opens the booking form for that slot;
+   * `unsubscribe` is the one-use link that ends the subscription.
+   */
+  "slot-alert": z.object({
+    link: z.url(),
+    unsubscribe: z.url(),
+    slotStartAt: instant,
   }),
 } as const satisfies Record<TemplateName, z.ZodType>;
 
@@ -103,6 +116,12 @@ const RENDERERS: Record<TemplateName, Record<Locale, Renderer>> = {
             v.depositEgp ? `, deposit EGP ${v.depositEgp}` : ""
           }\n${v.link}`
         : `Urgent hold on a slot starting soon: ${v.customerName}, ${v.occasion}, ${when(v.slotStartAt!, l)}. Watch for the proof.\n${v.link}`,
+  },
+  "slot-alert": {
+    ar: (v, l) =>
+      `توفّر موعد ${when(v.slotStartAt!, l)} في وصال. يمكنك حجزه الآن:\n${v.link}\nلإلغاء التنبيه: ${v.unsubscribe}`,
+    en: (v, l) =>
+      `The ${when(v.slotStartAt!, l)} slot at Wesal is free again. Book it now:\n${v.link}\nTo stop these alerts: ${v.unsubscribe}`,
   },
 };
 

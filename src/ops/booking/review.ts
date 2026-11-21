@@ -9,6 +9,7 @@ import { getDb, type Database } from "@/db/client";
 import { booking, occasion, paymentProof } from "@/db/schema";
 import { cairoParts } from "@/lib/cairo-time";
 import { normalizeBookingId } from "@/lib/booking-read-api";
+import { closeSlotAlerts, notifySlotAlerts } from "@/ops/alerts/notify";
 import {
   orderReviewQueue,
   REJECT_REASONS,
@@ -18,6 +19,7 @@ import {
   type ReviewQueue,
   type ReviewQueueItem,
 } from "@/lib/review-api";
+import { publicBaseUrl } from "@/messaging/config";
 
 import { effectiveStatus } from "./read";
 
@@ -29,6 +31,8 @@ import { effectiveStatus } from "./read";
 
 export interface ReviewDeps {
   db: Database;
+  /** Public origin, for the links in slot-alert messages. */
+  baseUrl: string;
 }
 
 function actorId(caller: Caller): string {
@@ -258,7 +262,14 @@ export function createReviewOperations(resolve: () => ReviewDeps) {
   });
 
   type Locked =
-    | { ok: true; id: number; publicId: string; status: string }
+    | {
+        ok: true;
+        id: number;
+        publicId: string;
+        status: string;
+        startsAt: Date;
+        endsAt: Date;
+      }
     | { ok: false; error: ApiError };
 
   /**
@@ -278,6 +289,8 @@ export function createReviewOperations(resolve: () => ReviewDeps) {
         publicId: booking.publicId,
         status: booking.status,
         holdExpiresAt: booking.holdExpiresAt,
+        startsAt: booking.startsAt,
+        endsAt: booking.endsAt,
       })
       .from(booking)
       .where(eq(booking.publicId, bookingId))
@@ -290,11 +303,25 @@ export function createReviewOperations(resolve: () => ReviewDeps) {
         .update(booking)
         .set({ status: "expired", updatedAt: now })
         .where(eq(booking.id, row.id));
+      // The stored expiry frees the slot, so tell anyone watching it.
+      await notifySlotAlerts(
+        tx,
+        { now: () => now },
+        row,
+        resolve().baseUrl,
+      );
     }
     if (status !== "proof_submitted") {
       return { ok: false, error: statusChanged(status) };
     }
-    return { ok: true, id: row.id, publicId: row.publicId, status };
+    return {
+      ok: true,
+      id: row.id,
+      publicId: row.publicId,
+      status,
+      startsAt: row.startsAt,
+      endsAt: row.endsAt,
+    };
   }
 
   const confirm = defineOperation({
@@ -315,6 +342,11 @@ export function createReviewOperations(resolve: () => ReviewDeps) {
           .update(booking)
           .set({ status: "confirmed", holdExpiresAt: null, updatedAt: now })
           .where(eq(booking.id, locked.id));
+        // A confirmed slot cannot free up; any watch on it ends here.
+        await closeSlotAlerts(tx, {
+          startsAt: locked.startsAt,
+          endsAt: locked.endsAt,
+        });
         await recordAudit(tx, ctx.clock, {
           actorId: actor,
           action: "booking.confirm",
@@ -349,7 +381,7 @@ export function createReviewOperations(resolve: () => ReviewDeps) {
         .transform((value) => (value ? value : null)),
     }),
     handler: async (input, ctx): Promise<ReviewDecision> => {
-      const { db } = resolve();
+      const { db, baseUrl } = resolve();
       const actor = actorId(ctx.caller);
       const now = ctx.clock.now();
       const bookingId = normalizeBookingId(input.bookingId);
@@ -364,6 +396,12 @@ export function createReviewOperations(resolve: () => ReviewDeps) {
           .update(booking)
           .set({ status: "rejected", holdExpiresAt: null, updatedAt: now })
           .where(eq(booking.id, locked.id));
+        await notifySlotAlerts(
+          tx,
+          ctx.clock,
+          { startsAt: locked.startsAt, endsAt: locked.endsAt },
+          baseUrl,
+        );
         await recordAudit(tx, ctx.clock, {
           actorId: actor,
           action: "booking.reject",
@@ -411,6 +449,8 @@ export function createReviewOperations(resolve: () => ReviewDeps) {
             publicId: booking.publicId,
             status: booking.status,
             holdExpiresAt: booking.holdExpiresAt,
+            startsAt: booking.startsAt,
+            endsAt: booking.endsAt,
           })
           .from(booking)
           .where(eq(booking.publicId, bookingId))
@@ -450,6 +490,13 @@ export function createReviewOperations(resolve: () => ReviewDeps) {
             updatedAt: now,
           })
           .where(eq(booking.id, row.id));
+
+        if (nextStatus === "confirmed") {
+          await closeSlotAlerts(tx, {
+            startsAt: row.startsAt,
+            endsAt: row.endsAt,
+          });
+        }
 
         await recordAudit(tx, ctx.clock, {
           actorId: actor,
@@ -491,6 +538,7 @@ export function createReviewOperations(resolve: () => ReviewDeps) {
 
 export const reviewOperations = createReviewOperations(() => ({
   db: getDb(),
+  baseUrl: publicBaseUrl(),
 }));
 
 export type { ReviewDetail, ReviewDecision, ReviewQueue, ReviewQueueItem };

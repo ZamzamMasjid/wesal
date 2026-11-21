@@ -14,6 +14,7 @@ import { verificationSecret } from "@/lib/verification-secret";
 import { publicBaseUrl } from "@/messaging/config";
 import { queueMessage } from "@/messaging/outbox";
 import { queueStaffAlert } from "@/messaging/staff-alerts";
+import { closeSlotAlerts, notifySlotAlerts } from "@/ops/alerts/notify";
 import { resolveSlots, sameSlot } from "@/ops/schedule/resolver";
 import { depositFor, loadSettings } from "@/ops/venue/settings";
 import { isE164, normalizePhone } from "@/ops/verification/phone";
@@ -229,8 +230,9 @@ export function createBookingOperations(resolve: () => HoldDeps) {
               ),
             );
             // ADR-010: a hold past its deadline is free, whether the sweep has
-            // run or not, so expire the row before asking the constraint.
-            await tx
+            // run or not, so expire the row before asking the constraint. The
+            // same transaction tells anyone watching that the slot is free.
+            const expiredOnRange = await tx
               .update(booking)
               .set({ status: "expired", updatedAt: now })
               .where(
@@ -239,11 +241,25 @@ export function createBookingOperations(resolve: () => HoldDeps) {
                   lt(booking.startsAt, endsAt),
                   gt(booking.endsAt, startsAt),
                 ),
-              );
-            await tx
+              )
+              .returning({
+                startsAt: booking.startsAt,
+                endsAt: booking.endsAt,
+              });
+            for (const expired of expiredOnRange) {
+              await notifySlotAlerts(tx, ctx.clock, expired, deps.baseUrl);
+            }
+            const expiredForPhone = await tx
               .update(booking)
               .set({ status: "expired", updatedAt: now })
-              .where(and(overdue, eq(booking.customerPhone, phone)));
+              .where(and(overdue, eq(booking.customerPhone, phone)))
+              .returning({
+                startsAt: booking.startsAt,
+                endsAt: booking.endsAt,
+              });
+            for (const expired of expiredForPhone) {
+              await notifySlotAlerts(tx, ctx.clock, expired, deps.baseUrl);
+            }
 
             const [existing] = await tx
               .select({ publicId: booking.publicId })
@@ -287,6 +303,9 @@ export function createBookingOperations(resolve: () => HoldDeps) {
               .returning({ id: booking.id });
 
             if (!row) throw new ApiError("INTERNAL", "Booking not written.");
+
+            // The slot now has an owner: nobody needs to be told it is free.
+            await closeSlotAlerts(tx, { startsAt, endsAt });
 
             await queueMessage(tx, ctx.clock, {
               template: "booking-link",

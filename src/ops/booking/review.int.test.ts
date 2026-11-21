@@ -24,7 +24,10 @@ const { db } = handle;
 const NOW = new Date("2026-12-20T08:00:00Z");
 let now = NOW;
 const clock: Clock = { now: () => now };
-const ops = createReviewOperations(() => ({ db }));
+const ops = createReviewOperations(() => ({
+  db,
+  baseUrl: "https://wesal.example",
+}));
 
 const base = createCallContext(
   { kind: "staff", userId: "staff-1", role: "staff" },

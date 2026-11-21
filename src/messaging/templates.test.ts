@@ -26,6 +26,11 @@ const SAMPLE: { [T in TemplateName]: TemplateValues<T> } = {
     customerName: "Mona",
     depositEgp: "500",
   },
+  "slot-alert": {
+    link: "https://wesal.example/book?day=2026-12-24&start=18%3A30&end=21%3A00",
+    unsubscribe: "https://wesal.example/alerts/unsubscribe/tok",
+    slotStartAt: "2026-12-24T16:30:00Z",
+  },
 };
 
 const render = (
@@ -81,6 +86,13 @@ describe("message templates", () => {
       kind: "urgent",
     });
     expect(arUrgent).toContain("عاجل");
+  });
+
+  it("puts the booking and unsubscribe links in a slot alert", () => {
+    const body = render("slot-alert", "en");
+    expect(body).toContain(SAMPLE["slot-alert"].link);
+    expect(body).toContain(SAMPLE["slot-alert"].unsubscribe);
+    expect(body).toContain("18:30");
   });
 
   it("rejects values that do not fit the template", () => {

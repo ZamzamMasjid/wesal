@@ -52,6 +52,7 @@ import {
 import { normalizeBookingId } from "@/lib/booking-read-api";
 import { publicBaseUrl } from "@/messaging/config";
 import { queueMessage } from "@/messaging/outbox";
+import { closeSlotAlerts, notifySlotAlerts } from "@/ops/alerts/notify";
 import { resolveSlots, sameSlot } from "@/ops/schedule/resolver";
 import { isE164, normalizePhone } from "@/ops/verification/phone";
 
@@ -526,7 +527,7 @@ export function createAdminBookingOperations(resolve: () => AdminBookingDeps) {
             // ADR-010: an overdue hold is free, so expire it before the
             // constraint is asked. This is the same transaction shape as a
             // customer hold; the database decides a race.
-            await tx
+            const expired = await tx
               .update(booking)
               .set({ status: "expired", updatedAt: now })
               .where(
@@ -539,7 +540,14 @@ export function createAdminBookingOperations(resolve: () => AdminBookingDeps) {
                   lt(booking.startsAt, endsAt),
                   gt(booking.endsAt, startsAt),
                 ),
-              );
+              )
+              .returning({
+                startsAt: booking.startsAt,
+                endsAt: booking.endsAt,
+              });
+            for (const range of expired) {
+              await notifySlotAlerts(tx, ctx.clock, range, deps.baseUrl);
+            }
 
             const [row] = await tx
               .insert(booking)
@@ -565,6 +573,9 @@ export function createAdminBookingOperations(resolve: () => AdminBookingDeps) {
               })
               .returning({ id: booking.id });
             if (!row) throw new ApiError("INTERNAL", "Booking not written.");
+
+            // The slot is now confirmed for this customer: end any watch.
+            await closeSlotAlerts(tx, { startsAt, endsAt });
 
             await queueMessage(tx, ctx.clock, {
               template: "booking-confirmed",

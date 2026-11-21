@@ -106,7 +106,7 @@ sequenceDiagram
   P-->>W: ok
 ```
 
-The slot is free at 14:20:00 whether or not the sweep has run, because every read compares the deadline with the clock (ADR-010). The sweep exists so stored status matches reality for the dashboard and reports. If the job loop is down, step 5 never happens and step 7 still succeeds, because hold creation expires the overdue row itself inside its transaction.
+The slot is free at 14:20:00 whether or not the sweep has run, because every read compares the deadline with the clock (ADR-010). The sweep exists so stored status matches reality for the dashboard and reports. If the job loop is down, step 5 never happens and step 7 still succeeds, because hold creation expires the overdue row itself inside its transaction. Both paths also queue one outbox message per slot-alert subscriber in the same transaction, so a watcher learns the slot is free; rejecting a proof does the same, and confirming a booking ends any pending watch.
 
 ## Flow 4: Staff enter a phone booking while an online hold is active
 
