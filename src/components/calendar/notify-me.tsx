@@ -1,7 +1,6 @@
 "use client";
 
-import { BellRing } from "lucide-react";
-import { useLocale, useTranslations } from "next-intl";
+import { BellRing } from "lucide-react";import { useLocale, useTranslations } from "next-intl";
 import { useState, type FormEvent } from "react";
 
 import { CodeStep } from "@/components/booking/code-step";
@@ -33,6 +32,8 @@ export interface NotifyMeProps {
   end: string;
   /** The slot's public state label, shown in the dialog's summary. */
   stateLabel: string;
+  /** This visit already subscribed to the slot; show the confirmation label. */
+  subscribed: boolean;
   onSubscribed: () => void;
 }
 
@@ -56,6 +57,7 @@ export function NotifyMe({
   start,
   end,
   stateLabel,
+  subscribed,
   onSubscribed,
 }: NotifyMeProps) {
   const t = useTranslations("Alerts");
@@ -113,6 +115,15 @@ export function NotifyMe({
   }
 
   const time = formatTime(start, locale);
+
+  if (subscribed && !open) {
+    return (
+      <span className="inline-flex min-h-(--size-touch) w-full items-center justify-center gap-2 rounded-full bg-fill px-5 text-sm font-medium text-muted">
+        <BellRing aria-hidden="true" className="size-4" strokeWidth={1.75} />
+        {t("subscribedTitle")}
+      </span>
+    );
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>

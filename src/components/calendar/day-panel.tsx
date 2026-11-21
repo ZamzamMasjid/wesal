@@ -1,6 +1,6 @@
 "use client";
 
-import { BellRing, CalendarX, MessageCircle, Phone } from "lucide-react";
+import { CalendarX, MessageCircle, Phone } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useState, type RefObject } from "react";
 
@@ -220,20 +220,14 @@ function SlotRow({
 
       {slot.alert && (
         <span className="col-span-2 sm:col-span-1">
-          {subscribed ? (
-            <span className="inline-flex min-h-(--size-touch) w-full items-center justify-center gap-2 rounded-full bg-fill px-5 text-sm font-medium text-muted">
-              <BellRing aria-hidden="true" className="size-4" strokeWidth={1.75} />
-              {t("notifySubscribed")}
-            </span>
-          ) : (
-            <NotifyMe
-              day={day}
-              start={slot.start}
-              end={slot.end}
-              stateLabel={t(`states.${slot.state}`)}
-              onSubscribed={onSubscribed}
-            />
-          )}
+          <NotifyMe
+            day={day}
+            start={slot.start}
+            end={slot.end}
+            stateLabel={t(`states.${slot.state}`)}
+            subscribed={subscribed}
+            onSubscribed={onSubscribed}
+          />
         </span>
       )}
 
