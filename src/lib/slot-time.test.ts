@@ -6,7 +6,9 @@ import {
   WEEK_ORDER,
   formatDay,
   formatTime,
+  isValidTime,
   nextSlot,
+  normalizeTimeInput,
   slotProblems,
   weekdayName,
 } from "./slot-time";
@@ -41,6 +43,33 @@ describe("weekdayName / formatDay", () => {
   });
 });
 
+describe("normalizeTimeInput", () => {
+  it("reads Western and Arabic-Indic digits as one HH:MM time", () => {
+    expect(normalizeTimeInput("0930")).toBe("09:30");
+    expect(normalizeTimeInput("09:30")).toBe("09:30");
+    expect(normalizeTimeInput("٠٩٣٠")).toBe("09:30");
+    expect(normalizeTimeInput("۰۹:۳۰")).toBe("09:30");
+  });
+
+  it("leaves a partial entry readable while it is typed", () => {
+    expect(normalizeTimeInput("")).toBe("");
+    expect(normalizeTimeInput("9")).toBe("9");
+    expect(normalizeTimeInput("16:3")).toBe("16:3");
+    expect(normalizeTimeInput("16:30:00")).toBe("16:30");
+  });
+});
+
+describe("isValidTime", () => {
+  it("accepts only a complete 24-hour time", () => {
+    expect(isValidTime("00:00")).toBe(true);
+    expect(isValidTime("23:59")).toBe(true);
+    expect(isValidTime("24:00")).toBe(false);
+    expect(isValidTime("9:30")).toBe(false);
+    expect(isValidTime("16:3")).toBe(false);
+    expect(isValidTime("")).toBe(false);
+  });
+});
+
 describe("slotProblems", () => {
   it("flags an empty time, an end before the start, and an overlap", () => {
     const problems = slotProblems([
@@ -53,6 +82,15 @@ describe("slotProblems", () => {
     expect(problems.get(1)).toBe("overlap");
     expect(problems.get(2)).toBe("endBeforeStart");
     expect(problems.get(3)).toBe("empty");
+  });
+
+  it("flags an incomplete or out-of-range time", () => {
+    const problems = slotProblems([
+      { start: "16:3", end: "18:00" },
+      { start: "24:00", end: "25:00" },
+    ]);
+    expect(problems.get(0)).toBe("invalidTime");
+    expect(problems.get(1)).toBe("invalidTime");
   });
 
   it("accepts slots that touch", () => {

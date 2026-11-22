@@ -1,6 +1,8 @@
 // Display and editing helpers for the schedule editor. Pure, so they run in the
 // browser and in tests. Times are `HH:MM` Africa/Cairo wall-clock strings.
 
+import { latinDigits } from "./digits";
+
 export interface EditableSlot {
   start: string;
   end: string;
@@ -42,7 +44,25 @@ export function formatDay(day: string, locale: string): string {
   }).format(new Date(`${day}T00:00:00Z`));
 }
 
-export type SlotProblem = "empty" | "endBeforeStart" | "overlap";
+export type SlotProblem =
+  "empty" | "invalidTime" | "endBeforeStart" | "overlap";
+
+/**
+ * What the owner typed in a time field, as far as it can be read: Arabic-Indic
+ * and Persian digits become ASCII (`٠٩٣٠` and `0930` both give `09:30`) and the
+ * colon is inserted after the hour. The result may be partial until four digits
+ * have been typed; `isValidTime` says when it is complete.
+ */
+export function normalizeTimeInput(value: string): string {
+  const digits = latinDigits(value).replace(/\D/g, "").slice(0, 4);
+  if (digits.length <= 2) return digits;
+  return `${digits.slice(0, 2)}:${digits.slice(2)}`;
+}
+
+/** Whether the value is a complete 24-hour `HH:MM` time, as the API expects. */
+export function isValidTime(value: string): boolean {
+  return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);
+}
 
 /**
  * Problems per slot index for one day's slots as the owner is typing them. The
@@ -52,6 +72,8 @@ export function slotProblems(slots: EditableSlot[]): Map<number, SlotProblem> {
   const problems = new Map<number, SlotProblem>();
   slots.forEach((s, i) => {
     if (!s.start || !s.end) problems.set(i, "empty");
+    else if (!isValidTime(s.start) || !isValidTime(s.end))
+      problems.set(i, "invalidTime");
     else if (s.end <= s.start) problems.set(i, "endBeforeStart");
   });
   const valid = slots

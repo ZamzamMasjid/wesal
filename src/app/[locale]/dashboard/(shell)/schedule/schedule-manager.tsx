@@ -8,7 +8,9 @@ import {
   WEEK_ORDER,
   formatDay,
   formatTime,
+  isValidTime,
   nextSlot,
+  normalizeTimeInput,
   slotProblems,
   sortSlots,
   weekdayName,
@@ -115,7 +117,7 @@ function Notice({ message }: { message: Message }) {
   );
 }
 
-/** Two time inputs and a remove button. Times are left-to-right in both languages. */
+/** Two time fields and a remove button. Times are left-to-right in both languages. */
 function SlotEditor({
   slot,
   problem,
@@ -133,13 +135,11 @@ function SlotEditor({
   return (
     <div role="group" aria-label={label} className="space-y-1">
       <div className="flex flex-col gap-2 rounded-md border border-border p-2 sm:flex-row sm:items-center md:flex-col md:items-stretch 2xl:flex-row 2xl:items-center">
-        <input
-          type="time"
-          dir="ltr"
-          aria-label={t("start")}
-          aria-invalid={problem ? true : undefined}
+        <TimeField
+          label={t("start")}
           value={slot.start}
-          onChange={(e) => onChange({ ...slot, start: e.target.value })}
+          invalid={Boolean(problem)}
+          onChange={(start) => onChange({ ...slot, start })}
           className={timeClass}
         />
         <span
@@ -148,13 +148,11 @@ function SlotEditor({
         >
           –
         </span>
-        <input
-          type="time"
-          dir="ltr"
-          aria-label={t("end")}
-          aria-invalid={problem ? true : undefined}
+        <TimeField
+          label={t("end")}
           value={slot.end}
-          onChange={(e) => onChange({ ...slot, end: e.target.value })}
+          invalid={Boolean(problem)}
+          onChange={(end) => onChange({ ...slot, end })}
           className={timeClass}
         />
         <Button
@@ -174,6 +172,42 @@ function SlotEditor({
         </p>
       )}
     </div>
+  );
+}
+
+/**
+ * A typed `HH:MM` time. Native `<input type="time">` ignores Arabic-Indic digits
+ * in Chromium, so an Arabic keyboard appeared to type nothing and the schedule
+ * could not be saved; this field takes either numeral system and always shows
+ * what was typed. Focusing selects the value so four digits replace it.
+ */
+function TimeField({
+  label,
+  value,
+  invalid,
+  onChange,
+  className,
+}: {
+  label: string;
+  value: string;
+  invalid: boolean;
+  onChange: (value: string) => void;
+  className: string;
+}) {
+  return (
+    <input
+      type="text"
+      dir="ltr"
+      inputMode="numeric"
+      autoComplete="off"
+      aria-label={label}
+      aria-invalid={invalid || undefined}
+      placeholder="--:--"
+      value={value}
+      onChange={(event) => onChange(normalizeTimeInput(event.target.value))}
+      onFocus={(event) => event.currentTarget.select()}
+      className={className}
+    />
   );
 }
 
@@ -457,7 +491,7 @@ export function ScheduleManager() {
                           slot={slot}
                           problem={problems.get(i)}
                           label={
-                            slot.start && slot.end
+                            isValidTime(slot.start) && isValidTime(slot.end)
                               ? `${formatTime(slot.start, locale)} – ${formatTime(slot.end, locale)}`
                               : name
                           }
@@ -785,7 +819,7 @@ function ExceptionDialog({
                 slot={slot}
                 problem={showErrors ? problems.get(i) : undefined}
                 label={
-                  slot.start && slot.end
+                  isValidTime(slot.start) && isValidTime(slot.end)
                     ? `${formatTime(slot.start, locale)} – ${formatTime(slot.end, locale)}`
                     : t("slotN", { n: i + 1 })
                 }
