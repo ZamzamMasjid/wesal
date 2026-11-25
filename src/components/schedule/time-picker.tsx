@@ -83,6 +83,7 @@ export function TimePicker({
   const { hour24, minute } = partsOf(draft);
   const hour12 = hour24 % 12 || 12;
   const pm = hour24 >= 12;
+  const handDegrees = mode === "hours" ? (hour12 % 12) * 30 : minute * 6;
 
   return (
     <Dialog open={open} onOpenChange={changeOpen}>
@@ -90,20 +91,22 @@ export function TimePicker({
         <button
           type="button"
           aria-label={label}
-          className={`inline-flex h-(--size-touch-dense) w-full min-w-0 items-center justify-between gap-1 rounded-full border bg-surface ps-2 pe-2 text-start outline-none focus-visible:ring-2 focus-visible:ring-focus ${
+          className={`inline-flex h-(--size-touch-dense) w-full min-w-0 items-center justify-center rounded-full border bg-surface ps-2 pe-2 text-center text-sm outline-none focus-visible:ring-2 focus-visible:ring-focus ${
             invalid ? "border-danger" : "border-border"
           }`}
         >
           <bdi className="truncate">{shown}</bdi>
-          <Clock className="size-4 shrink-0 text-muted" aria-hidden />
         </button>
       </DialogTrigger>
 
       <DialogContent
-        className="w-[min(92vw,24rem)]"
+        className="w-[min(92vw,24rem)] p-4 sm:p-6"
         closeLabel={t("closeDialog")}
       >
-        <DialogTitle>{label}</DialogTitle>
+        <DialogTitle className="flex items-center gap-2">
+          <Clock className="size-5 text-brand" aria-hidden />
+          {label}
+        </DialogTitle>
         <DialogDescription>{t("clockHint")}</DialogDescription>
 
         <div className="mt-4 space-y-4">
@@ -114,7 +117,7 @@ export function TimePicker({
             <bdi>{formatTime(draft, locale)}</bdi>
           </p>
 
-          <div className="flex flex-wrap justify-center gap-2 text-sm">
+          <div className="flex flex-wrap justify-center gap-3 text-sm">
             <div
               role="group"
               aria-label={t("clockMode")}
@@ -139,7 +142,7 @@ export function TimePicker({
             <div
               role="group"
               aria-label={t("clockPeriod")}
-              className="inline-flex rounded-full bg-fill p-1"
+              className="inline-flex rounded-full border border-border bg-surface p-1"
             >
               {[false, true].map((isPm) => (
                 <button
@@ -163,7 +166,7 @@ export function TimePicker({
             dir="ltr"
             role="group"
             aria-label={t(mode === "hours" ? "hour" : "minute")}
-            className="relative mx-auto size-64 max-w-full rounded-full border border-border bg-fill/50"
+            className="relative mx-auto size-56 max-w-full rounded-full border border-border bg-fill/50 sm:size-64"
           >
             <span
               aria-hidden="true"
@@ -171,10 +174,9 @@ export function TimePicker({
             />
             <span
               aria-hidden="true"
+              data-hand="true"
               className="pointer-events-none absolute start-1/2 top-1/2 h-0.5 w-[38%] origin-left rounded-full bg-brand/50"
-              style={handStyle(
-                mode === "hours" ? (hour12 % 12) * 30 : minute * 6,
-              )}
+              style={handStyle(handDegrees)}
             />
             {(mode === "hours" ? HOURS : MINUTES).map((item, index, all) => {
               const selected =

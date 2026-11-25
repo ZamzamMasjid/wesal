@@ -46,6 +46,19 @@ describe("TimePicker", () => {
     expect(onChange).toHaveBeenCalledWith("02:00");
   });
 
+  it("moves the hand when a number is picked, not on hover", () => {
+    setup("14:00");
+    fireEvent.click(screen.getByRole("button", { name: "Start time" }));
+    const hand = document.querySelector<HTMLElement>("[data-hand]")!;
+    expect(hand.style.transform).toBe("rotate(-30deg)");
+    fireEvent.mouseEnter(screen.getByRole("button", { name: "Hour 3" }));
+    expect(hand.style.transform).toBe("rotate(-30deg)");
+    fireEvent.click(screen.getByRole("button", { name: "Hour 3" }));
+    expect(hand.style.transform).toBe("rotate(-90deg)");
+    fireEvent.click(screen.getByRole("button", { name: "Minute 30" }));
+    expect(hand.style.transform).toBe("rotate(90deg)");
+  });
+
   it("leaves the value alone when cancelled", () => {
     const { onChange } = setup("14:00");
     fireEvent.click(screen.getByRole("button", { name: "Start time" }));
