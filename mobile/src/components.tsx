@@ -161,6 +161,7 @@ export function Field({
     <View style={styles.field}>
       <Text style={[styles.label, align(locale)]}>{label}</Text>
       <TextInput
+        accessibilityLabel={label}
         value={value}
         onChangeText={onChangeText}
         keyboardType={keyboardType}

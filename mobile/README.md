@@ -31,6 +31,20 @@ The API must be reachable from the phone; `localhost` on the phone is the phone
 itself. Set `EXPO_PUBLIC_API_URL` to the machine's LAN address in development and
 to the production origin in builds. The fallback in `app.json` is a placeholder.
 
+## Tests
+
+```bash
+cd mobile
+npm test           # Jest + jest-expo, one run
+npm run test:watch
+npm run coverage   # gated at 80% lines / 70% branches
+```
+
+`src/api.ts`, `src/dates.ts`, the shared components and every screen have tests.
+`jest.setup.ts` supplies the Expo native mocks (SecureStore, notifications,
+image picker, localization, safe areas) and a fixed API origin; the app's
+network calls are mocked at the `fetch` boundary.
+
 ## Store builds
 
 `eas.json` has development, preview and production profiles, and the app ids are

@@ -51,9 +51,12 @@ export function BookingScreen({
   const [seconds, setSeconds] = useState(0);
   const refreshRef = useRef<() => Promise<void>>(async () => undefined);
 
-  async function load(target: string) {
+  async function load(
+    target: string,
+    { keepNotice = false }: { keepNotice?: boolean } = {},
+  ) {
     setLoading(true);
-    setNotice(null);
+    if (!keepNotice) setNotice(null);
     const result = await fetchBooking(target);
     setLoading(false);
     if (result.ok && result.data) {
@@ -127,8 +130,8 @@ export function BookingScreen({
     });
     setBusy(false);
     if (result.ok) {
+      await load(activeToken, { keepNotice: true });
       setNotice(t.proofReceived);
-      await refreshRef.current();
     } else {
       setNotice(t.proofFailed);
     }

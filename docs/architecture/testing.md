@@ -2,7 +2,7 @@
 id: testing
 type: architecture
 title: Testing Strategy
-last_modified: 2026-11-16
+last_modified: 2026-11-25
 ---
 
 # Testing Strategy
@@ -24,13 +24,14 @@ The pyramid is integration-heavy on purpose. Wesal's risk is where the booking r
 | Concern | Choice | Notes |
 |---|---|---|
 | Unit + integration runner | Vitest | TypeScript-native and fast (ADR-018) |
+| Mobile unit + component runner | Jest + jest-expo | `mobile/`, Testing Library for screens, same coverage gate below |
 | E2E runner | Playwright | Multi-browser, mobile emulation, RTL screenshots (ADR-019) |
 | Coverage | Vitest v8 coverage | Thresholds below |
 | Assertions | Vitest `expect` | Testing Library for components |
 | Mocking | Vitest `vi` | Philosophy: mock at boundaries only |
 | Fixtures / factories | Hand-written builders in `src/test/` | `aBooking()`, `anOccasion()`, `aStaffUser()` with overridable fields |
 
-**What is real and what is fake.** Postgres is real in integration tests (the docker-compose database). The filesystem is real, pointed at a temporary directory. Twilio is never called: the messaging adapter is replaced by the fake sender, which records what would have been sent and can be told to fail a channel. Time comes from the injected clock, so a test can create a hold, advance 21 minutes and assert the slot is free without waiting.
+**What is real and what is fake.** Postgres is real in integration tests (the docker-compose database). The filesystem is real, pointed at a temporary directory. Twilio is never called: the messaging adapter is replaced by the fake sender, which records what would have been sent and can be told to fail a channel. Time comes from the injected clock, so a test can create a hold, advance 21 minutes and assert the slot is free without waiting. In the mobile suite `fetch` is a mock and Expo native modules come from `mobile/jest.setup.ts`; the API contract is covered by the server's integration tests, and the app tests prove it renders the envelopes and error codes.
 
 ## Conventions
 

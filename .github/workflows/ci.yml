@@ -1,6 +1,7 @@
 # PR checks (docs/architecture/testing.md): lint, typecheck, unit + integration
-# tests with coverage thresholds, and the Playwright smoke suite. Any failure
-# or coverage drop blocks the merge once this job is a required check.
+# tests with coverage thresholds, the mobile Jest suite, and the Playwright smoke
+# suite. Any failure or coverage drop blocks the merge once this job is a
+# required check.
 name: CI
 
 on:
@@ -55,3 +56,21 @@ jobs:
             playwright-report
             test-results
           retention-days: 7
+
+  mobile:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      # Jest fails below 80% lines or 70% branches (mobile/jest.config.js).
+      - run: npm run coverage

@@ -190,7 +190,9 @@ export const strings = {
   },
 } as const;
 
-export type Strings = (typeof strings)["ar"];
+export type Strings = {
+  readonly [K in keyof (typeof strings)["ar"]]: string;
+};
 
 export function text(locale: Locale): Strings {
   return strings[locale];
