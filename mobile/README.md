@@ -31,6 +31,34 @@ The API must be reachable from the phone; `localhost` on the phone is the phone
 itself. Set `EXPO_PUBLIC_API_URL` to the machine's LAN address in development and
 to the production origin in builds. The fallback in `app.json` is a placeholder.
 
+`npx expo start` runs the JS bundle inside Expo Go. That is enough for the
+customer screens, but Expo Go cannot receive remote push, so use a development
+build for the staff flows.
+
+## Development build
+
+The native shell is built once by EAS (`eas.json` → `development` profile), then
+`expo start` serves code into it. Rebuild only when native dependencies,
+`app.json` plugins or the app id change.
+
+```bash
+cd mobile
+npx eas-cli@latest login
+npx eas-cli@latest init      # writes the real project id into app.json
+npm run build:android:dev    # APK download link when the build finishes
+```
+
+Install the APK on an Android phone, then start Metro against it:
+
+```bash
+EXPO_PUBLIC_API_URL=http://<your-lan-ip>:3000 npm run start:dev
+```
+
+`EXPO_PUBLIC_API_URL` is inlined into the bundle, not read at runtime, so it must
+be set both in the terminal running Metro and when producing store builds. The
+`preview` profile (`npm run build:android:preview`) makes a plain installable
+APK without the dev menu.
+
 ## Tests
 
 ```bash
@@ -58,10 +86,10 @@ network calls are mocked at the `fetch` boundary.
 Then:
 
 ```bash
-npx eas build --platform android --profile production
-npx eas build --platform ios --profile production
-npx eas submit --platform android
-npx eas submit --platform ios
+npx eas-cli@latest build --platform android --profile production
+npx eas-cli@latest build --platform ios --profile production
+npx eas-cli@latest submit --platform android
+npx eas-cli@latest submit --platform ios
 ```
 
 These credentials do not exist in the repository, so the store items in the
