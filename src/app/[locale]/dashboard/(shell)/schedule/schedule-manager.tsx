@@ -10,9 +10,9 @@ import {
   formatTime,
   isValidTime,
   nextSlot,
-  normalizeTimeInput,
   slotProblems,
   sortSlots,
+  timeOptions,
   weekdayName,
   type EditableSlot,
   type SlotProblem,
@@ -71,7 +71,8 @@ type Message = { ok: boolean; text: string } | null;
 
 const inputClass =
   "h-(--size-touch-dense) w-full rounded-full border border-border bg-surface px-3 outline-none focus-visible:ring-2 focus-visible:ring-focus";
-const timeClass = inputClass.replace("px-3", "px-2 min-w-0");
+const timeSelectClass =
+  "h-(--size-touch-dense) w-full min-w-0 rounded-full border border-border bg-surface ps-3 pe-7 outline-none focus-visible:ring-2 focus-visible:ring-focus aria-invalid:border-danger";
 const cardClass = "space-y-3 rounded-lg bg-surface p-4 shadow-md";
 
 function toWeek(slots: PatternSlot[]): Week {
@@ -117,7 +118,7 @@ function Notice({ message }: { message: Message }) {
   );
 }
 
-/** Two time fields and a remove button. Times are left-to-right in both languages. */
+/** Two time pickers and a remove button. Times are left-to-right in both languages. */
 function SlotEditor({
   slot,
   problem,
@@ -134,17 +135,16 @@ function SlotEditor({
   const t = useTranslations("Dashboard.schedule");
   return (
     <div role="group" aria-label={label} className="space-y-1">
-      <div className="flex flex-col gap-2 rounded-md border border-border p-2 sm:flex-row sm:items-center md:flex-col md:items-stretch 2xl:flex-row 2xl:items-center">
+      <div className="flex flex-col gap-2 rounded-md border border-border p-2 sm:flex-row sm:items-center md:flex-col md:items-stretch">
         <TimeField
           label={t("start")}
           value={slot.start}
           invalid={Boolean(problem)}
           onChange={(start) => onChange({ ...slot, start })}
-          className={timeClass}
         />
         <span
           aria-hidden="true"
-          className="hidden text-center sm:inline md:hidden 2xl:inline"
+          className="hidden text-center sm:inline md:hidden"
         >
           –
         </span>
@@ -153,7 +153,6 @@ function SlotEditor({
           value={slot.end}
           invalid={Boolean(problem)}
           onChange={(end) => onChange({ ...slot, end })}
-          className={timeClass}
         />
         <Button
           type="button"
@@ -176,38 +175,47 @@ function SlotEditor({
 }
 
 /**
- * A typed `HH:MM` time. Native `<input type="time">` ignores Arabic-Indic digits
- * in Chromium, so an Arabic keyboard appeared to type nothing and the schedule
- * could not be saved; this field takes either numeral system and always shows
- * what was typed. Focusing selects the value so four digits replace it.
+ * A time picker: a native select over the quarter-hour options, labelled in the
+ * dashboard's 12-hour form. Nothing is typed, so an Arabic keyboard or a native
+ * time control cannot leave the field looking empty. A stored value that is not
+ * on the quarter hour (e.g. `23:59`) is kept and offered as an option too.
  */
 function TimeField({
   label,
   value,
   invalid,
   onChange,
-  className,
 }: {
   label: string;
   value: string;
   invalid: boolean;
   onChange: (value: string) => void;
-  className: string;
 }) {
+  const t = useTranslations("Dashboard.schedule");
+  const locale = useLocale();
+  const known = isValidTime(value);
   return (
-    <input
-      type="text"
+    <select
       dir="ltr"
-      inputMode="numeric"
-      autoComplete="off"
       aria-label={label}
       aria-invalid={invalid || undefined}
-      placeholder="--:--"
-      value={value}
-      onChange={(event) => onChange(normalizeTimeInput(event.target.value))}
-      onFocus={(event) => event.currentTarget.select()}
-      className={className}
-    />
+      value={known ? value : ""}
+      onChange={(event) => {
+        if (event.target.value) onChange(event.target.value);
+      }}
+      className={timeSelectClass}
+    >
+      {!known && (
+        <option value="" disabled>
+          {t("chooseTime")}
+        </option>
+      )}
+      {timeOptions(value).map((time) => (
+        <option key={time} value={time}>
+          {formatTime(time, locale)}
+        </option>
+      ))}
+    </select>
   );
 }
 

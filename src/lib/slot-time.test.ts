@@ -8,8 +8,8 @@ import {
   formatTime,
   isValidTime,
   nextSlot,
-  normalizeTimeInput,
   slotProblems,
+  timeOptions,
   weekdayName,
 } from "./slot-time";
 
@@ -43,19 +43,21 @@ describe("weekdayName / formatDay", () => {
   });
 });
 
-describe("normalizeTimeInput", () => {
-  it("reads Western and Arabic-Indic digits as one HH:MM time", () => {
-    expect(normalizeTimeInput("0930")).toBe("09:30");
-    expect(normalizeTimeInput("09:30")).toBe("09:30");
-    expect(normalizeTimeInput("٠٩٣٠")).toBe("09:30");
-    expect(normalizeTimeInput("۰۹:۳۰")).toBe("09:30");
+describe("timeOptions", () => {
+  it("offers every quarter hour, sorted", () => {
+    const options = timeOptions();
+    expect(options).toHaveLength(96);
+    expect(options[0]).toBe("00:00");
+    expect(options[1]).toBe("00:15");
+    expect(options.at(-1)).toBe("23:45");
   });
 
-  it("leaves a partial entry readable while it is typed", () => {
-    expect(normalizeTimeInput("")).toBe("");
-    expect(normalizeTimeInput("9")).toBe("9");
-    expect(normalizeTimeInput("16:3")).toBe("16:3");
-    expect(normalizeTimeInput("16:30:00")).toBe("16:30");
+  it("keeps a stored value that is not on a quarter hour", () => {
+    const options = timeOptions("23:59", "nonsense");
+    expect(options).toHaveLength(97);
+    expect(options.at(-1)).toBe("23:59");
+    expect(options).toContain("23:45");
+    expect(options).not.toContain("nonsense");
   });
 });
 

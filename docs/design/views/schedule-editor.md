@@ -2,7 +2,7 @@
 id: schedule-editor
 type: view
 title: Slot Schedule
-last_modified: 2026-11-22
+last_modified: 2026-11-25
 feature: slot-schedule
 mockup: none
 ---
@@ -45,7 +45,7 @@ Exceptions
 
 - Tabs
 - Weekly grid with slot chips
-- Slot editor (two typed time fields, remove)
+- Slot editor (two time pickers, remove)
 - Copy-day control
 - Exceptions list
 - Exception dialog (date, closed toggle, note, slots)
@@ -62,7 +62,7 @@ Exceptions
 
 ## Interactions
 
-- "Add slot" adds a slot to a day (one hour, starting where the last ends); each slot is two time fields typed as `HH:MM` (Arabic-Indic digits are accepted and shown as Western digits), always editable, with a remove button.
+- "Add slot" adds a slot to a day (one hour, starting where the last ends); each slot is two time pickers offering every quarter hour, always editable, with a remove button. A stored time off the quarter hour (e.g. 23:59) is kept and offered too.
 - "Copy to" copies a day's slots to selected other days.
 - "Save pattern" saves the whole week after validation.
 - "Block a date" opens the exception dialog with closed preselected.
@@ -79,7 +79,7 @@ Exceptions
 ## Accessibility
 
 - Each day is a labelled group; slot chips are buttons named with their times.
-- Time fields accept typed input from any keyboard, including Arabic-Indic digits.
+- Time pickers are native selects: every time is one tap away and nothing needs to be typed.
 - Validation errors are announced and focus moves to the first offending slot.
 - The conflict panel lists bookings as links and is announced when it appears.
 - The week starts on Saturday in both languages; in Arabic the columns run right to left.

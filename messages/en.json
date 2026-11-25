@@ -460,6 +460,7 @@
       "addSlot": "Add slot",
       "start": "Start time",
       "end": "End time",
+      "chooseTime": "Choose a time",
       "removeSlot": "Remove slot {label}",
       "slotN": "Slot {n}",
       "copyTo": "Copy to…",
@@ -470,7 +471,7 @@
       "patternSaved": "Schedule saved. Existing bookings keep their times.",
       "problem": {
         "empty": "Enter a start and an end time.",
-        "invalidTime": "Enter a valid time as HH:MM, from 00:00 to 23:59.",
+        "invalidTime": "This time is not valid. Choose a time between 00:00 and 23:59.",
         "endBeforeStart": "The end must be after the start.",
         "overlap": "This slot overlaps another slot on the same day."
       },

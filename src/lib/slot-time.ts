@@ -1,8 +1,6 @@
 // Display and editing helpers for the schedule editor. Pure, so they run in the
 // browser and in tests. Times are `HH:MM` Africa/Cairo wall-clock strings.
 
-import { latinDigits } from "./digits";
-
 export interface EditableSlot {
   start: string;
   end: string;
@@ -15,12 +13,24 @@ export const WEEK_ORDER = [6, 0, 1, 2, 3, 4, 5] as const;
 export function formatTime(time: string, locale: string): string {
   const [h, m] = time.split(":").map(Number);
   const date = new Date(Date.UTC(2000, 0, 1, h, m));
-  return new Intl.DateTimeFormat(locale, {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-    timeZone: "UTC",
-  }).format(date);
+  return timeFormatter(locale).format(date);
+}
+
+// The pickers format a hundred labels each, so build one formatter per locale.
+const TIME_FORMATTERS = new Map<string, Intl.DateTimeFormat>();
+
+function timeFormatter(locale: string): Intl.DateTimeFormat {
+  let formatter = TIME_FORMATTERS.get(locale);
+  if (!formatter) {
+    formatter = new Intl.DateTimeFormat(locale, {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+      timeZone: "UTC",
+    });
+    TIME_FORMATTERS.set(locale, formatter);
+  }
+  return formatter;
 }
 
 /** The localized name of a weekday (0 = Sunday ... 6 = Saturday). */
@@ -47,16 +57,30 @@ export function formatDay(day: string, locale: string): string {
 export type SlotProblem =
   "empty" | "invalidTime" | "endBeforeStart" | "overlap";
 
+/** Times are offered a quarter of an hour apart, as a venue schedules slots. */
+const TIME_STEP_MINUTES = 15;
+
+const QUARTER_HOURS = Array.from(
+  { length: (24 * 60) / TIME_STEP_MINUTES },
+  (_, index) => {
+    const minutes = index * TIME_STEP_MINUTES;
+    const hours = String(Math.floor(minutes / 60)).padStart(2, "0");
+    const rest = String(minutes % 60).padStart(2, "0");
+    return `${hours}:${rest}`;
+  },
+);
+
 /**
- * What the owner typed in a time field, as far as it can be read: Arabic-Indic
- * and Persian digits become ASCII (`٠٩٣٠` and `0930` both give `09:30`) and the
- * colon is inserted after the hour. The result may be partial until four digits
- * have been typed; `isValidTime` says when it is complete.
+ * The times a picker offers, `HH:MM` and sorted: every quarter hour of the day,
+ * plus any current values that fall between them (the API also stores `23:59`).
+ * Nothing needs to be typed, so an Arabic keyboard cannot get in the way.
  */
-export function normalizeTimeInput(value: string): string {
-  const digits = latinDigits(value).replace(/\D/g, "").slice(0, 4);
-  if (digits.length <= 2) return digits;
-  return `${digits.slice(0, 2)}:${digits.slice(2)}`;
+export function timeOptions(...current: string[]): string[] {
+  const times = new Set<string>(QUARTER_HOURS);
+  for (const value of current) {
+    if (isValidTime(value)) times.add(value);
+  }
+  return [...times].sort();
 }
 
 /** Whether the value is a complete 24-hour `HH:MM` time, as the API expects. */
