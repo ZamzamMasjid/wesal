@@ -57,32 +57,6 @@ export function formatDay(day: string, locale: string): string {
 export type SlotProblem =
   "empty" | "invalidTime" | "endBeforeStart" | "overlap";
 
-/** Times are offered a quarter of an hour apart, as a venue schedules slots. */
-const TIME_STEP_MINUTES = 15;
-
-const QUARTER_HOURS = Array.from(
-  { length: (24 * 60) / TIME_STEP_MINUTES },
-  (_, index) => {
-    const minutes = index * TIME_STEP_MINUTES;
-    const hours = String(Math.floor(minutes / 60)).padStart(2, "0");
-    const rest = String(minutes % 60).padStart(2, "0");
-    return `${hours}:${rest}`;
-  },
-);
-
-/**
- * The times a picker offers, `HH:MM` and sorted: every quarter hour of the day,
- * plus any current values that fall between them (the API also stores `23:59`).
- * Nothing needs to be typed, so an Arabic keyboard cannot get in the way.
- */
-export function timeOptions(...current: string[]): string[] {
-  const times = new Set<string>(QUARTER_HOURS);
-  for (const value of current) {
-    if (isValidTime(value)) times.add(value);
-  }
-  return [...times].sort();
-}
-
 /** Whether the value is a complete 24-hour `HH:MM` time, as the API expects. */
 export function isValidTime(value: string): boolean {
   return /^([01]\d|2[0-3]):[0-5]\d$/.test(value);

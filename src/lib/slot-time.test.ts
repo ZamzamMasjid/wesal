@@ -9,7 +9,6 @@ import {
   isValidTime,
   nextSlot,
   slotProblems,
-  timeOptions,
   weekdayName,
 } from "./slot-time";
 
@@ -40,24 +39,6 @@ describe("weekdayName / formatDay", () => {
   it("formats a date", () => {
     expect(formatDay("2026-12-25", "en")).toContain("25");
     expect(formatDay("2026-12-25", "en")).toContain("2026");
-  });
-});
-
-describe("timeOptions", () => {
-  it("offers every quarter hour, sorted", () => {
-    const options = timeOptions();
-    expect(options).toHaveLength(96);
-    expect(options[0]).toBe("00:00");
-    expect(options[1]).toBe("00:15");
-    expect(options.at(-1)).toBe("23:45");
-  });
-
-  it("keeps a stored value that is not on a quarter hour", () => {
-    const options = timeOptions("23:59", "nonsense");
-    expect(options).toHaveLength(97);
-    expect(options.at(-1)).toBe("23:59");
-    expect(options).toContain("23:45");
-    expect(options).not.toContain("nonsense");
   });
 });
 

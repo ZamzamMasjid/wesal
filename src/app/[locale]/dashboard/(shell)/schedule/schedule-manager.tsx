@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
+import { TimePicker } from "@/components/schedule/time-picker";
 import {
   WEEK_ORDER,
   formatDay,
@@ -12,7 +13,6 @@ import {
   nextSlot,
   slotProblems,
   sortSlots,
-  timeOptions,
   weekdayName,
   type EditableSlot,
   type SlotProblem,
@@ -71,8 +71,6 @@ type Message = { ok: boolean; text: string } | null;
 
 const inputClass =
   "h-(--size-touch-dense) w-full rounded-full border border-border bg-surface px-3 outline-none focus-visible:ring-2 focus-visible:ring-focus";
-const timeSelectClass =
-  "h-(--size-touch-dense) w-full min-w-0 rounded-full border border-border bg-surface ps-3 pe-7 outline-none focus-visible:ring-2 focus-visible:ring-focus aria-invalid:border-danger";
 const cardClass = "space-y-3 rounded-lg bg-surface p-4 shadow-md";
 
 function toWeek(slots: PatternSlot[]): Week {
@@ -136,7 +134,7 @@ function SlotEditor({
   return (
     <div role="group" aria-label={label} className="space-y-1">
       <div className="flex flex-col gap-2 rounded-md border border-border p-2 sm:flex-row sm:items-center md:flex-col md:items-stretch">
-        <TimeField
+        <TimePicker
           label={t("start")}
           value={slot.start}
           invalid={Boolean(problem)}
@@ -148,7 +146,7 @@ function SlotEditor({
         >
           –
         </span>
-        <TimeField
+        <TimePicker
           label={t("end")}
           value={slot.end}
           invalid={Boolean(problem)}
@@ -171,51 +169,6 @@ function SlotEditor({
         </p>
       )}
     </div>
-  );
-}
-
-/**
- * A time picker: a native select over the quarter-hour options, labelled in the
- * dashboard's 12-hour form. Nothing is typed, so an Arabic keyboard or a native
- * time control cannot leave the field looking empty. A stored value that is not
- * on the quarter hour (e.g. `23:59`) is kept and offered as an option too.
- */
-function TimeField({
-  label,
-  value,
-  invalid,
-  onChange,
-}: {
-  label: string;
-  value: string;
-  invalid: boolean;
-  onChange: (value: string) => void;
-}) {
-  const t = useTranslations("Dashboard.schedule");
-  const locale = useLocale();
-  const known = isValidTime(value);
-  return (
-    <select
-      dir="ltr"
-      aria-label={label}
-      aria-invalid={invalid || undefined}
-      value={known ? value : ""}
-      onChange={(event) => {
-        if (event.target.value) onChange(event.target.value);
-      }}
-      className={timeSelectClass}
-    >
-      {!known && (
-        <option value="" disabled>
-          {t("chooseTime")}
-        </option>
-      )}
-      {timeOptions(value).map((time) => (
-        <option key={time} value={time}>
-          {formatTime(time, locale)}
-        </option>
-      ))}
-    </select>
   );
 }
 

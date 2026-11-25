@@ -45,7 +45,7 @@ Exceptions
 
 - Tabs
 - Weekly grid with slot chips
-- Slot editor (two time pickers, remove)
+- Slot editor (two clock pickers, remove)
 - Copy-day control
 - Exceptions list
 - Exception dialog (date, closed toggle, note, slots)
@@ -62,7 +62,7 @@ Exceptions
 
 ## Interactions
 
-- "Add slot" adds a slot to a day (one hour, starting where the last ends); each slot is two time pickers offering every quarter hour, always editable, with a remove button. A stored time off the quarter hour (e.g. 23:59) is kept and offered too.
+- "Add slot" adds a slot to a day (one hour, starting where the last ends); each slot is two clock pickers, always editable, with a remove button. Tapping a time opens a clock face: choose the hour, then a five-minute mark, then Done. A stored time off the five-minute marks (e.g. 23:59) is kept until another minute is chosen.
 - "Copy to" copies a day's slots to selected other days.
 - "Save pattern" saves the whole week after validation.
 - "Block a date" opens the exception dialog with closed preselected.
@@ -79,7 +79,7 @@ Exceptions
 ## Accessibility
 
 - Each day is a labelled group; slot chips are buttons named with their times.
-- Time pickers are native selects: every time is one tap away and nothing needs to be typed.
+- Time pickers open a modal clock face. Hours, minutes, the day period and the mode are buttons with their selected state announced; the chosen time is live; Cancel or Escape leaves the value unchanged.
 - Validation errors are announced and focus moves to the first offending slot.
 - The conflict panel lists bookings as links and is announced when it appears.
 - The week starts on Saturday in both languages; in Arabic the columns run right to left.
