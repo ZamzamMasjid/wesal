@@ -12,7 +12,7 @@ feature: landing-page
 
 ## Visual conventions specific to this feature
 
-The hero is a full-bleed venue photograph with a dark scrim; the venue name, tagline and actions sit over it in the fixed photo copy color. The "About the venue" heading and description follow below it. Sections are separated by whitespace alone; there is no ornament and no divider. Content sits in soft-shadowed cards on the sand background.
+The hero is a full-bleed venue photograph with a dark scrim; the venue name and actions sit over it in the fixed photo copy color. The "About the venue" heading and description follow below it. Sections are separated by whitespace alone; there is no ornament and no divider. Content sits in soft-shadowed cards on the sand background.
 
 The gallery is a curated mosaic, not a uniform grid: one large tile, four regular tiles, one wide tile and two regular tiles. When the library is larger, a count tile opens the full lightbox. This keeps a library of near-identical exterior shots from reading as repetition.
 
@@ -20,7 +20,7 @@ Photography is the color. The interface around it stays in `bg`, `surface`, `fg`
 
 ## Components
 
-- **Hero** — full-bleed photograph with scrim, venue name, tagline, "Check availability" and a WhatsApp or Call action. Without media it becomes a `photo-scrim` block with the same copy.
+- **Hero** — full-bleed photograph with scrim, venue name, "Check availability" and a WhatsApp or Call action. Without media it becomes a `photo-scrim` block with the same copy.
 - **Introduction** — "About the venue" and the description.
 - **Primary action** — "Check availability", in the hero only.
 - **Gallery** — curated mosaic of photos and videos with a count tile; opens a lightbox (dialog) with swipe and arrow-key navigation. Videos show a poster and play on tap, muted by default.

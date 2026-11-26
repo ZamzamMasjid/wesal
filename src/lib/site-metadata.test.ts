@@ -6,7 +6,6 @@ import { homeMetadata, publicBaseUrl } from "./site-metadata";
 
 const input = {
   venueName: "Wesal Mosque and Event Hall",
-  tagline: "The mosque's event hall",
   descriptionAr: "قاعة للمناسبات",
   descriptionEn: "A hall for occasions",
   hero: {
@@ -27,7 +26,7 @@ describe("homeMetadata", () => {
     expect(meta.openGraph).toMatchObject({
       locale: "ar_EG",
       url: "/",
-      title: "Wesal Mosque and Event Hall — The mosque's event hall",
+      title: "Wesal Mosque and Event Hall",
     });
     expect(String(meta.description)).toBe("قاعة للمناسبات");
     expect(meta.openGraph?.images).toEqual([
@@ -49,7 +48,7 @@ describe("homeMetadata", () => {
     ]);
   });
 
-  it("falls back to the tagline and the text-only card without content or a hero", () => {
+  it("falls back to the venue name and the text-only card without content or a hero", () => {
     const meta = homeMetadata({
       ...input,
       locale: "en",
@@ -57,7 +56,7 @@ describe("homeMetadata", () => {
       descriptionEn: "",
       hero: null,
     });
-    expect(String(meta.description)).toBe("The mosque's event hall");
+    expect(String(meta.description)).toBe("Wesal Mosque and Event Hall");
     expect(meta.openGraph?.images).toBeUndefined();
     expect(meta.twitter).toMatchObject({ card: "summary" });
   });

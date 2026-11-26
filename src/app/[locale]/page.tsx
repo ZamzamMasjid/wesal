@@ -79,7 +79,6 @@ export async function generateMetadata({
     return homeMetadata({
       locale,
       venueName: t("venueName"),
-      tagline: t("tagline"),
       descriptionAr: content.descriptionAr,
       descriptionEn: content.descriptionEn,
       hero: hero
@@ -93,7 +92,6 @@ export async function generateMetadata({
     return homeMetadata({
       locale,
       venueName: t("venueName"),
-      tagline: t("tagline"),
       descriptionAr: "",
       descriptionEn: "",
       hero: null,
@@ -152,10 +150,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           <SiteHeader locale={locale} path="/" findBooking overlay />
 
           <div className="mx-auto flex w-full max-w-content flex-1 flex-col justify-end px-4 pb-10 pt-14 md:px-6 md:pb-16 md:pt-20">
-            <p className="text-sm font-semibold text-photo-fg/80">
-              {t("tagline")}
-            </p>
-            <h1 className="mt-3 max-w-[20ch] text-4xl font-bold text-photo-fg md:text-6xl">
+            <h1 className="max-w-[20ch] text-4xl font-bold text-photo-fg md:text-6xl">
               {t("venueName")}
             </h1>
             <div className="mt-7 flex flex-wrap items-center gap-3">

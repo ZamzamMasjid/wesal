@@ -10,8 +10,6 @@ export interface HomeMetadataInput {
   locale: Locale;
   /** The venue name in the reader's language. */
   venueName: string;
-  /** The tagline, used when the description is empty. */
-  tagline: string;
   descriptionAr: string;
   descriptionEn: string;
   hero: { url: string; altAr: string; altEn: string } | null;
@@ -23,14 +21,14 @@ export function homeMetadata(input: HomeMetadataInput): Metadata {
   const { locale, venueName, baseUrl } = input;
   const description =
     localized(input.descriptionAr, input.descriptionEn, locale).trim() ||
-    input.tagline;
+    venueName;
   const heroAlt = input.hero
     ? localized(input.hero.altAr, input.hero.altEn, locale)
     : "";
   const image = input.hero
     ? new URL(input.hero.url, baseUrl).toString()
     : undefined;
-  const title = `${venueName} — ${input.tagline}`;
+  const title = venueName;
   const canonical = locale === "ar" ? "/" : "/en";
 
   return {
