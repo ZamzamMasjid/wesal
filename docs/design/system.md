@@ -119,6 +119,14 @@ Tailwind defaults: `sm` 640px, `md` 768px, `lg` 1024px, `xl` 1280px. The public 
 
 Lucide, stroke width 1.75. 20px in UI, 16px inline with text and in badges, 24px in navigation. Directional icons (arrows, chevrons) flip in RTL; non-directional icons do not. Icons accompany labels; an icon-only button always has an accessible name.
 
+## Wordmark and icon
+
+The wordmark is the Arabic name **وصال** set in Cairo ExtraBold in `brand`, paired with a mihrab-arch mark whose niche is cut out. The mark is one shape, so it stays readable at 16px: the outer arch inherits the text colour and the niche takes the page background. Over a photograph the pair inverts — cream arch, `brand` niche — through the photo tone.
+
+- Header lockup: mark at 28px on phones and 40px from `md`, 8px before the word, both on the start side. The mark is decorative; the link's accessible name already carries the venue.
+- Tab and app icon: the same arch in cream on a `brand` rounded square (`public/favicon.svg`, with 16/32/180/192/512 PNGs). The manifest name and the Apple web-app title are both **وصال**.
+- Do not set the mark in a second colour, add a crescent, or put the full word inside the favicon; at tab size those details collapse.
+
 ## Accessibility baseline
 
 WCAG AA.
@@ -134,3 +142,5 @@ WCAG AA.
 ## Implementation
 
 The app consumes these tokens as CSS variables; see ADR-024.
+
+The wordmark mark is `src/components/wesal-mark.tsx`. The tab and app icon use the same arch paths in `public/favicon.svg`, with generated `favicon-16.png`, `favicon-32.png`, `apple-touch-icon.png`, `icon-192.png` and `icon-512.png`; `public/site.webmanifest` names the installed app **وصال**.

@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 
 import { ThemeToggle } from "@/components/theme-toggle";
+import { WesalMark } from "@/components/wesal-mark";
 import { Link } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
@@ -35,11 +36,15 @@ export async function SiteHeader({
       <Link
         href="/"
         aria-label={t("homeLabel")}
-        className={`text-3xl leading-none font-bold md:text-4xl ${
+        className={`flex items-center gap-2 text-3xl leading-none font-bold md:text-4xl ${
           overlay ? "text-photo-fg drop-shadow-sm" : "text-brand"
         }`}
       >
-        {home("heading")}
+        <WesalMark
+          tone={overlay ? "photo" : "brand"}
+          className="size-7 shrink-0 md:size-10"
+        />
+        <span>{home("heading")}</span>
       </Link>
       <nav
         aria-label={t("navLabel")}
