@@ -26,10 +26,20 @@ export const FRIDAY_SLOTS = [
 
 /**
  * Inserts the sample occasions and the weekly pattern into empty tables and
- * leaves populated ones untouched, so running it twice is safe.
+ * leaves populated ones untouched, so running it twice is safe. `replace`
+ * clears both tables first; it is for a deliberate production reset and a
+ * booking that still references an occasion will abort the transaction.
  */
-export async function seedVenueData(db: Database): Promise<void> {
+export async function seedVenueData(
+  db: Database,
+  { replace = false }: { replace?: boolean } = {},
+): Promise<void> {
   await db.transaction(async (tx) => {
+    if (replace) {
+      await tx.delete(slotPattern);
+      await tx.delete(occasion);
+    }
+
     if ((await tx.select({ id: occasion.id }).from(occasion)).length === 0) {
       await tx
         .insert(occasion)

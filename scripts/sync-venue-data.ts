@@ -7,10 +7,13 @@ import { seedVenueData } from "../src/db/venue-data";
 
 async function main(): Promise<void> {
   const { db, pool } = createDb(requireDatabaseUrl());
+  const replace = process.argv.includes("--replace");
   try {
-    await seedVenueData(db);
+    await seedVenueData(db, { replace });
     process.stdout.write(
-      "Occasions and the weekly slot pattern are in place.\n",
+      replace
+        ? "Occasions and the weekly slot pattern were replaced.\n"
+        : "Occasions and the weekly slot pattern are in place.\n",
     );
   } finally {
     await pool.end();

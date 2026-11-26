@@ -122,7 +122,7 @@ The same image carries the sample occasions and weekly slot pattern from `src/db
 fly machine exec <machine-id> -a wesal "sh -c 'cd /app && su-exec node node dist/sync-venue-data.mjs'"
 ```
 
-Verify with `curl -s https://<app-url>/api/v1/occasions`; the calendar then has slots for the week. This script never creates a staff login — use `dist/create-owner.mjs` for the first owner.
+Add `--replace` to clear both tables first, for a deliberate reset; a booking that still references an occasion makes the transaction abort. Verify with `curl -s https://<app-url>/api/v1/occasions`; the calendar then has slots for the week. This script never creates a staff login — use `dist/create-owner.mjs` for the first owner.
 
 ## Checking a deploy
 
