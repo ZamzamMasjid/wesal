@@ -36,6 +36,9 @@
   /* A photograph stays dark in both themes, so copy over it keeps one pair. */
   --color-photo-fg: #fffdf9;
   --color-photo-scrim: #1a1513;
+  /* The wordmark plaque keeps its brand colors in both themes. */
+  --color-logo-bg: #6b2737;
+  --color-logo-fg: #fffdf9;
 
   /* Typography */
   --font-mono: ui-monospace, "Cascadia Mono", Consolas, monospace;
@@ -115,6 +118,8 @@
   --color-overlay: rgb(0 0 0 / 0.6);
   --color-photo-fg: #fffdf9;
   --color-photo-scrim: #1a1513;
+  --color-logo-bg: #6b2737;
+  --color-logo-fg: #fffdf9;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
   --shadow-md: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px rgb(0 0 0 / 0.35);
   --shadow-lg: 0 2px 4px rgb(0 0 0 / 0.3), 0 24px 64px rgb(0 0 0 / 0.55);
@@ -173,6 +178,8 @@
   --color-overlay: var(--color-overlay);
   --color-photo-fg: var(--color-photo-fg);
   --color-photo-scrim: var(--color-photo-scrim);
+  --color-logo-bg: var(--color-logo-bg);
+  --color-logo-fg: var(--color-logo-fg);
   --color-transparent: transparent;
   --color-current: currentColor;
 

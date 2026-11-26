@@ -147,7 +147,7 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
         <div aria-hidden="true" className="hero-scrim absolute inset-0" />
 
         <div className="relative flex min-h-[min(84svh,760px)] flex-col">
-          <SiteHeader locale={locale} path="/" findBooking overlay />
+          <SiteHeader locale={locale} path="/" findBooking />
 
           <div className="mx-auto flex w-full max-w-content flex-1 flex-col justify-end px-4 pb-10 pt-14 md:px-6 md:pb-16 md:pt-20">
             <h1 className="max-w-[20ch] text-4xl font-bold text-photo-fg md:text-6xl">
@@ -310,15 +310,15 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                 {rules.map((rule, index) => (
                   <li
                     key={`${index}-${rule}`}
-                    className="grid grid-cols-8 items-start gap-3 text-muted"
+                    className="flex items-start gap-3 text-muted"
                   >
                     <span
                       aria-hidden="true"
-                      className="inline-flex size-8 items-center justify-center rounded-full bg-fill text-sm font-semibold text-fg"
+                      className="inline-flex size-8 shrink-0 items-center justify-center rounded-full bg-fill text-sm font-semibold text-fg"
                     >
                       {index + 1}
                     </span>
-                    <span>{rule}</span>
+                    <span className="min-w-0 flex-1">{rule}</span>
                   </li>
                 ))}
               </ol>

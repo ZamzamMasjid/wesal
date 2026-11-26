@@ -47,6 +47,8 @@ Light is the default theme; dark is an optional toggle, set as `data-theme="dark
 | `overlay` | `rgb(42 33 28 / 0.5)` | `rgb(0 0 0 / 0.6)` | Dialog backdrop |
 | `photo-fg` | `#FFFDF9` | `#FFFDF9` | Text and icons laid directly over a photograph |
 | `photo-scrim` | `#1A1513` | `#1A1513` | Gradient that keeps copy on a photograph readable |
+| `logo-bg` | `#6B2737` | `#6B2737` | The fixed wordmark plaque, in both themes |
+| `logo-fg` | `#FFFDF9` | `#FFFDF9` | The arch and name on that plaque |
 
 Slot states have fixed semantic colors, always paired with a text label and an icon, never color alone:
 
@@ -121,11 +123,11 @@ Lucide, stroke width 1.75. 20px in UI, 16px inline with text and in badges, 24px
 
 ## Wordmark and icon
 
-The wordmark is the Arabic name **وصال** set in Cairo ExtraBold in `brand`, paired with a mihrab-arch mark whose niche is cut out. The mark is one shape, so it stays readable at 16px: the outer arch inherits the text colour and the niche takes the page background. Over a photograph the pair inverts — cream arch, `brand` niche — through the photo tone.
+The wordmark is the Arabic name **وصال** in Cairo ExtraBold, cream on a fixed oxblood plaque, beside a mihrab-arch mark whose niche is cut out of it. The mark is one shape, so it stays readable at 16px. The plaque uses the fixed `logo-bg` and `logo-fg` tokens: it is identical on every page and in both themes; the page behind it changes, not the logo.
 
-- Header lockup: mark at 28px on phones and 40px from `md`, 8px before the word, both on the start side. The mark is decorative; the link's accessible name already carries the venue.
-- Tab and app icon: the same arch in cream on a `brand` rounded square (`public/favicon.svg`, with 16/32/180/192/512 PNGs). The manifest name and the Apple web-app title are both **وصال**.
-- Do not set the mark in a second colour, add a crescent, or put the full word inside the favicon; at tab size those details collapse.
+- Header lockup: a `logo-bg` pill with the mark at 24px on phones and 28px from `md`, then the name; 8px gap and a thin `logo-fg/15` ring for the hero photograph.
+- Tab and app icon: the same arch in cream on a `logo-bg` rounded square (`public/favicon.svg`, with 16/32/180/192/512 PNGs). The manifest name and the Apple web-app title are both **وصال**.
+- Do not theme the plaque, invert it over a photograph, or put the full word inside the favicon; at tab size those changes make the mark read differently.
 
 ## Accessibility baseline
 

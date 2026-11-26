@@ -41,6 +41,8 @@
   --color-overlay: rgb(42 33 28 / 0.5);   /* dialog backdrop */
   --color-photo-fg: #FFFDF9;       /* copy laid directly over a photograph */
   --color-photo-scrim: #1A1513;    /* the gradient that keeps that copy readable */
+  --color-logo-bg: #6B2737;        /* the fixed wordmark plaque, in both themes */
+  --color-logo-fg: #FFFDF9;        /* the arch and name on that plaque */
 
   /* ── Typography ─────────────────────────────────── */
   --font-sans: "Cairo", "Segoe UI", Tahoma, system-ui, sans-serif;   /* everything, Arabic and English */
@@ -121,6 +123,8 @@
   --color-overlay: rgb(0 0 0 / 0.6);
   --color-photo-fg: #FFFDF9;
   --color-photo-scrim: #1A1513;
+  --color-logo-bg: #6B2737;
+  --color-logo-fg: #FFFDF9;
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.3);
   --shadow-md: 0 1px 2px rgb(0 0 0 / 0.3), 0 12px 32px rgb(0 0 0 / 0.35);
   --shadow-lg: 0 2px 4px rgb(0 0 0 / 0.3), 0 24px 64px rgb(0 0 0 / 0.55);
