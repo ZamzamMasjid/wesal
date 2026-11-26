@@ -2,7 +2,7 @@
 id: landing-page
 type: feature-design
 title: Landing Page — Design
-last_modified: 2026-11-15
+last_modified: 2026-11-26
 feature: landing-page
 ---
 
@@ -12,16 +12,18 @@ feature: landing-page
 
 ## Visual conventions specific to this feature
 
-The hero is one wide venue photograph with rounded corners and nothing laid over it. The venue name and description follow below it. Sections are separated by whitespace alone; there is no ornament and no divider. Content sits in soft-shadowed cards on the sand background.
+The hero is a full-bleed venue photograph with a dark scrim; the venue name, tagline and actions sit over it in the fixed photo copy color. The "About the venue" heading and description follow below it. Sections are separated by whitespace alone; there is no ornament and no divider. Content sits in soft-shadowed cards on the sand background.
 
-Photography is the color. The interface around it stays in `bg`, `surface`, `fg` and `brand`.
+The gallery is a curated mosaic, not a uniform grid: one large tile, four regular tiles, one wide tile and two regular tiles. When the library is larger, a count tile opens the full lightbox. This keeps a library of near-identical exterior shots from reading as repetition.
+
+Photography is the color. The interface around it stays in `bg`, `surface`, `fg` and `brand`; over a photograph it uses `photo-fg` and `photo-scrim` so the copy clears the image in both themes.
 
 ## Components
 
-- **Hero** — the venue photograph only.
-- **Introduction** — venue name and description.
-- **Primary action** — "Check availability", placed under the price cards.
-- **Gallery** — grid of photos and videos; opens a lightbox (dialog) with swipe and arrow-key navigation. Videos show a poster and play on tap, muted by default.
+- **Hero** — full-bleed photograph with scrim, venue name, tagline, "Check availability", a WhatsApp or Call action and an "Explore the venue" cue. Without media it becomes a `photo-scrim` block with the same copy.
+- **Introduction** — "About the venue" and the description.
+- **Primary action** — "Check availability", in the hero and under the price cards.
+- **Gallery** — curated mosaic of photos and videos with a count tile; opens a lightbox (dialog) with swipe and arrow-key navigation. Videos show a poster and play on tap, muted by default.
 - **Price list** — one row per occasion: name and price in EGP, with a note stating the deposit percentage.
 - **Policy block** — collapsible text.
 - **Contact bar** — phone and WhatsApp buttons; sticky at the bottom on phones.

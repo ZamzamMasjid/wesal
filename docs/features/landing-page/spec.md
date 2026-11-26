@@ -3,7 +3,7 @@ id: landing-page
 type: feature
 title: Landing Page
 status: shipped
-last_modified: 2026-11-21
+last_modified: 2026-11-26
 milestone: v1
 pillar: public-site
 depends_on: [content-management, public-calendar, venue-settings]
@@ -56,7 +56,7 @@ No entities of its own. Reads:
 ## Edge cases and constraints
 
 - Videos are served from the app machine's volume; they must stream with range requests and must not autoplay with sound.
-- If no media has been uploaded yet, the gallery section is omitted rather than shown empty.
+- If no media has been uploaded yet, the gallery section is omitted rather than shown empty and the hero falls back to a `photo-scrim` block with the venue name and actions.
 - Occasion prices are shown with the deposit percentage so the deposit is no surprise later.
 - Arabic and English each have their own URL with `hreflang` links; the Arabic page is the canonical default.
 - The page must meet WCAG AA: image alt text is editable by the owner, and the gallery is keyboard-operable.

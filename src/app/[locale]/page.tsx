@@ -106,6 +106,8 @@ const primary =
   "inline-flex min-h-14 items-center justify-center gap-2 rounded-full bg-brand px-8 text-lg font-semibold text-brand-fg transition-colors hover:bg-brand-hover motion-reduce:transition-none";
 const quiet =
   "inline-flex min-h-(--size-touch) items-center justify-center gap-2 rounded-full bg-fill px-6 font-semibold text-fg transition-colors hover:bg-border motion-reduce:transition-none";
+const heroQuiet =
+  "inline-flex min-h-14 items-center justify-center gap-2 rounded-full border border-photo-fg/40 bg-photo-fg/10 px-6 font-semibold text-photo-fg backdrop-blur-sm transition-colors hover:bg-photo-fg/20 motion-reduce:transition-none";
 
 export default async function Home({ params }: PageProps<"/[locale]">) {
   const { locale } = await params;
@@ -128,38 +130,93 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
   const phone = content.contactPhone.trim();
   const whatsapp = content.contactWhatsapp.trim();
   const hasContact = phone !== "" || whatsapp !== "";
+  const hasDescription = description.trim() !== "";
+  const scrollTarget = hasDescription ? "#about-title" : "#prices-title";
 
   return (
     <>
-      <SiteHeader locale={locale} path="/" findBooking />
-
-      <main className="mx-auto max-w-content px-4 pb-24 md:px-6 md:pb-16">
+      <section className="relative isolate overflow-hidden bg-photo-scrim">
         {hero && (
           <Image
             src={hero.url}
             alt={mediaAlternative(hero, locale) || t("mediaAltFallback")}
-            width={1120}
-            height={520}
+            fill
             priority
             unoptimized
-            sizes="(max-width: 1024px) 100vw, 1120px"
-            className="h-[260px] w-full rounded-lg object-cover md:h-[480px] md:rounded-xl"
+            sizes="100vw"
+            className="object-cover object-center"
           />
         )}
+        <div aria-hidden="true" className="hero-scrim absolute inset-0" />
 
-        <section
-          className="grid items-start gap-6 pt-8 md:grid-cols-[5fr_7fr] md:gap-12 md:pt-16"
-          aria-labelledby="about-title"
-        >
-          <h1 id="about-title" className="text-4xl font-bold md:text-6xl">
-            {t("venueName")}
-          </h1>
-          <div className="space-y-4 text-lg text-muted">
-            {paragraphs(description).map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
+        <div className="relative flex min-h-[min(84svh,760px)] flex-col">
+          <SiteHeader locale={locale} path="/" findBooking overlay />
+
+          <div className="mx-auto flex w-full max-w-content flex-1 flex-col justify-end px-4 pb-10 pt-14 md:px-6 md:pb-16 md:pt-20">
+            <p className="text-sm font-semibold text-photo-fg/80">
+              {t("tagline")}
+            </p>
+            <h1 className="mt-3 max-w-[20ch] text-4xl font-bold text-photo-fg md:text-6xl">
+              {t("venueName")}
+            </h1>
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <Link href="/calendar" className={primary}>
+                <CalendarDays
+                  aria-hidden="true"
+                  className="size-5"
+                  strokeWidth={1.75}
+                />
+                {t("checkAvailability")}
+              </Link>
+              {whatsapp ? (
+                <a href={whatsappUrl(whatsapp)} className={heroQuiet}>
+                  <MessageCircle
+                    aria-hidden="true"
+                    className="size-5"
+                    strokeWidth={1.75}
+                  />
+                  {t("whatsapp")}
+                </a>
+              ) : (
+                phone && (
+                  <a href={`tel:${dialable(phone)}`} className={heroQuiet}>
+                    <Phone
+                      aria-hidden="true"
+                      className="size-5"
+                      strokeWidth={1.75}
+                    />
+                    {t("call")}
+                  </a>
+                )
+              )}
+            </div>
+            <a
+              href={scrollTarget}
+              className="mt-10 inline-flex w-fit items-center gap-2 text-sm font-medium text-photo-fg/75 transition-colors hover:text-photo-fg motion-reduce:transition-none"
+            >
+              {t("explore")}
+              <ChevronDown aria-hidden="true" className="size-4" />
+            </a>
           </div>
-        </section>
+        </div>
+      </section>
+
+      <main className="mx-auto max-w-content px-4 pb-24 md:px-6 md:pb-16">
+        {hasDescription && (
+          <section
+            className="grid items-start gap-6 pt-12 md:grid-cols-[5fr_7fr] md:gap-12 md:pt-20"
+            aria-labelledby="about-title"
+          >
+            <h2 id="about-title" className="text-3xl font-bold md:text-5xl">
+              {t("about")}
+            </h2>
+            <div className="space-y-4 text-lg text-muted">
+              {paragraphs(description).map((paragraph) => (
+                <p key={paragraph}>{paragraph}</p>
+              ))}
+            </div>
+          </section>
+        )}
 
         {gallery.length > 0 && <HomeGallery media={gallery} locale={locale} />}
 

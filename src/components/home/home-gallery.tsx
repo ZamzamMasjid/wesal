@@ -1,6 +1,6 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Play } from "lucide-react";
+import { ChevronLeft, ChevronRight, Images, Play } from "lucide-react";
 import Image from "next/image";
 import { useTranslations } from "next-intl";
 import { useId, useState } from "react";
@@ -9,23 +9,35 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import type { MediaItem } from "@/lib/content-api";
 import { mediaAlternative, type Locale } from "@/lib/site-text";
 
-// The landing gallery and its lightbox (docs/design/views/home.md): a photo and
-// video grid whose first tile is double width. Tiles are buttons with the
-// owner's alternative text; the lightbox traps focus, closes on Escape, and
-// moves with arrows or the previous/next buttons. Videos never autoplay with
-// sound and always have controls.
+// The landing gallery and its lightbox (docs/design/views/home.md): a curated
+// mosaic of the strongest tiles, with the remaining photos behind a count tile
+// that opens the same lightbox. Tiles are buttons with the owner's alternative
+// text; the lightbox traps focus, closes on Escape, and moves with arrows or the
+// previous/next buttons. Videos never autoplay with sound and always have
+// controls.
+
+/** How many tiles the mosaic shows before the "+N photos" tile. */
+export const FEATURED_COUNT = 7;
 
 export function HomeGallery({
   media,
   locale,
+  featuredCount = FEATURED_COUNT,
 }: {
   media: MediaItem[];
   locale: Locale;
+  /** Lets tests and future layouts change the mosaic cut without touching it. */
+  featuredCount?: number;
 }) {
   const t = useTranslations("Home");
   const headingId = useId();
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const current = openIndex === null ? null : (media[openIndex] ?? null);
+
+  const shown = media.slice(0, Math.max(0, featuredCount));
+  const remaining = media.length - shown.length;
+  const tiles = shown.length + (remaining > 0 ? 1 : 0);
+  const morePreview = media[shown.length];
 
   function labelFor(item: MediaItem): string {
     const alt =
@@ -43,19 +55,58 @@ export function HomeGallery({
     });
   }
 
+  // The mosaic: one large tile, four regular tiles, then a wide tile and two
+  // regular ones. Small libraries stretch their last tile so a row never ends
+  // with a hole. It falls back gracefully at every count.
+  function spansWide(index: number): boolean {
+    return (
+      (tiles === 4 && index === 3) ||
+      (tiles === 6 && index === 5) ||
+      (tiles === 7 && index === 6) ||
+      (tiles >= 8 && index === 5)
+    );
+  }
+
+  function tileClass(index: number): string {
+    if (tiles <= 2) return "col-span-2 md:col-span-4";
+    if (index === 0) {
+      return tiles >= 4 ? "col-span-2 md:row-span-2" : "col-span-2";
+    }
+    if (tiles === 6 && index === 5) return "col-span-2 md:col-span-4";
+    if (spansWide(index)) return "col-span-2";
+    return "";
+  }
+
+  function tileAspect(index: number): string {
+    if (index === 0 || tiles <= 2 || spansWide(index)) {
+      return "aspect-[16/9] md:aspect-auto";
+    }
+    return "aspect-[4/3] md:aspect-auto";
+  }
+
+  function tileSizes(index: number): string {
+    if (index === 0 || tiles <= 2 || spansWide(index)) {
+      return "(max-width: 768px) 100vw, 50vw";
+    }
+    return "(max-width: 768px) 50vw, 25vw";
+  }
+
   return (
     <section className="pt-16 md:pt-24" aria-labelledby={headingId}>
       <h2 id={headingId} className="text-3xl font-bold md:text-5xl">
         {t("gallery")}
       </h2>
-      <ul className="mt-8 grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4 lg:grid-cols-4">
-        {media.map((item, index) => (
-          <li key={item.id} className={index === 0 ? "col-span-2" : undefined}>
+      <ul className="mt-8 grid grid-cols-2 gap-3 md:auto-rows-[190px] md:grid-cols-4 md:gap-4 lg:auto-rows-[220px]">
+        {shown.map((item, index) => (
+          <li
+            key={item.id}
+            className={`${tileClass(index)} ${tileAspect(index)} min-w-0`}
+          >
             <button
               type="button"
               onClick={() => setOpenIndex(index)}
               aria-label={labelFor(item)}
-              className="group relative block aspect-[4/3] w-full overflow-hidden rounded-lg bg-fill focus-visible:ring-2 focus-visible:ring-focus"
+              className="group relative block h-full w-full overflow-hidden rounded-lg bg-fill focus-visible:ring-2 focus-visible:ring-focus"
             >
               {item.kind === "photo" ? (
                 <Image
@@ -63,11 +114,7 @@ export function HomeGallery({
                   alt=""
                   fill
                   unoptimized
-                  sizes={
-                    index === 0
-                      ? "(max-width: 640px) 100vw, (max-width: 1024px) 66vw, 50vw"
-                      : "(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                  }
+                  sizes={tileSizes(index)}
                   className="object-cover transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none"
                 />
               ) : (
@@ -90,6 +137,45 @@ export function HomeGallery({
             </button>
           </li>
         ))}
+
+        {remaining > 0 && (
+          <li
+            className={`${tileClass(shown.length)} ${tileAspect(shown.length)} min-w-0`}
+          >
+            <button
+              type="button"
+              onClick={() => setOpenIndex(shown.length)}
+              aria-label={`+${remaining} ${t("morePhotos")} — ${t("showAll", { count: media.length })}`}
+              className="group relative block h-full w-full overflow-hidden rounded-lg bg-fill focus-visible:ring-2 focus-visible:ring-focus"
+            >
+              {morePreview?.kind === "photo" && (
+                <Image
+                  src={morePreview.url}
+                  alt=""
+                  fill
+                  unoptimized
+                  sizes={tileSizes(shown.length)}
+                  className="object-cover opacity-70 transition-transform duration-300 group-hover:scale-105 motion-reduce:transition-none"
+                />
+              )}
+              <span
+                aria-hidden="true"
+                className="absolute inset-0 bg-photo-scrim/45"
+              />
+              <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 text-photo-fg">
+                <Images
+                  aria-hidden="true"
+                  className="size-6"
+                  strokeWidth={1.75}
+                />
+                <bdi dir="ltr" className="text-2xl font-bold tabular-nums">
+                  +{remaining}
+                </bdi>{" "}
+                <span className="text-sm font-medium">{t("morePhotos")}</span>
+              </span>
+            </button>
+          </li>
+        )}
       </ul>
 
       <Dialog

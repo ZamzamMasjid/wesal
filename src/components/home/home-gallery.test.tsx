@@ -55,10 +55,10 @@ const media: MediaItem[] = [
   },
 ];
 
-function renderGallery() {
+function renderGallery(items: MediaItem[] = media, featuredCount?: number) {
   render(
     <NextIntlClientProvider locale="en" messages={messages}>
-      <HomeGallery media={media} locale="en" />
+      <HomeGallery media={items} locale="en" featuredCount={featuredCount} />
     </NextIntlClientProvider>,
   );
 }
@@ -123,5 +123,27 @@ describe("HomeGallery", () => {
       (screen.getByRole("button", { name: "Next" }) as HTMLButtonElement)
         .disabled,
     ).toBe(true);
+  });
+
+  it("keeps the extra photos behind a count tile that opens the lightbox", () => {
+    const many: MediaItem[] = Array.from({ length: 9 }, (_, index) => ({
+      id: index + 1,
+      kind: "photo",
+      position: index,
+      altAr: `صورة ${index + 1}`,
+      altEn: `Photo ${index + 1}`,
+      url: `/api/v1/media/${index + 1}`,
+      mimeType: "image/jpeg",
+      byteSize: 10,
+    }));
+
+    renderGallery(many, 3);
+
+    expect(screen.getByRole("button", { name: /more photos/ })).toBeTruthy();
+    expect(screen.queryByRole("button", { name: "Photo 4" })).toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: /more photos/ }));
+    expect(screen.getByText("4 / 9")).toBeTruthy();
+    expect(screen.getByAltText("Photo 4")).toBeTruthy();
   });
 });

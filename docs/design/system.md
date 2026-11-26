@@ -2,7 +2,7 @@
 id: design-system
 type: design-system
 title: Design System
-last_modified: 2026-11-15
+last_modified: 2026-11-26
 ---
 
 # Design System
@@ -45,6 +45,8 @@ Light is the default theme; dark is an optional toggle, set as `data-theme="dark
 | `success-soft` | `#DDEBDD` | `#1E2E22` | Confirmed badge in the dashboard |
 | `focus` | `#6B2737` | `#E3A1AE` | Focus ring |
 | `overlay` | `rgb(42 33 28 / 0.5)` | `rgb(0 0 0 / 0.6)` | Dialog backdrop |
+| `photo-fg` | `#FFFDF9` | `#FFFDF9` | Text and icons laid directly over a photograph |
+| `photo-scrim` | `#1A1513` | `#1A1513` | Gradient that keeps copy on a photograph readable |
 
 Slot states have fixed semantic colors, always paired with a text label and an icon, never color alone:
 
