@@ -2,14 +2,21 @@ import { useFonts } from "expo-font";
 import * as Localization from "expo-localization";
 import * as Notifications from "expo-notifications";
 import { StatusBar } from "expo-status-bar";
-import { useEffect, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  View,
+} from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import { fetchOccasions, type Occasion, type Slot } from "./src/api";
 import { Text, direction } from "./src/components";
 import { fontAssets } from "./src/fonts";
 import { text, type Locale } from "./src/i18n";
+import { RefreshProvider, type RefreshHandler } from "./src/refresh";
 import { BookingFormScreen } from "./src/screens/BookingFormScreen";
 import { BookingScreen } from "./src/screens/BookingScreen";
 import { CalendarScreen } from "./src/screens/CalendarScreen";
@@ -44,8 +51,28 @@ export default function App() {
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [occasions, setOccasions] = useState<Occasion[]>([]);
   const [lastToken, setLastToken] = useState<string | null>(null);
+  const [refreshing, setRefreshing] = useState(false);
+  const refreshHandler = useRef<RefreshHandler | null>(null);
   const [fontsLoaded, fontError] = useFonts(fontAssets);
   const t = text(locale);
+
+  const registerRefresh = useCallback((handler: RefreshHandler) => {
+    refreshHandler.current = handler;
+    return () => {
+      if (refreshHandler.current === handler) refreshHandler.current = null;
+    };
+  }, []);
+
+  const pullToRefresh = useCallback(async () => {
+    const handler = refreshHandler.current;
+    if (!handler) return;
+    setRefreshing(true);
+    try {
+      await handler();
+    } finally {
+      setRefreshing(false);
+    }
+  }, []);
 
   useEffect(() => {
     void (async () => {
@@ -92,58 +119,72 @@ export default function App() {
           </Pressable>
         </View>
 
-        <View style={styles.content}>
-          <ScrollView
-            contentContainerStyle={styles.scroll}
-            keyboardShouldPersistTaps="handled"
-            showsVerticalScrollIndicator={false}
-          >
-            {route.name === "home" && (
-              <HomeScreen
-                locale={locale}
-                t={t}
-                onCalendar={() => setRoute({ name: "calendar" })}
-                onBooking={(token) => openBooking(token)}
-                onStaff={() => setRoute({ name: "staff" })}
-              />
-            )}
-            {route.name === "calendar" && (
-              <CalendarScreen
-                locale={locale}
-                t={t}
-                onBook={(day, slot) => setRoute({ name: "book", day, slot })}
-              />
-            )}
-            {route.name === "book" && (
-              <BookingFormScreen
-                locale={locale}
-                t={t}
-                day={route.day}
-                start={route.slot.start}
-                end={route.slot.end}
-                occasions={occasions}
-                onHeld={(token) => openBooking(token)}
-                onBack={() => setRoute({ name: "calendar" })}
-                onCalendar={() => setRoute({ name: "calendar" })}
-              />
-            )}
-            {route.name === "booking" && (
-              <BookingScreen
-                locale={locale}
-                t={t}
-                token={route.token}
-                onBack={() => setRoute({ name: "home" })}
-              />
-            )}
-            {route.name === "staff" && (
-              <StaffScreen
-                locale={locale}
-                t={t}
-                onBack={() => setRoute({ name: "home" })}
-              />
-            )}
-          </ScrollView>
-        </View>
+        <RefreshProvider register={registerRefresh}>
+          <View style={styles.content}>
+            <ScrollView
+              testID="app-scroll"
+              contentContainerStyle={styles.scroll}
+              keyboardShouldPersistTaps="handled"
+              showsVerticalScrollIndicator={false}
+              alwaysBounceVertical
+              refreshControl={
+                <RefreshControl
+                  testID="app-refresh"
+                  refreshing={refreshing}
+                  onRefresh={() => void pullToRefresh()}
+                  tintColor={colors.brand}
+                  colors={[colors.brand]}
+                />
+              }
+            >
+              {route.name === "home" && (
+                <HomeScreen
+                  locale={locale}
+                  t={t}
+                  onCalendar={() => setRoute({ name: "calendar" })}
+                  onBooking={(token) => openBooking(token)}
+                  onStaff={() => setRoute({ name: "staff" })}
+                />
+              )}
+              {route.name === "calendar" && (
+                <CalendarScreen
+                  locale={locale}
+                  t={t}
+                  onHome={() => setRoute({ name: "home" })}
+                  onBook={(day, slot) => setRoute({ name: "book", day, slot })}
+                />
+              )}
+              {route.name === "book" && (
+                <BookingFormScreen
+                  locale={locale}
+                  t={t}
+                  day={route.day}
+                  start={route.slot.start}
+                  end={route.slot.end}
+                  occasions={occasions}
+                  onHeld={(token) => openBooking(token)}
+                  onBack={() => setRoute({ name: "calendar" })}
+                  onCalendar={() => setRoute({ name: "calendar" })}
+                />
+              )}
+              {route.name === "booking" && (
+                <BookingScreen
+                  locale={locale}
+                  t={t}
+                  token={route.token}
+                  onBack={() => setRoute({ name: "home" })}
+                />
+              )}
+              {route.name === "staff" && (
+                <StaffScreen
+                  locale={locale}
+                  t={t}
+                  onBack={() => setRoute({ name: "home" })}
+                />
+              )}
+            </ScrollView>
+          </View>
+        </RefreshProvider>
 
         <View accessibilityRole="tablist" style={styles.tabs}>
           {(

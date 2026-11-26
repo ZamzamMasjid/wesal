@@ -25,6 +25,7 @@ import {
 } from "../components";
 import { dayLabel, formatTime } from "../dates";
 import type { Locale, Strings } from "../i18n";
+import { useRefreshHandler } from "../refresh";
 import {
   clearDeviceId,
   clearStaffCookie,
@@ -70,6 +71,10 @@ export function StaffScreen({
     const result = await fetchReviewQueue(value);
     if (result.ok && result.data) setQueue(result.data.items);
   }
+
+  useRefreshHandler(async () => {
+    if (cookie) await loadQueue(cookie);
+  });
 
   async function registerPush(value: string) {
     try {

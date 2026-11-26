@@ -33,4 +33,4 @@ Same visual language as the website: the tokens, typefaces and slot-state colors
 
 ## Interactions
 
-Pull to refresh on the calendar and on My booking. The booking link from WhatsApp opens directly in the app on the right booking. Copy buttons for payment numbers use the system clipboard, and a shortcut offers to open the wallet app where the platform allows.
+Pull to refresh on the home, calendar, My booking and staff review screens; the shell keeps the native spinner visible until the visible screen has reloaded its data. The booking link from WhatsApp opens directly in the app on the right booking. Copy buttons for payment numbers use the system clipboard, and a shortcut offers to open the wallet app where the platform allows.

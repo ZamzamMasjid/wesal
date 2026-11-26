@@ -9,12 +9,18 @@ import {
   cairoToday,
   countdown,
   dayLabel,
+  dayNumber,
+  defaultDay,
   firstDayOfMonth,
+  firstOpenDay,
   formatTime,
   lastDayOfMonth,
+  longDayLabel,
   money,
+  monthCells,
   monthLabel,
   monthOf,
+  weekdayHeaders,
 } from "./dates";
 
 describe("cairoToday", () => {
@@ -67,11 +73,56 @@ describe("day and month arithmetic", () => {
   });
 });
 
+describe("month grid", () => {
+  it("lays a month out in six Saturday-first weeks", () => {
+    const cells = monthCells("2026-11");
+    expect(cells).toHaveLength(42);
+    // 1 November 2026 is a Sunday, so the first cell is empty.
+    expect(cells[0]).toBeNull();
+    expect(cells[1]).toBe("2026-11-01");
+    expect(cells[30]).toBe("2026-11-30");
+    expect(cells.filter(Boolean)).toHaveLength(30);
+    expect(dayNumber("2026-11-25")).toBe(25);
+  });
+
+  it("names the weekdays from Saturday", () => {
+    expect(weekdayHeaders("en")).toEqual([
+      "Sat",
+      "Sun",
+      "Mon",
+      "Tue",
+      "Wed",
+      "Thu",
+      "Fri",
+    ]);
+    expect(weekdayHeaders("ar")[0]).toBe("السبت");
+  });
+
+  it("opens on today or the first open day", () => {
+    expect(defaultDay("2026-11", "2026-11-25")).toBe("2026-11-25");
+    expect(defaultDay("2026-12", "2026-11-25")).toBe("2026-12-01");
+
+    const days = [
+      { day: "2026-11-25", closed: true, slots: [{ action: "book" }] },
+      { day: "2026-11-26", closed: false, slots: [{ action: "none" }] },
+      { day: "2026-11-27", closed: false, slots: [{ action: "book" }] },
+    ];
+    expect(firstOpenDay(days, "2026-11-25")).toBe("2026-11-27");
+    expect(firstOpenDay([], "2026-11-25")).toBe("2026-11-25");
+  });
+});
+
 describe("localised labels", () => {
   it("labels a month in English and Arabic", () => {
     expect(monthLabel("2026-11", "en")).toBe("November 2026");
     expect(monthLabel("2026-11", "ar")).toMatch(/نوفمبر/);
-    expect(monthLabel("2026-11", "ar")).toMatch(/٢٠٢٦/);
+    // Western digits in the grid heading, like the website's calendar.
+    expect(monthLabel("2026-11", "ar")).toMatch(/2026/);
+  });
+
+  it("labels the selected day for the day panel", () => {
+    expect(longDayLabel("2026-11-25", "en")).toBe("Wednesday 25 November");
+    expect(longDayLabel("2026-11-25", "ar")).toMatch(/الأربعاء/);
   });
 
   it("labels a day in English and Arabic", () => {

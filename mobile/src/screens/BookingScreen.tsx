@@ -21,6 +21,7 @@ import {
 } from "../components";
 import { countdown, formatTime, dayLabel, money } from "../dates";
 import type { Locale, Strings } from "../i18n";
+import { useRefreshHandler } from "../refresh";
 import { colors, spacing } from "../theme";
 
 const STATUS_KEY = {
@@ -82,6 +83,10 @@ export function BookingScreen({
   refreshRef.current = async () => {
     if (activeToken) await load(activeToken);
   };
+
+  useRefreshHandler(async () => {
+    if (activeToken) await load(activeToken, { keepNotice: true });
+  });
 
   useEffect(() => {
     if (activeToken) void load(activeToken);

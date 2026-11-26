@@ -3,7 +3,13 @@
 // ROADMAP: phase-7-mobile-app / customer-mobile-app / Scaffold Expo app with
 // Arabic/English and RTL, consuming /api/v1
 
-import { fireEvent, render, screen } from "@testing-library/react-native";
+import {
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react-native";
+import { RefreshControl } from "react-native";
 
 import App from "./App";
 import type { Availability, PublicBooking, SiteContent } from "./src/api";
@@ -147,6 +153,27 @@ describe("App", () => {
     expect(
       (await screen.findAllByText("مسجد وصال وقاعة المناسبات")).length,
     ).toBeGreaterThan(0);
+  });
+
+  it("reloads the visible screen when the user pulls it down", async () => {
+    render(<App />);
+    await waitFor(() => expect(api.fetchContent).toHaveBeenCalledTimes(1));
+
+    fireEvent(screen.UNSAFE_getByType(RefreshControl), "refresh");
+
+    await waitFor(() => expect(api.fetchContent).toHaveBeenCalledTimes(2));
+  });
+
+  it("refreshes the calendar month after switching tabs", async () => {
+    render(<App />);
+    await screen.findAllByText("وصال");
+
+    fireEvent.press(screen.getByRole("tab", { name: "التقويم" }));
+    await waitFor(() => expect(api.fetchAvailability).toHaveBeenCalledTimes(1));
+
+    fireEvent(screen.UNSAFE_getByType(RefreshControl), "refresh");
+
+    await waitFor(() => expect(api.fetchAvailability).toHaveBeenCalledTimes(2));
   });
 
   it("opens the booking saved on the device", async () => {

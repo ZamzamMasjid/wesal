@@ -1,5 +1,6 @@
-// SPEC: customer-mobile-app/spec.md — the calendar lists each open day, marks
-// which slots are bookable, and lets the customer move between months.
+// SPEC: customer-mobile-app/spec.md — the calendar mirrors the website's month
+// grid, marks which days have free slots, and lets the customer move between
+// months and open a day's slots.
 // ROADMAP: phase-7-mobile-app / customer-mobile-app / Implement calendar, booking
 // form, booking page and proof upload screens
 
@@ -56,36 +57,52 @@ const availability: Availability = {
   ],
 };
 
-function renderCalendar(onBook = jest.fn()) {
-  return render(<CalendarScreen locale="en" t={text("en")} onBook={onBook} />);
+function renderCalendar({
+  onBook = jest.fn(),
+  onHome = jest.fn(),
+}: { onBook?: jest.Mock; onHome?: jest.Mock } = {}) {
+  return render(
+    <CalendarScreen
+      locale="en"
+      t={text("en")}
+      onBook={onBook}
+      onHome={onHome}
+    />,
+  );
 }
 
 beforeEach(() => {
-  jest.mocked(api.fetchAvailability).mockResolvedValue({
-    ok: true,
-    data: availability,
-  });
+  jest
+    .mocked(api.fetchAvailability)
+    .mockImplementation(async (from: string, to: string) => ({
+      ok: true,
+      data:
+        from === "2026-11-01"
+          ? availability
+          : { ...availability, from, to, days: [] },
+    }));
 });
 
 describe("CalendarScreen", () => {
-  it("loads the visible month and shows its open days", async () => {
+  it("loads the visible month as a Saturday-first grid", async () => {
     renderCalendar();
 
     expect(screen.getByText(text("en").sending)).toBeOnTheScreen();
-    expect(await screen.findByText("Wednesday 25 Nov")).toBeOnTheScreen();
-    expect(screen.getByText("November 2026")).toBeOnTheScreen();
+    expect(await screen.findByText("November 2026")).toBeOnTheScreen();
+    expect(screen.getByText("Sat")).toBeOnTheScreen();
+    expect(screen.getByText("Fri")).toBeOnTheScreen();
     expect(api.fetchAvailability).toHaveBeenCalledWith(
       "2026-11-01",
       "2026-11-30",
     );
-    expect(screen.queryByText("Thursday 26 Nov")).not.toBeOnTheScreen();
   });
 
-  it("marks free slots as bookable and reports the chosen one", async () => {
+  it("opens on today and marks free slots as bookable", async () => {
     const onBook = jest.fn();
-    renderCalendar(onBook);
+    renderCalendar({ onBook });
 
-    expect(await screen.findByText("Book")).toBeOnTheScreen();
+    expect(await screen.findByText("Wednesday 25 November")).toBeOnTheScreen();
+    expect(screen.getByText("Book")).toBeOnTheScreen();
     expect(screen.getByText("Awaiting payment")).toBeOnTheScreen();
 
     fireEvent.press(screen.getByText("Book"));
@@ -93,11 +110,21 @@ describe("CalendarScreen", () => {
     expect(onBook).toHaveBeenCalledWith("2026-11-25", freeSlot);
   });
 
+  it("shows a closed day when it is picked in the grid", async () => {
+    renderCalendar();
+    await screen.findByText("November 2026");
+
+    fireEvent.press(screen.getByTestId("day-2026-11-26"));
+
+    expect(screen.getByText("Thursday 26 November")).toBeOnTheScreen();
+    expect(screen.getByText(text("en").noSlots)).toBeOnTheScreen();
+  });
+
   it("moves to the next and previous month", async () => {
     renderCalendar();
     await screen.findByText("November 2026");
 
-    fireEvent.press(screen.getByRole("button", { name: "›" }));
+    fireEvent.press(screen.getByRole("button", { name: text("en").nextMonth }));
 
     await waitFor(() => {
       expect(api.fetchAvailability).toHaveBeenLastCalledWith(
@@ -107,7 +134,9 @@ describe("CalendarScreen", () => {
     });
     expect(screen.getByText("December 2026")).toBeOnTheScreen();
 
-    fireEvent.press(screen.getByRole("button", { name: "‹" }));
+    fireEvent.press(
+      screen.getByRole("button", { name: text("en").previousMonth }),
+    );
 
     await waitFor(() => {
       expect(api.fetchAvailability).toHaveBeenLastCalledWith(
@@ -115,6 +144,16 @@ describe("CalendarScreen", () => {
         "2026-11-30",
       );
     });
+  });
+
+  it("returns to the home screen from the back link", async () => {
+    const onHome = jest.fn();
+    renderCalendar({ onHome });
+    await screen.findByText("November 2026");
+
+    fireEvent.press(screen.getByRole("button", { name: text("en").backHome }));
+
+    expect(onHome).toHaveBeenCalledTimes(1);
   });
 
   it("shows the offline banner when the month cannot be loaded", async () => {
@@ -139,16 +178,16 @@ describe("CalendarScreen", () => {
     expect(await screen.findByText(text("en").noSlots)).toBeOnTheScreen();
   });
 
-  it("shows the venue day when the server's today differs", async () => {
+  it("disables days before the server's today", async () => {
     jest.mocked(api.fetchAvailability).mockResolvedValue({
       ok: true,
-      data: { ...availability, today: "2026-11-24" },
+      data: { ...availability, today: "2026-11-25" },
     });
 
     renderCalendar();
+    await screen.findByText("November 2026");
 
-    expect(
-      await screen.findByText(`${text("en").availability} · 2026-11-25`),
-    ).toBeOnTheScreen();
+    expect(screen.getByTestId("day-2026-11-24")).toBeDisabled();
+    expect(screen.getByTestId("day-2026-11-25")).not.toBeDisabled();
   });
 });

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Image, Linking, Pressable, ScrollView, View } from "react-native";
 
 import {
@@ -21,6 +21,7 @@ import {
 } from "../components";
 import { type Locale, type Strings } from "../i18n";
 import { money } from "../dates";
+import { useRefreshHandler } from "../refresh";
 import { storedBookings, type StoredBooking } from "../storage";
 import { colors, radius, spacing } from "../theme";
 
@@ -43,26 +44,31 @@ export function HomeScreen({
   const [bookings, setBookings] = useState<StoredBooking[]>([]);
   const [offline, setOffline] = useState(false);
 
-  useEffect(() => {
-    void (async () => {
-      setBookings(await storedBookings());
-      const [contentResult, occasionResult] = await Promise.all([
-        fetchContent(),
-        fetchOccasions(),
-      ]);
-      if (contentResult.ok && contentResult.data) {
-        setContent(contentResult.data.content);
-        setMedia(
-          contentResult.data.media.filter((item) => item.kind === "photo"),
-        );
-      } else {
-        setOffline(true);
-      }
-      if (occasionResult.ok && occasionResult.data) {
-        setOccasions(occasionResult.data.occasions);
-      }
-    })();
+  const load = useCallback(async () => {
+    setBookings(await storedBookings());
+    const [contentResult, occasionResult] = await Promise.all([
+      fetchContent(),
+      fetchOccasions(),
+    ]);
+    if (contentResult.ok && contentResult.data) {
+      setContent(contentResult.data.content);
+      setMedia(
+        contentResult.data.media.filter((item) => item.kind === "photo"),
+      );
+      setOffline(false);
+    } else {
+      setOffline(true);
+    }
+    if (occasionResult.ok && occasionResult.data) {
+      setOccasions(occasionResult.data.occasions);
+    }
   }, []);
+
+  useEffect(() => {
+    void load();
+  }, [load]);
+
+  useRefreshHandler(load);
 
   const latest = bookings[0];
   const description =
