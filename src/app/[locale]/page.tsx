@@ -131,7 +131,6 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
   const whatsapp = content.contactWhatsapp.trim();
   const hasContact = phone !== "" || whatsapp !== "";
   const hasDescription = description.trim() !== "";
-  const scrollTarget = hasDescription ? "#about-title" : "#prices-title";
 
   return (
     <>
@@ -190,13 +189,6 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                 )
               )}
             </div>
-            <a
-              href={scrollTarget}
-              className="mt-10 inline-flex w-fit items-center gap-2 text-sm font-medium text-photo-fg/75 transition-colors hover:text-photo-fg motion-reduce:transition-none"
-            >
-              {t("explore")}
-              <ChevronDown aria-hidden="true" className="size-4" />
-            </a>
           </div>
         </div>
       </section>
@@ -269,17 +261,6 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
                     </li>
                   ))}
                 </ul>
-                <div className="mt-8 flex flex-wrap items-center gap-4">
-                  <Link href="/calendar" className={primary}>
-                    <CalendarDays
-                      aria-hidden="true"
-                      className="size-5"
-                      strokeWidth={1.75}
-                    />
-                    {t("checkAvailability")}
-                  </Link>
-                  <span className="text-sm text-muted">{t("chooseNote")}</span>
-                </div>
               </div>
             ) : (
               <div className="flex flex-col items-start gap-4 rounded-lg bg-surface p-6 shadow-md sm:flex-row sm:items-center sm:p-8">
@@ -386,16 +367,6 @@ export default async function Home({ params }: PageProps<"/[locale]">) {
           </section>
         )}
       </main>
-
-      <footer className="mx-auto flex max-w-content flex-wrap justify-between gap-3 px-4 pb-24 pt-8 text-sm text-muted md:px-6 md:pb-12">
-        <Link
-          href="/find-booking"
-          className="font-medium text-brand underline-offset-4 hover:underline"
-        >
-          {t("findBookingFooter")}
-        </Link>
-        <span>{t("venueName")}</span>
-      </footer>
 
       {hasContact && (
         <nav

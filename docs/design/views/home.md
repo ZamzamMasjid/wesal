@@ -20,13 +20,12 @@ The visitor learns what the venue is, sees it, finds out what each occasion cost
 Single scrolling page, capped at 1120px. Shown in reading order; in Arabic everything mirrors.
 
 1. **Header** — floats inside the hero photograph: wordmark on the start side in the photo copy color; on the end side one pill holding "Find my booking", the language switch and the theme toggle.
-2. **Hero photograph** — full-bleed, edge to edge, with a dark scrim. The venue name (the page's `h1`), tagline, "Check availability", a WhatsApp or Call action and a quiet "Explore the venue" cue sit over it in the photo copy color.
+2. **Hero photograph** — full-bleed, edge to edge, with a dark scrim. The venue name (the page's `h1`), tagline, "Check availability" and a WhatsApp or Call action sit over it in the photo copy color.
 3. **Introduction** — "About the venue" (`h2`) on the start side, the description text beside it. Omitted when the owner has not written a description.
 4. **Gallery** — heading, then a curated mosaic: one large tile, four regular tiles, one wide tile and two regular tiles. When the library is larger than the mosaic, a count tile (`+N photos`) opens the full lightbox.
-5. **Prices** — heading, a one-line note and the deposit note on the start side; a two-by-two grid of occasion cards beside them. Under the cards sits the page's primary action, "Check availability".
+5. **Prices** — heading, a one-line note and the deposit note on the start side; a two-by-two grid of occasion cards beside them.
 6. **Booking policy** — one collapsible card with numbered rules.
 7. **Contact** — a `brand` block with the phone number and Call and WhatsApp buttons.
-8. **Footer** — the "Find my booking by booking ID" link.
 
 Prices in the mockup are placeholders; real values come from venue settings. The mockup predates the full-bleed hero and the mosaic gallery; the tokens it shows are still authoritative.
 
@@ -37,10 +36,8 @@ Prices in the mockup are placeholders; real values come from venue settings. The
 - Introduction block with "About the venue" and the description
 - Gallery mosaic with lightbox (Radix Dialog); the count tile opens the first hidden photo; video tiles show a play chip
 - Occasion price cards, each with name, price and a go arrow
-- Primary action "Check availability"
 - Policy block (Radix Collapsible)
 - Contact block, and a sticky contact bar on phones
-- Footer with the "Find my booking" link
 
 ## States
 
@@ -48,13 +45,12 @@ Prices in the mockup are placeholders; real values come from venue settings. The
 |---|---|
 | Default | All sections populated from content and settings |
 | Loading | Server-rendered; images sit on the fill color until they load |
-| Empty | No media: the hero becomes a `photo-scrim` block with the copy and no photograph, and the gallery is omitted. No description: the introduction is omitted. No occasions: the price cards and primary action are replaced by a card with a contact prompt, Call and WhatsApp |
+| Empty | No media: the hero becomes a `photo-scrim` block with the copy and no photograph, and the gallery is omitted. No description: the introduction is omitted. No occasions: the price cards are replaced by a card with a contact prompt, Call and WhatsApp |
 | Error | Database unavailable: the page body is replaced by one centered notice with the phone number, Call and WhatsApp |
 
 ## Interactions
 
-- "Check availability", in the hero and under the price cards, opens the calendar view.
-- "Explore the venue" scrolls to the introduction, or to prices when there is no description.
+- "Check availability", in the hero, opens the calendar view.
 - Tapping an occasion card opens the calendar with that occasion preselected.
 - Tapping a gallery item opens the lightbox; the count tile opens the first photo it hides; swipe or arrow keys move through the whole library; videos play on tap, muted.
 - Call and WhatsApp buttons leave the site to the dialer or a WhatsApp chat.
@@ -62,7 +58,7 @@ Prices in the mockup are placeholders; real values come from venue settings. The
 
 ## Responsive behavior
 
-- Below `sm`: hero about `84svh` (capped); one column; gallery two across with the first tile full width, the wide tile full width and the count tile a regular tile; price cards one per row with a full-width primary action; the contact block shows the number only and a sticky bar at the bottom of the screen carries Call and WhatsApp.
+- Below `sm`: hero about `84svh` (capped); one column; gallery two across with the first tile full width, the wide tile full width and the count tile a regular tile; price cards one per row; the contact block shows the number only and a sticky bar at the bottom of the screen carries Call and WhatsApp.
 - `md`: introduction and prices become two columns; the gallery becomes four across with fixed row heights and the mosaic spans.
 - `lg` and up: content capped at 1120px; the hero stays full-bleed.
 
