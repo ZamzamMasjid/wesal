@@ -21,7 +21,7 @@ ENV NEXT_PUBLIC_VENUE_PHONE=$NEXT_PUBLIC_VENUE_PHONE \
     NEXT_PUBLIC_VENUE_WHATSAPP=$NEXT_PUBLIC_VENUE_WHATSAPP
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npm run build && npm run build:migrate && npm run build:owner
+RUN npm run build && npm run build:migrate && npm run build:owner && npm run build:media
 
 FROM node:${NODE_VERSION}-alpine AS runtime
 WORKDIR /app
@@ -40,6 +40,10 @@ COPY --from=build /app/public ./public
 COPY --from=build /app/dist/migrate.mjs ./dist/migrate.mjs
 # One-off: creates the first owner (docs: DEPLOYMENT.md).
 COPY --from=build /app/dist/create-owner.mjs ./dist/create-owner.mjs
+# One-off: imports the venue photographs in assets/venue (docs: DEPLOYMENT.md).
+COPY --from=build /app/dist/import-venue-media.mjs ./dist/import-venue-media.mjs
+COPY --from=build /app/assets/venue ./assets/venue
+COPY --from=build /app/scripts/venue-media.json ./scripts/venue-media.json
 COPY --from=build /app/drizzle ./drizzle
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh

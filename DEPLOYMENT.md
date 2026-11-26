@@ -103,6 +103,17 @@ fly ssh console -a wesal -t -C "node dist/create-owner.mjs --username owner --na
 
 It asks for the password at a hidden prompt (minimum 8 characters); the password is never an argument, so it stays out of shell history. It refuses if an active owner already exists, so it cannot create a second one. The owner then adds staff from the dashboard. Locally, `npm run owner:create -- --username owner --name Owner` does the same; `npm run db:seed` creates a dev owner with a known password and must never run against production.
 
+## Importing the venue photographs (once)
+
+The image carries the curated set from `assets/venue` and its order in `scripts/venue-media.json`. The import refuses to run when the library already has media, so it can never overwrite the owner's uploads. On a fresh database:
+
+```bash
+fly machine list -a wesal --json
+fly machine exec <machine-id> -a wesal "su-exec node node dist/import-venue-media.mjs"
+```
+
+The first photo in the manifest becomes the hero. To replace an existing library deliberately, run the same command with `--replace`; that deletes the current media rows and files first. Afterwards `curl -s https://<app-url>/api/v1/content` lists the photographs. The owner can also reorder or replace them in the dashboard media editor.
+
 ## Checking a deploy
 
 ```bash

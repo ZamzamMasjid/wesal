@@ -10,6 +10,9 @@ playwright-report
 dist
 docs
 e2e
+mobile
+.playwright-mcp
+public/images
 .env*
 !.env.example
 *.tsbuildinfo
