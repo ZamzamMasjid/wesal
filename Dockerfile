@@ -21,7 +21,7 @@ ENV NEXT_PUBLIC_VENUE_PHONE=$NEXT_PUBLIC_VENUE_PHONE \
     NEXT_PUBLIC_VENUE_WHATSAPP=$NEXT_PUBLIC_VENUE_WHATSAPP
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
-RUN npm run build && npm run build:migrate && npm run build:owner && npm run build:media
+RUN npm run build && npm run build:migrate && npm run build:owner && npm run build:media && npm run build:venue
 
 FROM node:${NODE_VERSION}-alpine AS runtime
 WORKDIR /app
@@ -44,6 +44,8 @@ COPY --from=build /app/dist/create-owner.mjs ./dist/create-owner.mjs
 COPY --from=build /app/dist/import-venue-media.mjs ./dist/import-venue-media.mjs
 COPY --from=build /app/assets/venue ./assets/venue
 COPY --from=build /app/scripts/venue-media.json ./scripts/venue-media.json
+# One-off: seeds the sample occasions and weekly slot pattern.
+COPY --from=build /app/dist/sync-venue-data.mjs ./dist/sync-venue-data.mjs
 COPY --from=build /app/drizzle ./drizzle
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 RUN chmod +x /usr/local/bin/docker-entrypoint.sh

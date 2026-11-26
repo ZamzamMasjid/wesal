@@ -20,6 +20,7 @@
     "build:migrate": "esbuild src/db/migrate.ts --bundle --platform=node --format=esm --target=node24 --external:pg-native --banner:js=\"import{createRequire}from'node:module';const require=createRequire(import.meta.url);\" --outfile=dist/migrate.mjs",
     "build:owner": "esbuild src/auth/create-owner.ts --bundle --platform=node --format=esm --target=node24 --external:pg-native --alias:@=./src --banner:js=\"import{createRequire}from'node:module';const require=createRequire(import.meta.url);\" --outfile=dist/create-owner.mjs",
     "build:media": "esbuild scripts/import-venue-media.ts --bundle --platform=node --format=esm --target=node24 --external:pg-native --alias:@=./src --banner:js=\"import{createRequire}from'node:module';const require=createRequire(import.meta.url);\" --outfile=dist/import-venue-media.mjs",
+    "build:venue": "esbuild scripts/sync-venue-data.ts --bundle --platform=node --format=esm --target=node24 --external:pg-native --alias:@=./src --banner:js=\"import{createRequire}from'node:module';const require=createRequire(import.meta.url);\" --outfile=dist/sync-venue-data.mjs",
     "owner:create": "tsx --env-file-if-exists=.env.local src/auth/create-owner.ts",
     "db:seed": "tsx --env-file-if-exists=.env.local src/db/seed.ts",
     "media:import": "tsx --env-file-if-exists=.env.local scripts/import-venue-media.ts",

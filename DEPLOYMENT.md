@@ -109,10 +109,20 @@ The image carries the curated set from `assets/venue` and its order in `scripts/
 
 ```bash
 fly machine list -a wesal --json
-fly machine exec <machine-id> -a wesal "su-exec node node dist/import-venue-media.mjs"
+fly machine exec <machine-id> -a wesal "sh -c 'cd /app && su-exec node node dist/import-venue-media.mjs'"
 ```
 
 The first photo in the manifest becomes the hero. To replace an existing library deliberately, run the same command with `--replace`; that deletes the current media rows and files first. Afterwards `curl -s https://<app-url>/api/v1/content` lists the photographs. The owner can also reorder or replace them in the dashboard media editor.
+
+## Seeding the opening occasions and weekly pattern (once)
+
+The same image carries the sample occasions and weekly slot pattern from `src/db/venue-data.ts`. The sync inserts only into empty tables, so it never overwrites an owner's prices or schedule:
+
+```bash
+fly machine exec <machine-id> -a wesal "sh -c 'cd /app && su-exec node node dist/sync-venue-data.mjs'"
+```
+
+Verify with `curl -s https://<app-url>/api/v1/occasions`; the calendar then has slots for the week. This script never creates a staff login — use `dist/create-owner.mjs` for the first owner.
 
 ## Checking a deploy
 
