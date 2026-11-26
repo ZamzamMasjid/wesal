@@ -1,12 +1,14 @@
+import { useFonts } from "expo-font";
 import * as Localization from "expo-localization";
 import * as Notifications from "expo-notifications";
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 import { fetchOccasions, type Occasion, type Slot } from "./src/api";
-import { direction } from "./src/components";
+import { Text, direction } from "./src/components";
+import { fontAssets } from "./src/fonts";
 import { text, type Locale } from "./src/i18n";
 import { BookingFormScreen } from "./src/screens/BookingFormScreen";
 import { BookingScreen } from "./src/screens/BookingScreen";
@@ -42,6 +44,7 @@ export default function App() {
   const [route, setRoute] = useState<Route>({ name: "home" });
   const [occasions, setOccasions] = useState<Occasion[]>([]);
   const [lastToken, setLastToken] = useState<string | null>(null);
+  const [fontsLoaded, fontError] = useFonts(fontAssets);
   const t = text(locale);
 
   useEffect(() => {
@@ -66,16 +69,18 @@ export default function App() {
     setRoute({ name: "booking", token: token ?? lastToken });
   }
 
+  if (!fontsLoaded && !fontError) {
+    return <View style={styles.root} />;
+  }
+
   return (
     <SafeAreaProvider>
-      <SafeAreaView style={styles.root}>
+      <SafeAreaView
+        style={[styles.root, { direction: direction(locale) }]}
+        testID="app-root"
+      >
         <StatusBar style="dark" />
-        <View
-          style={[
-            styles.header,
-            { flexDirection: locale === "ar" ? "row-reverse" : "row" },
-          ]}
-        >
+        <View style={styles.header}>
           <Text style={styles.brand}>{t.appName}</Text>
           <Pressable
             accessibilityRole="button"
@@ -87,7 +92,7 @@ export default function App() {
           </Pressable>
         </View>
 
-        <View style={[styles.content, { direction: direction(locale) }]}>
+        <View style={styles.content}>
           <ScrollView
             contentContainerStyle={styles.scroll}
             keyboardShouldPersistTaps="handled"
@@ -140,13 +145,7 @@ export default function App() {
           </ScrollView>
         </View>
 
-        <View
-          accessibilityRole="tablist"
-          style={[
-            styles.tabs,
-            { flexDirection: locale === "ar" ? "row-reverse" : "row" },
-          ]}
-        >
+        <View accessibilityRole="tablist" style={styles.tabs}>
           {(
             [
               ["home", t.home, { name: "home" } as Route],
@@ -182,6 +181,7 @@ export default function App() {
 const styles = StyleSheet.create({
   root: { flex: 1, backgroundColor: colors.bg },
   header: {
+    flexDirection: "row",
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     alignItems: "center",
@@ -202,6 +202,7 @@ const styles = StyleSheet.create({
   content: { flex: 1 },
   scroll: { padding: spacing.md, gap: spacing.md, paddingBottom: spacing.xl },
   tabs: {
+    flexDirection: "row",
     backgroundColor: colors.surface,
     borderTopWidth: StyleSheet.hairlineWidth,
     borderTopColor: colors.border,

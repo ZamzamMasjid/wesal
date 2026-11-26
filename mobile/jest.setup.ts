@@ -35,6 +35,12 @@ jest.mock("expo-localization", () => ({
   getCalendars: jest.fn(() => []),
 }));
 
+jest.mock("expo-font", () => ({
+  useFonts: () => [true, null],
+  loadAsync: jest.fn(async () => undefined),
+  isLoaded: jest.fn(() => true),
+}));
+
 jest.mock("expo-secure-store", () => {
   const store = new Map<string, string>();
   return {

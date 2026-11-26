@@ -1,7 +1,7 @@
 import Constants from "expo-constants";
 import * as Notifications from "expo-notifications";
 import { useEffect, useState } from "react";
-import { Platform, Text, View } from "react-native";
+import { Platform, View } from "react-native";
 
 import {
   fetchReviewQueue,
@@ -19,7 +19,9 @@ import {
   Card,
   Field,
   Heading,
+  Text,
   Title,
+  align,
 } from "../components";
 import { dayLabel, formatTime } from "../dates";
 import type { Locale, Strings } from "../i18n";
@@ -197,10 +199,12 @@ export function StaffScreen({
         ) : (
           queue.map((item) => (
             <View key={item.bookingId} style={{ gap: 2 }}>
-              <Text style={{ color: colors.fg, fontWeight: "600" }}>
+              <Text
+                style={[{ color: colors.fg, fontWeight: "600" }, align(locale)]}
+              >
                 {item.customerName} · {item.bookingId}
               </Text>
-              <Text style={{ color: colors.muted }}>
+              <Text style={[{ color: colors.muted }, align(locale)]}>
                 {dayLabel(item.day, locale)} · {formatTime(item.start, locale)}{" "}
                 – {formatTime(item.end, locale)}
               </Text>

@@ -17,18 +17,29 @@ import {
   Title,
   align,
   direction,
-  row,
+  styles,
 } from "./components";
+import { fontFamilyFor } from "./fonts";
 import { colors } from "./theme";
 
 describe("layout helpers", () => {
-  it("maps the locale to a direction and a row order", () => {
+  it("maps the locale to a direction, a row order and text alignment", () => {
     expect(direction("ar")).toBe("rtl");
     expect(direction("en")).toBe("ltr");
-    expect(row("ar")).toEqual({ flexDirection: "row-reverse" });
-    expect(row("en")).toEqual({ flexDirection: "row" });
+    expect(styles.row).toEqual({ flexDirection: "row" });
     expect(align("ar")).toEqual({ textAlign: "right" });
     expect(align("en")).toEqual({ textAlign: "left" });
+  });
+});
+
+describe("fonts", () => {
+  it("picks the Cairo face that matches the weight", () => {
+    expect(fontFamilyFor(undefined)).toBe("Cairo_400Regular");
+    expect(fontFamilyFor("normal")).toBe("Cairo_400Regular");
+    expect(fontFamilyFor("500")).toBe("Cairo_500Medium");
+    expect(fontFamilyFor(600)).toBe("Cairo_600SemiBold");
+    expect(fontFamilyFor("bold")).toBe("Cairo_700Bold");
+    expect(fontFamilyFor("800")).toBe("Cairo_800ExtraBold");
   });
 });
 
@@ -58,9 +69,18 @@ describe("text primitives", () => {
       </>,
     );
 
-    expect(screen.getByText("title")).toHaveStyle({ textAlign: "right" });
-    expect(screen.getByText("heading")).toHaveStyle({ textAlign: "right" });
-    expect(screen.getByText("body")).toHaveStyle({ textAlign: "right" });
+    expect(screen.getByText("title")).toHaveStyle({
+      textAlign: "right",
+      fontFamily: "Cairo_700Bold",
+    });
+    expect(screen.getByText("heading")).toHaveStyle({
+      textAlign: "right",
+      fontFamily: "Cairo_700Bold",
+    });
+    expect(screen.getByText("body")).toHaveStyle({
+      textAlign: "right",
+      fontFamily: "Cairo_400Regular",
+    });
     expect(screen.getByText("muted")).toHaveStyle({ color: colors.muted });
   });
 

@@ -111,6 +111,18 @@ describe("App", () => {
     expect(screen.getByRole("button", { name: "العربية" })).toBeOnTheScreen();
   });
 
+  it("sets the shell direction from the chosen language", async () => {
+    render(<App />);
+    await screen.findAllByText("وصال");
+
+    expect(screen.getByTestId("app-root")).toHaveStyle({ direction: "rtl" });
+
+    fireEvent.press(screen.getByRole("button", { name: "English" }));
+
+    expect((await screen.findAllByText("Wesal")).length).toBeGreaterThan(0);
+    expect(screen.getByTestId("app-root")).toHaveStyle({ direction: "ltr" });
+  });
+
   it("moves between the home, calendar and booking tabs", async () => {
     render(<App />);
     await screen.findAllByText("وصال");

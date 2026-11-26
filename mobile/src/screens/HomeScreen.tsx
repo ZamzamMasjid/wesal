@@ -1,12 +1,5 @@
 import { useEffect, useState } from "react";
-import {
-  Image,
-  Linking,
-  Pressable,
-  ScrollView,
-  Text,
-  View,
-} from "react-native";
+import { Image, Linking, Pressable, ScrollView, View } from "react-native";
 
 import {
   absoluteUrl,
@@ -22,8 +15,8 @@ import {
   Button,
   Card,
   Heading,
+  Text,
   Title,
-  row,
   styles,
 } from "../components";
 import { type Locale, type Strings } from "../i18n";
@@ -99,7 +92,7 @@ export function HomeScreen({
               {t.bookingId}: {latest.bookingId}
             </Body>
             <Body locale={locale} muted>
-              {t.open} ›
+              {t.open} {locale === "ar" ? "‹" : "›"}
             </Body>
           </Card>
         </Pressable>
@@ -126,8 +119,6 @@ export function HomeScreen({
             horizontal
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={{ gap: spacing.sm }}
-            // In RTL the gallery scrolls from the start side too.
-            style={{ flexDirection: locale === "ar" ? "row-reverse" : "row" }}
           >
             {media.map((item) => (
               <Image
@@ -157,7 +148,7 @@ export function HomeScreen({
             <View
               key={occasion.id}
               style={[
-                row(locale),
+                styles.row,
                 {
                   justifyContent: "space-between",
                   paddingVertical: spacing.xs,
@@ -177,7 +168,7 @@ export function HomeScreen({
         )}
       </Card>
 
-      <View style={[row(locale), { gap: spacing.sm }]}>
+      <View style={[styles.row, { gap: spacing.sm }]}>
         {content?.contactPhone ? (
           <View style={{ flex: 1 }}>
             <Button

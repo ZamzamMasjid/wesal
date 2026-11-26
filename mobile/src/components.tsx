@@ -4,12 +4,14 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Text,
+  Text as NativeText,
   TextInput,
   View,
+  type TextProps,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+import { fontFamilyFor } from "./fonts";
 import type { Locale } from "./i18n";
 import { colors, radius, shadow, spacing, touch } from "./theme";
 
@@ -17,21 +19,35 @@ export function direction(locale: Locale) {
   return locale === "ar" ? "rtl" : "ltr";
 }
 
-export function row(locale: Locale) {
-  return { flexDirection: locale === "ar" ? "row-reverse" : "row" } as const;
-}
-
 export function align(locale: Locale) {
   return { textAlign: locale === "ar" ? "right" : "left" } as const;
+}
+
+/**
+ * Every label in the app goes through here so it picks up Cairo. The static
+ * face is chosen from the style's weight, then the weight is reset so Android
+ * does not fake-bold a face that is already bold.
+ */
+export function Text({ style, ...props }: TextProps) {
+  const weight = StyleSheet.flatten(style)?.fontWeight;
+  return (
+    <NativeText
+      {...props}
+      style={[
+        style,
+        { fontFamily: fontFamilyFor(weight), fontWeight: "normal" },
+      ]}
+    />
+  );
 }
 
 export function Screen({
   children,
   footer,
-  locale,
 }: {
   children: ReactNode;
   footer?: ReactNode;
+  // Kept in the signature so every screen names its direction the same way.
   locale: Locale;
 }) {
   return (
@@ -41,7 +57,7 @@ export function Screen({
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
-        <View style={{ direction: direction(locale) }}>{children}</View>
+        {children}
       </ScrollView>
       {footer}
     </SafeAreaView>
@@ -207,6 +223,7 @@ export function Banner({
 export const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
   content: { padding: spacing.md, gap: spacing.md, paddingBottom: spacing.xl },
+  row: { flexDirection: "row" },
   card: {
     backgroundColor: colors.surface,
     borderRadius: radius.lg,
@@ -241,6 +258,7 @@ export const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     fontSize: 16,
     color: colors.fg,
+    fontFamily: "Cairo_400Regular",
   },
   banner: { borderRadius: radius.md, padding: spacing.md },
   bannerText: { fontSize: 14 },

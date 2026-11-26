@@ -1,6 +1,6 @@
 import * as ImagePicker from "expo-image-picker";
 import { useEffect, useRef, useState } from "react";
-import { Linking, Text, View } from "react-native";
+import { Linking, View } from "react-native";
 
 import {
   fetchBooking,
@@ -15,8 +15,9 @@ import {
   Card,
   Field,
   Heading,
+  Text,
   Title,
-  row,
+  styles,
 } from "../components";
 import { countdown, formatTime, dayLabel, money } from "../dates";
 import type { Locale, Strings } from "../i18n";
@@ -200,7 +201,7 @@ export function BookingScreen({
               {formatTime(booking.start, locale)} –{" "}
               {formatTime(booking.end, locale)}
             </Body>
-            <View style={[row(locale), { justifyContent: "space-between" }]}>
+            <View style={[styles.row, { justifyContent: "space-between" }]}>
               <Text style={{ color: colors.muted }}>{t.status}</Text>
               <Text style={{ color: colors.brand, fontWeight: "700" }}>
                 {t[STATUS_KEY[booking.status]]}
@@ -220,19 +221,19 @@ export function BookingScreen({
 
           <Card>
             <Heading locale={locale}>{t.deposit}</Heading>
-            <View style={[row(locale), { justifyContent: "space-between" }]}>
+            <View style={[styles.row, { justifyContent: "space-between" }]}>
               <Text style={{ color: colors.muted }}>{t.price}</Text>
               <Text style={{ color: colors.fg }}>
                 {money(locale, booking.priceEgp)}
               </Text>
             </View>
-            <View style={[row(locale), { justifyContent: "space-between" }]}>
+            <View style={[styles.row, { justifyContent: "space-between" }]}>
               <Text style={{ color: colors.muted }}>{t.deposit}</Text>
               <Text style={{ color: colors.fg }}>
                 {money(locale, booking.depositEgp)}
               </Text>
             </View>
-            <View style={[row(locale), { justifyContent: "space-between" }]}>
+            <View style={[styles.row, { justifyContent: "space-between" }]}>
               <Text style={{ color: colors.muted }}>{t.remainder}</Text>
               <Text style={{ color: colors.fg }}>
                 {booking.remainderPaid
@@ -247,14 +248,12 @@ export function BookingScreen({
                   <PressableLine
                     label={t.vodafone}
                     value={booking.transfer.vodafoneCashNumber}
-                    locale={locale}
                   />
                 )}
                 {booking.transfer.instapayAddress && (
                   <PressableLine
                     label={t.instapay}
                     value={booking.transfer.instapayAddress}
-                    locale={locale}
                   />
                 )}
               </>
@@ -293,17 +292,9 @@ export function BookingScreen({
   );
 }
 
-function PressableLine({
-  label,
-  value,
-  locale,
-}: {
-  label: string;
-  value: string;
-  locale: Locale;
-}) {
+function PressableLine({ label, value }: { label: string; value: string }) {
   return (
-    <View style={[row(locale), { justifyContent: "space-between" }]}>
+    <View style={[styles.row, { justifyContent: "space-between" }]}>
       <Text style={{ color: colors.muted }}>{label}</Text>
       <Text
         accessibilityRole="button"

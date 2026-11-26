@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import {
   fetchAvailability,
@@ -13,8 +13,9 @@ import {
   Button,
   Card,
   Heading,
+  Text,
   Title,
-  row,
+  align,
   styles,
 } from "../components";
 import {
@@ -88,14 +89,14 @@ export function CalendarScreen({
 
       <View
         style={[
-          row(locale),
+          styles.row,
           { alignItems: "center", justifyContent: "space-between" },
         ]}
       >
         <Button
           locale={locale}
           variant="secondary"
-          label="‹"
+          label={locale === "ar" ? "›" : "‹"}
           onPress={() => setMonth(addMonths(month, -1))}
         />
         <Text style={{ fontSize: 18, fontWeight: "700", color: colors.fg }}>
@@ -104,7 +105,7 @@ export function CalendarScreen({
         <Button
           locale={locale}
           variant="secondary"
-          label="›"
+          label={locale === "ar" ? "‹" : "›"}
           onPress={() => setMonth(addMonths(month, 1))}
         />
       </View>
@@ -134,7 +135,7 @@ export function CalendarScreen({
                     backgroundColor: bookable ? colors.accentSoft : colors.bg,
                     borderRadius: radius.pill,
                     padding: spacing.md,
-                    flexDirection: locale === "ar" ? "row-reverse" : "row",
+                    flexDirection: "row",
                     justifyContent: "space-between",
                     alignItems: "center",
                     minHeight: 48,
@@ -160,7 +161,7 @@ export function CalendarScreen({
         ))
       )}
 
-      <Text style={[styles.body, { color: colors.muted }]}>
+      <Text style={[styles.body, { color: colors.muted }, align(locale)]}>
         {data?.today === today ? "" : `${t.availability} · ${today}`}
       </Text>
     </View>

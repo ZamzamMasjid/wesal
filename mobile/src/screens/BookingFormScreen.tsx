@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Text, View } from "react-native";
+import { View } from "react-native";
 
 import {
   checkVerificationCode,
@@ -14,7 +14,9 @@ import {
   Card,
   Field,
   Heading,
+  Text,
   Title,
+  align,
 } from "../components";
 import { formatTime } from "../dates";
 import type { Locale, Strings } from "../i18n";
@@ -189,7 +191,12 @@ export function BookingFormScreen({
             {t.phoneHint}
           </Body>
 
-          <Text style={{ fontSize: 16, fontWeight: "600", color: colors.fg }}>
+          <Text
+            style={[
+              { fontSize: 16, fontWeight: "600", color: colors.fg },
+              align(locale),
+            ]}
+          >
             {t.chooseOccasion}
           </Text>
           {occasions.map((occasion) => {
